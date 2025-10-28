@@ -1,0 +1,103 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  subtitle      String
+  description   String?  // Removido @db.Text - SQLite no lo necesita
+  price         Float
+  originalPrice Float?
+  
+  // Technical details
+  firmness      String
+  story         String   // Removido @db.Text
+  image         String
+  images        String   // Cambiado a String - almacenaremos JSON
+  
+  // Ratings & reviews
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  
+  // Features - Cambiado a String para almacenar JSON
+  features      String   // JSON string array
+  techFeatures  String   // JSON string array
+  certifications String  // JSON string array
+  
+  // Badges & status
+  badge         String?
+  isNew         Boolean  @default(false)
+  isBestSeller  Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  
+  // Visual
+  gradient      String   @default("from-blue-500 to-cyan-500")
+  
+  // Discount
+  discount      Int?     @default(0)
+  
+  // SEO
+  metaTitle     String?
+  metaDescription String?
+  
+  // Inventory
+  stock         Int      @default(0)
+  sku           String?  @unique
+  
+  // Relations
+  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId    String?
+  
+  reviews       Review[]
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Review data
+  rating      Int      // 1-5
+  title       String
+  comment     String   // Removido @db.Text
+  verified    Boolean  @default(false)
+  
+  // User info
+  userName    String
+  userEmail   String?
+  userLocation String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([productId])
+  @@index([rating])
+}

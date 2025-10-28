@@ -1,0 +1,19 @@
+# robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://descansopremium.es/sitemap.xml
+
+# Disallow admin areas (cuando se creen)
+Disallow: /api/
+Disallow: /admin/
+
+# Allow important pages
+Allow: /
+Allow: /simulador
+Allow: /catalogo
+Allow: /blog
+Allow: /comparador
+Allow: /profesional
+Allow: /contacto
