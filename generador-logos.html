@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Logos TiendaColchon - YouTube</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #2d1b4e 50%, #0a0a0a 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 50px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #c084fc;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(24, 24, 27, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-container {
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 40px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .logo-circular {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7 0%, #db2777 50%, #9333ea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+        }
+
+        .logo-square {
+            width: 200px;
+            height: 200px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #a855f7 0%, #db2777 50%, #9333ea 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+            padding: 24px;
+        }
+
+        .logo-icon {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7 0%, #db2777 50%, #9333ea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+        }
+
+        .logo-horizontal {
+            width: 280px;
+            height: 100px;
+            border-radius: 16px;
+            background: linear-gradient(90deg, #a855f7 0%, #db2777 50%, #9333ea 100%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 24px;
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+        }
+
+        .moon-icon {
+            width: 112px;
+            height: 112px;
+            fill: white;
+        }
+
+        .moon-icon-small {
+            width: 64px;
+            height: 64px;
+            fill: white;
+        }
+
+        .moon-icon-large {
+            width: 128px;
+            height: 128px;
+            fill: white;
+        }
+
+        .moon-icon-medium {
+            width: 56px;
+            height: 56px;
+            fill: white;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            text-align: center;
+        }
+
+        .logo-text-main {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .logo-text-sub {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .logo-text-horizontal {
+            text-align: left;
+        }
+
+        .logo-text-horizontal-main {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .logo-text-horizontal-sub {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .info-box {
+            padding: 16px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 12px;
+        }
+
+        .info-text {
+            color: #c084fc;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .variant-btn {
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .variant-btn.active {
+            background: linear-gradient(to right, #9333ea, #db2777);
+            color: white;
+            box-shadow: 0 8px 24px rgba(147, 51, 234, 0.5);
+        }
+
+        .variant-btn.inactive {
+            background: rgba(39, 39, 42, 0.5);
+            color: #d1d5db;
+            border: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .variant-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .size-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .size-btn {
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .size-btn.active {
+            background: linear-gradient(to right, #059669, #0d9488);
+            color: white;
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+        }
+
+        .size-btn.inactive {
+            background: rgba(39, 39, 42, 0.5);
+            color: #d1d5db;
+            border: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .size-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to right, #9333ea, #db2777);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 20px 60px rgba(147, 51, 234, 0.5);
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .guide {
+            background: linear-gradient(135deg, rgba(76, 29, 149, 0.4), rgba(190, 24, 93, 0.4));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .guide h2 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .guide-card {
+            background: rgba(24, 24, 27, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .guide-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-desc {
+            color: #d1d5db;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .guide-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .guide-list li {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="badge">
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Generador Profesional
+            </div>
+            <h1>Logos para YouTube</h1>
+            <p class="subtitle">Descarga tu logo en alta calidad optimizado para tu canal</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>
+                    <svg style="width: 20px; height: 20px; color: #c084fc;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    Vista Previa
+                </h2>
+                <div class="preview-container" id="previewContainer">
+                    <div class="logo-circular" id="logoCircular">
+                        <svg class="moon-icon" viewBox="0 0 24 24">
+                            <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z"/>
+                        </svg>
+                    </div>
+
+                    <div class="logo-square hidden" id="logoSquare">
+                        <svg class="moon-icon-small" viewBox="0 0 24 24">
+                            <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z"/>
+                        </svg>
+                        <div class="logo-text">
+                            <div class="logo-text-main">TiendaColchon</div>
+                            <div class="logo-text-sub">Descanso Premium</div>
+                        </div>
+                    </div>
+
+                    <div class="logo-icon hidden" id="logoIcon">
+                        <svg class="moon-icon-large" viewBox="0 0 24 24">
+                            <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z"/>
+                        </svg>
+                    </div>
+
+                    <div class="logo-horizontal hidden" id="logoHorizontal">
+                        <svg class="moon-icon-medium" viewBox="0 0 24 24">
+                            <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z"/>
+                        </svg>
+                        <div class="logo-text-horizontal">
+                            <div class="logo-text-horizontal-main">TiendaColchon</div>
+                            <div class="logo-text-horizontal-sub">Descanso Premium</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <p class="info-text" id="variantDescription">Perfecto para avatar de canal</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="card" style="margin-bottom: 24px;">
+                    <h2>
+                        <svg style="width: 20px; height: 20px; color: #c084fc;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                        </svg>
+                        Tipo de Logo
+                    </h2>
+                    <div class="button-grid">
+                        <button class="variant-btn active" data-variant="circular">Logo Circular</button>
+                        <button class="variant-btn inactive" data-variant="square">Logo Cuadrado</button>
+                        <button class="variant-btn inactive" data-variant="icon">Solo Ícono</button>
+                        <button class="variant-btn inactive" data-variant="horizontal">Logo Horizontal</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h2>
+                        <svg style="width: 20px; height: 20px; color: #c084fc;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                        </svg>
+                        Calidad de Exportación
+                    </h2>
+                    <div class="size-buttons">
+                        <button class="size-btn inactive" data-size="800">Mínimo YouTube (800x800px)</button>
+                        <button class="size-btn active" data-size="2048">Alta calidad (2048x2048px)</button>
+                        <button class="size-btn inactive" data-size="4096">Máxima calidad (4096x4096px)</button>
+                    </div>
+                </div>
+
+                <button class="download-btn" id="downloadBtn">
+                    <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Descargar Logo PNG
+                </button>
+            </div>
+        </div>
+
+        <div class="guide">
+            <h2>
+                <svg style="width: 24px; height: 24px; color: #c084fc;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Guía Rápida de YouTube
+            </h2>
+            <div class="guide-grid">
+                <div class="guide-card">
+                    <div class="guide-title" style="color: #c084fc;">
+                        <svg style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        Avatar del Canal
+                    </div>
+                    <p class="guide-desc">Usa <strong>Logo Circular o Solo Ícono</strong></p>
+                    <ul class="guide-list">
+                        <li>• Tamaño: 800x800px (mínimo)</li>
+                        <li>• Formato: PNG con transparencia</li>
+                        <li>• Se verá en círculo automáticamente</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-title" style="color: #10b981;">
+                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+                        </svg>
+                        Banner del Canal
+                    </div>
+                    <p class="guide-desc">Usa <strong>Logo Horizontal</strong></p>
+                    <ul class="guide-list">
+                        <li>• Tamaño banner: 2560x1440px</li>
+                        <li>• Área segura: centro 1546x423px</li>
+                        <li>• Combina el logo con tu mensaje</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-title" style="color: #f472b6;">
+                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Miniaturas
+                    </div>
+                    <p class="guide-desc">Usa <strong>Logo Cuadrado o Circular</strong></p>
+                    <ul class="guide-list">
+                        <li>• Tamaño: 1280x720px</li>
+                        <li>• Coloca el logo en esquina</li>
+                        <li>• Mantén buena visibilidad</li>
+                    </ul>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-title" style="color: #60a5fa;">
+                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                        Consejos Pro
+                    </div>
+                    <ul class="guide-list">
+                        <li>• Usa 2048px para mejor calidad</li>
+                        <li>• Prueba en diferentes tamaños</li>
+                        <li>• Mantén consistencia de marca</li>
+                        <li>• El circular es más versátil</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Todos los logos incluyen fondo transparente y máxima calidad de exportación</p>
+        </div>
+    </div>
+
+    <script>
+        let currentVariant = 'circular';
+        let currentSize = 2048;
+
+        const variants = {
+            circular: { desc: 'Perfecto para avatar de canal' },
+            square: { desc: 'Con texto optimizado' },
+            icon: { desc: 'Minimalista y versátil' },
+            horizontal: { desc: 'Para banners y watermarks' }
+        };
+
+        // Event listeners para botones de variante
+        document.querySelectorAll('.variant-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const variant = this.getAttribute('data-variant');
+                changeVariant(variant);
+            });
+        });
+
+        // Event listeners para botones de tamaño
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const size = parseInt(this.getAttribute('data-size'));
+                changeSize(size);
+            });
+        });
+
+        // Event listener para botón de descarga
+        document.getElementById('downloadBtn').addEventListener('click', downloadLogo);
+
+        function changeVariant(variant) {
+            currentVariant = variant;
+            
+            document.querySelectorAll('[id^="logo"]').forEach(el => el.classList.add('hidden'));
+            
+            const logoId = 'logo' + variant.charAt(0).toUpperCase() + variant.slice(1);
+            document.getElementById(logoId).classList.remove('hidden');
+            
+            document.getElementById('variantDescription').textContent = variants[variant].desc;
+            
+            document.querySelectorAll('.variant-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
+            });
+            
+            document.querySelectorAll('.variant-btn').forEach(btn => {
+                if (btn.getAttribute('data-variant') === variant) {
+                    btn.classList.remove('inactive');
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function changeSize(size) {
+            currentSize = size;
+            
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
+            });
+            
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                if (parseInt(btn.getAttribute('data-size')) === size) {
+                    btn.classList.remove('inactive');
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function downloadLogo() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const dpr = 2;
+            canvas.width = currentSize * dpr;
+            canvas.height = currentSize * dpr;
+            ctx.scale(dpr, dpr);
+
+            const size = currentSize;
+            const center = size / 2;
+            const padding = size * 0.1;
+
+            ctx.clearRect(0, 0, size, size);
+
+            if (currentVariant === 'circular') {
+                drawCircularLogo(ctx, center, size, padding);
+            } else if (currentVariant === 'square') {
+                drawSquareLogo(ctx, center, size, padding);
+            } else if (currentVariant === 'icon') {
+                drawIconLogo(ctx, center, size, padding);
+            } else if (currentVariant === 'horizontal') {
+                drawHorizontalLogo(ctx, center, size, padding);
+            }
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tiendacolchon-logo-${currentVariant}-${currentSize}px.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png', 1.0);
+        }
+
+        function drawCircularLogo(ctx, center, size, padding) {
+            const gradient = ctx.createRadialGradient(center, center, 0, center, center, center - padding);
+            gradient.addColorStop(0, '#a855f7');
+            gradient.addColorStop(0.5, '#db2777');
+            gradient.addColorStop(1, '#9333ea');
+            
+            ctx.beginPath();
+            ctx.arc(center, center, center - padding, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            drawMoon(ctx, center, center, size * 0.35);
+        }
+
+        function drawSquareLogo(ctx, center, size, padding) {
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#a855f7');
+            gradient.addColorStop(0.5, '#db2777');
+            gradient.addColorStop(1, '#9333ea');
+
+            const borderRadius = size * 0.15;
+            roundRect(ctx, padding, padding, size - padding * 2, size - padding * 2, borderRadius);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            const iconY = center - size * 0.15;
+            drawMoon(ctx, center, iconY, size * 0.18);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            ctx.font = `bold ${size * 0.11}px Arial, sans-serif`;
+            ctx.fillText('TiendaColchon', center, center + size * 0.15);
+            
+            ctx.font = `600 ${size * 0.04}px Arial, sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillText('DESCANSO PREMIUM', center, center + size * 0.25);
+        }
+
+        function drawIconLogo(ctx, center, size, padding) {
+            const gradient = ctx.createRadialGradient(center, center, 0, center, center, center - padding);
+            gradient.addColorStop(0, '#a855f7');
+            gradient.addColorStop(0.5, '#db2777');
+            gradient.addColorStop(1, '#9333ea');
+            
+            ctx.beginPath();
+            ctx.arc(center, center, center - padding, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            drawMoon(ctx, center, center, size * 0.4);
+        }
+
+        function drawHorizontalLogo(ctx, center, size, padding) {
+            const width = size;
+            const height = size * 0.35;
+            const y = (size - height) / 2;
+            
+            const gradient = ctx.createLinearGradient(0, y, width, y + height);
+            gradient.addColorStop(0, '#a855f7');
+            gradient.addColorStop(0.5, '#db2777');
+            gradient.addColorStop(1, '#9333ea');
+
+            const borderRadius = height * 0.3;
+            roundRect(ctx, padding, y, width - padding * 2, height, borderRadius);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            const iconX = padding + height * 0.5;
+            const iconY = center;
+            drawMoon(ctx, iconX, iconY, height * 0.35);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            
+            const textX = iconX + height * 0.5;
+            ctx.font = `bold ${height * 0.35}px Arial, sans-serif`;
+            ctx.fillText('TiendaColchon', textX, iconY - height * 0.08);
+            
+            ctx.font = `600 ${height * 0.15}px Arial, sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fillText('DESCANSO PREMIUM', textX, iconY + height * 0.15);
+        }
+
+        function drawMoon(ctx, x, y, radius) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            
+            const cutRadius = radius * 0.7;
+            const cutX = radius * 0.3;
+            
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(cutX, 0, cutRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+    </script>
+</body>
+</html>

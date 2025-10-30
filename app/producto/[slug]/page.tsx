@@ -9,9 +9,9 @@ import ProductLoading from './product-loading'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }): Promise<Metadata> {
-  const { slug } = await params
+  const { slug } = params
   const product = await getProductBySlug(slug)
 
   if (!product) {
@@ -90,9 +90,9 @@ function normalizeStringArray(value: unknown): string[] {
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }) {
-  const { slug } = await params
+  const { slug } = params
   const product = await getProductBySlug(slug)
   
   if (!product) {
