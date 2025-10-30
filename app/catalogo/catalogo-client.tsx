@@ -524,8 +524,7 @@ function EmptyState({ onClearFilters }: { onClearFilters: () => void }) {
 function TrustSection() {
   const features = [
     { icon: Truck, title: 'Envío Gratis Express', desc: 'Recíbelo en 24-48h' },
-    { icon: Shield, title: 'Garantía 10 Años', desc: 'Calidad certificada' },
-    { icon: Package, title: '100 Noches Prueba', desc: 'Devolución gratuita' },
+    { icon: Shield, title: 'Garantía 3 Años', desc: 'Calidad certificada' },
     { icon: BadgeCheck, title: 'Opiniones Verificadas', desc: '+50K clientes' },
     { icon: Lock, title: 'Pago Seguro', desc: 'Encriptación SSL' },
     { icon: Globe, title: 'Certificado Europeo', desc: 'Normativas CE' }

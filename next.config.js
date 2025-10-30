@@ -2,8 +2,7 @@
 const nextConfig = {
   // Optimizaciones de producción
   reactStrictMode: true,
-  swcMinify: true,
-  
+
   // Configuración de imágenes
   images: {
     remotePatterns: [
@@ -11,11 +10,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      // Añade aquí otros dominios de imágenes que uses
-      // {
-      //   protocol: 'https',
-      //   hostname: 'tu-cdn.com',
-      // },
     ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -29,30 +23,12 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
-          }
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
     ]
@@ -66,10 +42,7 @@ const nextConfig = {
   // Configuración de compresión
   compress: true,
 
-  // Optimización de fonts
-  optimizeFonts: true,
-
-  // Experimental features (opcional)
+  // Experimental features
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react'],
   },

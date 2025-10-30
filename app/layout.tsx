@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     template: '%s | Tienda Colchón'
   },
   // ✅ MEJORA: Descripción optimizada con long-tail keywords y CTA
-  description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 24-48h ✓ 100 noches de prueba ✓ 10 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
+  description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 24-48h ✓ Tu descanso asegurado ✓ 3 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
   applicationName: 'Tienda Colchón',
   
   // ✅ SEO CRÍTICO: Keywords estratégicas (búsquedas reales de usuarios)
@@ -76,8 +76,8 @@ export const metadata: Metadata = {
     
     // Beneficios
     'envío gratis colchones',
-    '100 noches prueba',
-    'colchón garantía 10 años',
+    'tu descanso asegurado',
+    'colchón garantía 3 años',
     'financiación colchones'
   ],
   
@@ -97,8 +97,8 @@ export const metadata: Metadata = {
     locale: 'es_ES',
     url: 'https://tiendacolchon.es',
     siteName: 'Tienda Colchón',
-    title: 'Colchones Viscoelásticos Premium | Envío Gratis 24h y 100 Noches de Prueba',
-    description: '🛏️ +50.000 clientes duermen mejor. Colchones premium con tecnología adaptativa. ✓ Envío gratis ✓ Sin riesgo ✓ Garantía 10 años',
+    title: 'Colchones Viscoelásticos Premium | Envío Gratis 24h y Tu descanso asegurado',
+    description: '🛏️ +50.000 clientes duermen mejor. Colchones premium con tecnología adaptativa. ✓ Envío gratis ✓ Sin riesgo ✓ Garantía 3 años',
     images: [
       {
         url: 'https://tiendacolchon.es/og-image-home.jpg',
@@ -123,7 +123,7 @@ export const metadata: Metadata = {
     site: '@tiendacolchon',
     creator: '@tiendacolchon',
     title: '🛏️ Colchones Viscoelásticos Premium | Envío Gratis 24h',
-    description: '+50k clientes satisfechos. 100 noches de prueba sin compromiso. Encuentra tu colchón perfecto hoy.',
+    description: '+50k clientes satisfechos. Tu descanso asegurado. Encuentra tu colchón perfecto hoy.',
     images: {
       url: 'https://tiendacolchon.es/twitter-image.jpg',
       alt: 'Tienda Colchón - Colchones Premium',
@@ -320,7 +320,7 @@ const jsonLd = {
       isPartOf: { '@id': 'https://tiendacolchon.es/#website' },
       about: { '@id': 'https://tiendacolchon.es/#organization' },
       primaryImageOfPage: { '@id': 'https://tiendacolchon.es/#logo' },
-      description: 'Compra colchones viscoelásticos premium en España. Envío gratis 24-48h, 100 noches de prueba y 10 años de garantía.',
+      description: 'Compra colchones viscoelásticos premium en España. Envío gratis 24-48h, Tu descanso asegurado y 3 años de garantía.',
       inLanguage: 'es-ES',
     },
     
@@ -405,10 +405,10 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Puedo probar el colchón antes de comprarlo definitivamente?',
+      name: '¿Por qué confiar en la calidad de nuestros colchones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, ofrecemos 100 noches de prueba. Si no quedas satisfecho, recogemos el colchón gratis y te devolvemos el 100% de tu dinero.'
+        text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.'
       }
     },
     {

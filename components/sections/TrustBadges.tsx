@@ -32,11 +32,6 @@ export default function TrustBadges() {
 
 const badges = [
   {
-    icon: Shield,
-    title: '100 Noches',
-    description: 'Garantía de prueba',
-  },
-  {
     icon: Truck,
     title: 'Envío Gratis',
     description: 'En 24-48h',

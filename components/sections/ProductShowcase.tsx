@@ -240,7 +240,7 @@ export default function ProductShowcase() {
           </Link>
 
           <p className="text-sm text-gray-500 mt-4">
-            🚚 Envío gratis 24-48h • 💤 100 noches prueba • 🛡️ 10 años garantía
+            🚚 Envío gratis 24-48h • 💤 Certificados de calidad europea • 🛡️ 3 años garantía
           </p>
         </motion.div>
       </div>

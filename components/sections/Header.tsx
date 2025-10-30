@@ -70,7 +70,6 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cartCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
-  const [currentPath, setCurrentPath] = useState('/')
 
   const handleScroll = useCallback(() => {
     const isScrolled = window.scrollY > 20
@@ -79,10 +78,6 @@ export default function Header() {
 
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), [])
   const closeMenu = useCallback(() => setIsMenuOpen(false), [])
-
-  useEffect(() => {
-    setCurrentPath(window.location.pathname)
-  }, [])
 
   useEffect(() => {
     let ticking = false
@@ -152,7 +147,7 @@ export default function Header() {
             
             <div className="flex items-center gap-4 ml-auto">
               <Link href="/prueba-100-noches" className="text-gray-400 hover:text-purple-300 transition-colors font-medium text-xs hidden lg:block rounded px-2 py-1">
-                Prueba 100 noches
+                Tu descanso asegurado
               </Link>
               <a href={`tel:${SITE_CONFIG.phone}`} className="flex items-center gap-1.5 text-gray-300 hover:text-purple-300 transition-colors font-semibold rounded px-2 py-1">
                 <Icons.Phone className="w-3.5 h-3.5" />
@@ -234,121 +229,161 @@ export default function Header() {
                 <span>Test Gratis</span>
               </Link>
 
-              <button onClick={toggleMenu} className="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-gray-900/50 border border-gray-800/50 transition-all" aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
+              <button 
+                onClick={toggleMenu} 
+                className="lg:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-gray-900/50 border border-gray-800/50 transition-all relative z-[60]" 
+                aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              >
                 {isMenuOpen ? <Icons.X className="w-5 h-5 text-gray-300" /> : <Icons.Menu className="w-5 h-5 text-gray-300" />}
               </button>
             </div>
           </div>
         </nav>
-
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <>
-            <div onClick={closeMenu} className="fixed inset-0 bg-black/80 backdrop-blur-sm lg:hidden z-40 animate-fade-in" />
-
-            <aside className="fixed inset-0 lg:hidden z-50 flex flex-col animate-slide-up">
-              {/* Menu header */}
-              <div className="flex-shrink-0 bg-zinc-950/98 backdrop-blur-xl border-b border-purple-900/20">
-                <div className="container mx-auto px-4">
-                  <div className="flex items-center justify-between h-20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                        <Icons.Moon className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-white">TiendaColchon</div>
-                        <div className="text-[9px] text-gray-500 uppercase tracking-wider">Menú</div>
-                      </div>
-                    </div>
-                    <button onClick={closeMenu} className="w-10 h-10 rounded-xl bg-gray-900/50 border border-gray-800/50 flex items-center justify-center">
-                      <Icons.X className="w-5 h-5 text-gray-300" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Scrollable content */}
-              <div className="flex-1 overflow-y-auto bg-zinc-950">
-                <div className="container mx-auto px-4 py-6 pb-safe">
-                  {/* Quick CTAs */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <Link href="/simulador" onClick={closeMenu} className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform">
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-600" />
-                      <div className="relative flex flex-col items-center justify-center p-6 text-white">
-                        <Icons.Sparkles className="w-8 h-8 mb-3" />
-                        <span className="text-base font-bold">Test Gratis</span>
-                        <span className="text-xs text-purple-100 mt-1">Con IA</span>
-                      </div>
-                    </Link>
-                    
-                    <a href={`tel:${SITE_CONFIG.phone}`} className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform">
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600" />
-                      <div className="relative flex flex-col items-center justify-center p-6 text-white">
-                        <Icons.Phone className="w-8 h-8 mb-3" />
-                        <span className="text-base font-bold">Llamar</span>
-                        <span className="text-xs text-emerald-100 mt-1">Gratis</span>
-                      </div>
-                    </a>
-                  </div>
-
-                  {/* Trust badges */}
-                  <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-purple-950/40 to-pink-950/40 rounded-2xl border border-purple-900/30">
-                    <div className="flex flex-col items-center text-center">
-                      <Icons.Star className="w-5 h-5 text-amber-400 mb-2" filled />
-                      <div className="text-sm font-bold text-white">{SITE_CONFIG.rating}/5</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">+{SITE_CONFIG.reviewCount}</div>
-                    </div>
-                    <div className="flex flex-col items-center text-center border-x border-purple-900/30">
-                      <Icons.Shield className="w-5 h-5 text-emerald-400 mb-2" />
-                      <div className="text-sm font-bold text-white">{SITE_CONFIG.warrantyYears} años</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">Garantía</div>
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <Icons.Clock className="w-5 h-5 text-blue-400 mb-2" />
-                      <div className="text-sm font-bold text-white">{SITE_CONFIG.shippingTime}</div>
-                      <div className="text-[10px] text-gray-400 mt-0.5">Envío</div>
-                    </div>
-                  </div>
-
-                  {/* Navigation */}
-                  <nav className="mb-6">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Navegación</div>
-                    <ul className="space-y-2">
-                      {navLinks.map((link) => (
-                        <li key={link.href}>
-                          <Link href={link.href} onClick={closeMenu} className={`flex items-center justify-between p-4 rounded-xl font-semibold transition-all active:scale-98 ${
-                            link.featured ? 'bg-gradient-to-r from-purple-950/60 to-pink-950/60 text-white border border-purple-500/30' : 'text-gray-300 bg-gray-900/30 border border-gray-800/50'
-                          }`}>
-                            <span className="text-base">{link.label}</span>
-                            {link.featured && (
-                              <span className="px-2.5 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[9px] font-bold rounded-full uppercase">Popular</span>
-                            )}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </nav>
-
-                  {/* Account links */}
-                  <div className="border-t border-gray-800/50 pt-6">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Mi cuenta</div>
-                    <div className="space-y-2">
-                      <Link href="/mi-cuenta" onClick={closeMenu} className="flex items-center gap-3 p-4 text-gray-300 bg-gray-900/30 border border-gray-800/50 rounded-xl transition-all active:scale-98">
-                        <Icons.User className="w-5 h-5" />
-                        <span>Mi cuenta</span>
-                      </Link>
-                      <Link href="/prueba-100-noches" onClick={closeMenu} className="flex items-center gap-3 p-4 text-gray-300 bg-gray-900/30 border border-gray-800/50 rounded-xl transition-all active:scale-98">
-                        <Icons.Shield className="w-5 h-5" />
-                        <span>Prueba 100 noches</span>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </aside>
-          </>
-        )}
       </header>
+
+      {/* ============================================================ */}
+      {/* MOBILE MENU - Z-INDEX CORREGIDO */}
+      {/* ============================================================ */}
+      {isMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            onClick={closeMenu} 
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm lg:hidden animate-fade-in"
+            style={{ zIndex: 9998 }}
+          />
+
+          {/* Menu Panel */}
+          <div 
+            className="fixed inset-0 lg:hidden flex flex-col animate-slide-up"
+            style={{ zIndex: 9999 }}
+          >
+            {/* Menu header */}
+            <div className="flex-shrink-0 bg-zinc-950/98 backdrop-blur-xl border-b border-purple-900/20">
+              <div className="container mx-auto px-4">
+                <div className="flex items-center justify-between h-20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                      <Icons.Moon className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-white">TiendaColchon</div>
+                      <div className="text-[9px] text-gray-500 uppercase tracking-wider">Menú</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={closeMenu} 
+                    className="w-10 h-10 rounded-xl bg-gray-900/50 border border-gray-800/50 flex items-center justify-center"
+                    aria-label="Cerrar menú"
+                  >
+                    <Icons.X className="w-5 h-5 text-gray-300" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto bg-zinc-950">
+              <div className="container mx-auto px-4 py-6 pb-safe">
+                {/* Quick CTAs */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <Link 
+                    href="/simulador" 
+                    onClick={closeMenu} 
+                    className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-pink-600" />
+                    <div className="relative flex flex-col items-center justify-center p-6 text-white">
+                      <Icons.Sparkles className="w-8 h-8 mb-3" />
+                      <span className="text-base font-bold">Test Gratis</span>
+                      <span className="text-xs text-purple-100 mt-1">Con IA</span>
+                    </div>
+                  </Link>
+                  
+                  <a 
+                    href={`tel:${SITE_CONFIG.phone}`} 
+                    className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600" />
+                    <div className="relative flex flex-col items-center justify-center p-6 text-white">
+                      <Icons.Phone className="w-8 h-8 mb-3" />
+                      <span className="text-base font-bold">Llamar</span>
+                      <span className="text-xs text-emerald-100 mt-1">Gratis</span>
+                    </div>
+                  </a>
+                </div>
+
+                {/* Trust badges */}
+                <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-purple-950/40 to-pink-950/40 rounded-2xl border border-purple-900/30">
+                  <div className="flex flex-col items-center text-center">
+                    <Icons.Star className="w-5 h-5 text-amber-400 mb-2" filled />
+                    <div className="text-sm font-bold text-white">{SITE_CONFIG.rating}/5</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">+{SITE_CONFIG.reviewCount}</div>
+                  </div>
+                  <div className="flex flex-col items-center text-center border-x border-purple-900/30">
+                    <Icons.Shield className="w-5 h-5 text-emerald-400 mb-2" />
+                    <div className="text-sm font-bold text-white">{SITE_CONFIG.warrantyYears} años</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">Garantía</div>
+                  </div>
+                  <div className="flex flex-col items-center text-center">
+                    <Icons.Clock className="w-5 h-5 text-blue-400 mb-2" />
+                    <div className="text-sm font-bold text-white">{SITE_CONFIG.shippingTime}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">Envío</div>
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <nav className="mb-6">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Navegación</div>
+                  <ul className="space-y-2">
+                    {navLinks.map((link) => (
+                      <li key={link.href}>
+                        <Link 
+                          href={link.href} 
+                          onClick={closeMenu} 
+                          className={`flex items-center justify-between p-4 rounded-xl font-semibold transition-all active:scale-98 ${
+                            link.featured 
+                              ? 'bg-gradient-to-r from-purple-950/60 to-pink-950/60 text-white border border-purple-500/30' 
+                              : 'text-gray-300 bg-gray-900/30 border border-gray-800/50'
+                          }`}
+                        >
+                          <span className="text-base">{link.label}</span>
+                          {link.featured && (
+                            <span className="px-2.5 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[9px] font-bold rounded-full uppercase">Popular</span>
+                          )}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+
+                {/* Account links */}
+                <div className="border-t border-gray-800/50 pt-6">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Mi cuenta</div>
+                  <div className="space-y-2">
+                    <Link 
+                      href="/mi-cuenta" 
+                      onClick={closeMenu} 
+                      className="flex items-center gap-3 p-4 text-gray-300 bg-gray-900/30 border border-gray-800/50 rounded-xl transition-all active:scale-98"
+                    >
+                      <Icons.User className="w-5 h-5" />
+                      <span>Mi cuenta</span>
+                    </Link>
+                    <Link 
+                      href="/prueba-100-noches" 
+                      onClick={closeMenu} 
+                      className="flex items-center gap-3 p-4 text-gray-300 bg-gray-900/30 border border-gray-800/50 rounded-xl transition-all active:scale-98"
+                    >
+                      <Icons.Shield className="w-5 h-5" />
+                      <span>Certificados de calidad</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* CSS Animations */}
       <style jsx>{`
@@ -380,7 +415,7 @@ export default function Header() {
           .animate-pulse-glow,
           .animate-scale-in,
           .animate-fade-in,
-          .animate-slide-up { animation: none; }
+          .animate-slide-up { animation: none !important; }
         }
       `}</style>
     </>

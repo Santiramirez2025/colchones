@@ -7,7 +7,7 @@ import { Sparkles, Zap } from 'lucide-react'
 export const metadata = {
   title: 'Colchones Premium 2025 | Desde 39€/mes - Envío Gratis',
   description:
-    'Descubre nuestra colección exclusiva de colchones premium con hasta -50%. Tecnología Multisac®, 1.800 muelles. 100 noches de prueba gratis.',
+    'Descubre nuestra colección exclusiva de colchones premium con hasta -50%. Tecnología Multisac®, 1.800 muelles. Certificados de calidad europea.',
 }
 
 export const revalidate = 3600

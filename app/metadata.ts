@@ -300,10 +300,10 @@ export const structuredData = {
         },
         {
           '@type': 'Question',
-          name: '¿Puedo probar el colchón antes de comprarlo?',
+          name: '¿Por qué confiar en la calidad de nuestros colchones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sí, ofrecemos 100 noches de prueba sin riesgo. Si no estás satisfecho, te lo recogemos gratis y te devolvemos el 100% del importe.',
+            text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.',
           },
         },
         {
@@ -348,7 +348,7 @@ export function generateProductMetadata(product: {
 
   return {
     title: `${product.name} - Comprar Online`,
-    description: `${product.description} Precio: ${product.price}€. Envío gratis. Garantía 10 años. 100 noches de prueba.`,
+    description: `${product.description} Precio: ${product.price}€. Envío gratis. Garantía 3 años. Certificados de calidad europea.`,
     openGraph: {
       title: product.name,
       description: product.description,

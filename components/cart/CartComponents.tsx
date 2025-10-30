@@ -62,17 +62,10 @@ export function TrustBadges() {
   const badges = [
     {
       icon: Shield,
-      title: 'Garantía 10 años',
+      title: 'Garantía 3 años',
       description: 'Respaldo total',
       color: 'text-blue-600',
       bg: 'bg-blue-50'
-    },
-    {
-      icon: Package,
-      title: 'Devolución gratis',
-      description: '100 noches prueba',
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50'
     },
     {
       icon: Award,

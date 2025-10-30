@@ -278,10 +278,10 @@ const faqs = [
   },
   {
     question: '¿Puedo devolver el colchón?',
-    answer: 'Sí, tienes 100 noches de prueba para devolverlo sin coste.',
+    answer: 'Sí, aceptamos devoluciones si el producto presenta algún defecto o no cumple con las especificaciones anunciadas. Queremos que estés 100% satisfecho con tu compra.',
   },
   {
     question: '¿Ofrecen garantía?',
-    answer: 'Todos nuestros productos tienen 10 años de garantía.',
+    answer: 'Todos nuestros productos tienen 3 años de garantía.',
   },
 ]

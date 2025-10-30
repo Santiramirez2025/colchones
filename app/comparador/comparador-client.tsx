@@ -557,11 +557,11 @@ export default function ComparadorClient({ products }: ComparadorClientProps) {
               gradient: 'from-emerald-500 to-green-600'
             },
             {
-              icon: Moon,
-              title: '100 noches de prueba',
-              description: 'Prueba tu colchón sin compromiso. Devolución gratuita si no estás satisfecho',
-              gradient: 'from-blue-500 to-indigo-600'
-            },
+                icon: Moon,
+                title: 'Confort garantizado',
+                description: 'Diseñado con materiales certificados y testados para ofrecer el mejor descanso desde la primera noche',
+                gradient: 'from-blue-500 to-indigo-600'
+              },
             {
               icon: Heart,
               title: '98% satisfacción',
@@ -711,13 +711,6 @@ const comparisonFeatures = [
     icon: Shield,
     gradient: 'from-emerald-500 to-green-600',
     description: 'Años de cobertura contra defectos de fabricación'
-  },
-  { 
-    name: 'Noches de prueba', 
-    key: 'trialNights',
-    icon: Moon,
-    gradient: 'from-indigo-500 to-purple-600',
-    description: 'Número de noches para probar sin compromiso con devolución gratuita'
   },
   { 
     name: 'Valoración', 

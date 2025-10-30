@@ -2,12 +2,11 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, useTransform, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Brain, Sparkles } from 'lucide-react'
+import { motion, useTransform } from 'framer-motion'
+import { ArrowRight, Brain, Sparkles, Star, Award } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import { FloatingParticles } from './FloatingParticles'
-import { PriceDisplay } from '../PriceDisplay'
-import { HERO_PRODUCT, SOCIAL_PROOF } from '@/lib/product-data'
+import { HERO_PRODUCT } from '@/lib/product-data'
 import { useMousePosition } from '@/lib/hooks/useMousePosition'
 import { useScrollProgress } from '@/lib/hooks/useScrollProgress'
 
@@ -82,27 +81,21 @@ export function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
           {/* Left Column */}
           <div className="text-left space-y-8">
-            {/* Social proof badges */}
+            
+            {/* Social proof badge - ÚNICO Y POTENTE */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="flex flex-col sm:flex-row gap-3"
+              className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 backdrop-blur-xl border border-amber-500/20 px-4 py-2.5 rounded-full"
             >
-              {SOCIAL_PROOF.badges.map((badge, i) => (
-                <div 
-                  key={i}
-                  className={`inline-flex items-center gap-3 bg-gradient-to-r ${badge.gradient} backdrop-blur-xl border ${badge.border} px-5 py-3 rounded-2xl`}
-                >
-                  <badge.icon className={`w-5 h-5 ${badge.iconColor} ${badge.label.includes('4.8') ? 'fill-current' : ''}`} />
-                  <span className="text-white/90 font-bold text-sm">
-                    {badge.label} {badge.sublabel && `· ${badge.sublabel}`}
-                  </span>
-                </div>
-              ))}
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
+              <span className="text-white/90 font-bold text-sm">
+                +15.000 personas duermen mejor
+              </span>
             </motion.div>
 
-            {/* Main headline */}
+            {/* Main headline - SIN CAMBIOS (ya es perfecto) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -115,7 +108,7 @@ export function HeroSection() {
                 </span>
                 <span className="block relative">
                   <span className="relative z-10 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                    despierta renovado
+                    despierta invencible
                   </span>
                   {!prefersReducedMotion && (
                     <motion.div
@@ -130,83 +123,72 @@ export function HeroSection() {
               </h1>
             </motion.div>
 
-            {/* Subtitle with price */}
+            {/* Subtitle - ULTRA SIMPLIFICADO */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <p className="text-xl md:text-2xl text-zinc-300 leading-relaxed">
-                {HERO_PRODUCT.description}
+              <p className="text-2xl md:text-3xl text-zinc-300 leading-relaxed font-light">
+                Tu cuerpo se adapta al colchón.<br />
+                <span className="text-white font-medium">Nosotros lo hacemos al revés.</span>
               </p>
 
-              <PriceDisplay {...HERO_PRODUCT.price} />
-              
-              {/* Quick specs */}
-              <div className="flex flex-wrap gap-3 pt-2">
-                {HERO_PRODUCT.quickSpecs.map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6 + i * 0.1 }}
-                    className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-xl"
-                  >
-                    <item.icon className="w-4 h-4 text-violet-400" aria-hidden="true" />
-                    <span className="text-zinc-300 text-sm font-medium">{item.text}</span>
-                  </motion.div>
-                ))}
+              {/* Precio - GRANDE Y CLARO */}
+              <div className="flex items-center gap-6">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-6xl md:text-7xl font-black text-white tracking-tight">449€</span>
+                  <div className="flex flex-col">
+                    <span className="text-xl text-zinc-500 line-through">799€</span>
+                    <span className="text-sm font-bold text-amber-400">-44% HOY</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - MÁS ESPACIO, MENOS TEXTO */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 pt-4"
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 pt-6"
             >
               <Link 
                 href="/simulador"
-                className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] hover:bg-[position:100%_0] text-white px-8 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-violet-500/50 transition-all duration-500 hover:scale-[1.02]"
+                className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] hover:bg-[position:100%_0] text-white px-10 py-6 rounded-2xl font-bold text-xl shadow-2xl shadow-violet-500/50 transition-all duration-500 hover:scale-[1.02]"
                 aria-label="Hacer test gratuito personalizado en 2 minutos"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-fuchsia-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-                <Brain className="w-5 h-5 relative z-10" aria-hidden="true" />
-                <span className="relative z-10">Test gratuito 2 min</span>
+                <Brain className="w-6 h-6 relative z-10" aria-hidden="true" />
+                <span className="relative z-10">Test gratuito · 2 min</span>
                 <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
 
               <Link
-                href="/colchones"
-                className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white px-8 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-                aria-label="Ver todas las ofertas de colchones"
+                href="/catalogo"
+                className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white px-10 py-6 rounded-2xl font-bold text-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                aria-label="Ver colección premium de colchones"
               >
                 <Sparkles className="w-5 h-5" aria-hidden="true" />
-                Ver ofertas
+                Ver colección
               </Link>
             </motion.div>
 
-            {/* Trust indicators */}
+            {/* Trust indicators - CONDENSADO EN 1 LÍNEA */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex flex-wrap items-center gap-6 pt-4 text-sm text-zinc-400"
-              role="list"
-              aria-label="Garantías y beneficios"
+              transition={{ delay: 0.8 }}
+              className="flex items-center gap-6 pt-4 text-sm text-zinc-400 border-t border-white/5"
             >
-              {HERO_PRODUCT.trustIndicators.map((item, i) => (
-                <div key={i} className="flex items-center gap-2" role="listitem">
-                  <item.icon className={`w-4 h-4 ${item.color}`} aria-hidden="true" />
-                  <span className="text-zinc-300 font-medium">{item.text}</span>
-                </div>
-              ))}
+              <span className="text-zinc-300">✓ Muelles Entresacados</span>
+              <span className="text-zinc-300">✓ Envío gratis</span>
+              <span className="text-zinc-300">✓ Hecho en España</span>
             </motion.div>
           </div>
 
-          {/* Right Column - Product Image */}
+          {/* Right Column - Product Image - SIN CAMBIOS */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -215,82 +197,102 @@ export function HeroSection() {
           >
             <div className="relative">
               {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-violet-600/20 via-fuchsia-600/20 to-cyan-600/20 rounded-[3rem] blur-3xl" aria-hidden="true" />
+              <div className="absolute -inset-8 bg-gradient-to-r from-violet-600/30 via-fuchsia-600/30 to-cyan-600/30 rounded-[3rem] blur-[80px] opacity-60" aria-hidden="true" />
               
-              <div className="relative bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden">
+              {/* Rim light effect */}
+              <div className="absolute -inset-4 bg-gradient-to-br from-cyan-500/20 via-transparent to-violet-500/20 rounded-[3rem] blur-2xl" aria-hidden="true" />
+              
+              <div className="relative bg-gradient-to-br from-zinc-900/95 to-zinc-950/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-fuchsia-500/5" />
                 
+                {/* Light strips effect */}
+                <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-violet-400/20 to-transparent" aria-hidden="true" />
+                <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-cyan-400/20 to-transparent" aria-hidden="true" />
+                
                 {/* Product Image */}
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black">
                   <Image 
                     src={HERO_PRODUCT.images.hero}
-                    alt={`${HERO_PRODUCT.name} - Vista del colchón premium`}
+                    alt={`${HERO_PRODUCT.name} - Colchón premium con tecnología avanzada`}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
-                    quality={80}
+                    quality={90}
                     placeholder="blur"
                     blurDataURL={HERO_PRODUCT.images.blurDataURL}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 via-transparent to-zinc-900/40" />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-900/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-violet-900/10 via-transparent to-cyan-900/10" />
 
-                  {/* Floating spec badges */}
+                  {/* Floating spec badges - SIMPLIFICADOS */}
                   <motion.div
                     animate={{ y: prefersReducedMotion ? 0 : [0, -10, 0] }}
                     transition={{ duration: 3, repeat: Infinity }}
-                    className="absolute top-4 right-4 bg-violet-500/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg"
+                    className="absolute top-4 right-4 bg-gradient-to-r from-violet-600/95 to-fuchsia-600/95 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-2xl border border-white/10"
                   >
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        const LayersIcon = HERO_PRODUCT.specifications[0].icon
-                        return <LayersIcon className="w-4 h-4 text-white" aria-hidden="true" />
-                      })()}
-                      <span className="text-white text-xs font-bold">32cm Premium</span>
-                    </div>
+                    <span className="text-white text-sm font-bold">32cm · 7 capas</span>
                   </motion.div>
 
                   <motion.div
                     animate={{ y: prefersReducedMotion ? 0 : [0, -10, 0] }}
                     transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                    className="absolute bottom-4 left-4 bg-cyan-500/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg"
+                    className="absolute bottom-4 left-4 bg-gradient-to-r from-cyan-600/95 to-blue-600/95 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-2xl border border-white/10"
                   >
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        const ZapIcon = HERO_PRODUCT.specifications[1].icon
-                        return <ZapIcon className="w-4 h-4 text-white" aria-hidden="true" />
-                      })()}
-                      <span className="text-white text-xs font-bold">1.800 muelles</span>
-                    </div>
+                    <span className="text-white text-sm font-bold">1.800 muelles</span>
                   </motion.div>
 
                   {/* Discount badge */}
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 1.2, type: "spring" }}
-                    className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-orange-600 px-4 py-2 rounded-xl shadow-2xl"
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 1.2, type: "spring", bounce: 0.5 }}
+                    className="absolute top-4 left-4 bg-gradient-to-br from-amber-500 to-orange-600 px-4 py-2.5 rounded-xl shadow-2xl border-2 border-amber-300/30"
                   >
                     <div className="text-center">
-                      <div className="text-white text-xs font-bold">OFERTA</div>
-                      <div className="text-white text-lg font-black leading-tight">-{HERO_PRODUCT.price.discount}%</div>
+                      <div className="text-white text-xs font-bold uppercase tracking-wide">Oferta</div>
+                      <div className="text-white text-xl font-black leading-tight">-44%</div>
                     </div>
                   </motion.div>
+
+                  {/* Particle effect overlay */}
+                  {!prefersReducedMotion && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(8)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ 
+                            opacity: [0, 0.6, 0],
+                            y: [20, -100],
+                            x: [0, Math.random() * 40 - 20]
+                          }}
+                          transition={{
+                            duration: 3 + Math.random() * 2,
+                            repeat: Infinity,
+                            delay: i * 0.8,
+                            ease: "easeOut"
+                          }}
+                          className="absolute bottom-0 left-1/2 w-1 h-1 bg-white/40 rounded-full blur-sm"
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Specifications Grid */}
-                <div className="mt-6 grid grid-cols-2 gap-3">
+                {/* Specifications Grid - VISUAL, NO TEXTO */}
+                <div className="mt-6 grid grid-cols-4 gap-2">
                   {HERO_PRODUCT.specifications.map((spec, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1 + i * 0.1 }}
-                      className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                      transition={{ delay: 1 + i * 0.05 }}
+                      className="group flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-violet-500/30 transition-all duration-300"
                     >
-                      <spec.icon className="w-5 h-5 text-violet-400" aria-hidden="true" />
-                      <span className="text-white font-bold text-sm">{spec.value}</span>
-                      <span className="text-white/60 text-xs">{spec.label}</span>
+                      <spec.icon className="w-5 h-5 text-violet-400 group-hover:text-violet-300 transition-colors" aria-hidden="true" />
+                      <span className="text-white font-bold text-xs">{spec.value}</span>
                     </motion.div>
                   ))}
                 </div>
@@ -311,12 +313,11 @@ export function HeroSection() {
           aria-label="Desplázate para ver más"
         >
           <div className="flex flex-col items-center gap-2 text-white/40">
-            <span className="text-xs font-bold uppercase tracking-widest">Descubre más</span>
-            <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
+            <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1.5 bg-white/5 backdrop-blur-sm">
               <motion.div 
                 animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1.5 h-1.5 bg-white/40 rounded-full"
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="w-1.5 h-1.5 bg-gradient-to-b from-violet-400 to-fuchsia-400 rounded-full shadow-lg shadow-violet-500/50"
               />
             </div>
           </div>

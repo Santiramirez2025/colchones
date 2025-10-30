@@ -188,10 +188,6 @@ export default function ProductClient({
       a: 'La garantía cubre defectos de fabricación y hundimiento superior a 2,5cm. No cubre desgaste normal ni manchas.'
     },
     {
-      q: '¿Cómo funciona el período de prueba?',
-      a: `Tienes ${product.trialNights} noches para probar el colchón. Si no estás satisfecho, lo recogemos gratis y te devolvemos el dinero.`
-    },
-    {
       q: '¿Necesito una base especial?',
       a: 'Funciona con cualquier base firme: somier de láminas, base tapizada o canapé. No recomendado para bases blandas.'
     },
@@ -406,14 +402,10 @@ export default function ProductClient({
                   <p className="text-xs font-bold text-white">Envío {product.deliveryDays}h</p>
                   <p className="text-[10px] text-zinc-400">Gratis</p>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl">
-                  <Shield className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                  <p className="text-xs font-bold text-white">{product.trialNights} noches</p>
-                  <p className="text-[10px] text-zinc-400">Prueba</p>
-                </div>
+
                 <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 rounded-xl">
                   <Award className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                  <p className="text-xs font-bold text-white">{product.warranty} años</p>
+                  <p className="text-xs font-bold text-white">{product.warranty} 3 años</p>
                   <p className="text-[10px] text-zinc-400">Garantía</p>
                 </div>
               </div>
@@ -700,52 +692,40 @@ export default function ProductClient({
             </div>
 
             {/* Stock & Delivery Info Premium */}
-            <div className="space-y-3 mb-8">
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
-                <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Package className="w-6 h-6 text-emerald-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-white flex items-center gap-2">
-                    En stock - Envío inmediato
-                    {stockInfo.quantity > 5 && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-                  </p>
-                  <p className="text-sm text-zinc-400">
-                    Recíbelo en {product.deliveryDays} días laborables
-                  </p>
-                </div>
-              </div>
+<div className="space-y-3 mb-8">
+  <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
+    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+      <Package className="w-6 h-6 text-emerald-400" />
+    </div>
+    <div className="flex-1">
+      <p className="font-bold text-white flex items-center gap-2">
+        En stock - Envío inmediato
+        {stockInfo.quantity > 5 && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+      </p>
+      <p className="text-sm text-zinc-400">
+        Recíbelo en {product.deliveryDays} días laborables
+      </p>
+    </div>
+  </div>
+</div>
 
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-xl">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <RotateCcw className="w-6 h-6 text-blue-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-white">Devolución gratuita</p>
-                  <p className="text-sm text-zinc-400">
-                    Pruébalo {product.trialNights} noches sin compromiso
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Certifications */}
-            {certifications.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap mb-8">
-                <span className="text-sm font-bold text-zinc-400 flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  Certificaciones:
-                </span>
-                {certifications.map((cert, i) => (
-                  <span 
-                    key={i}
-                    className="px-3 py-1.5 bg-zinc-900 border border-white/10 text-xs font-bold text-zinc-300 rounded-lg"
-                  >
-                    {cert}
-                  </span>
-                ))}
-              </div>
-            )}
+{/* Certifications */}
+{certifications.length > 0 && (
+  <div className="flex items-center gap-2 flex-wrap mb-8">
+    <span className="text-sm font-bold text-zinc-400 flex items-center gap-2">
+      <Award className="w-4 h-4" />
+      Certificaciones:
+    </span>
+    {certifications.map((cert, i) => (
+      <span 
+        key={i}
+        className="px-3 py-1.5 bg-zinc-900 border border-white/10 text-xs font-bold text-zinc-300 rounded-lg"
+      >
+        {cert}
+      </span>
+    ))}
+  </div>
+)}
 
             {/* Garantías destacadas */}
             <div className="grid grid-cols-2 gap-3">
@@ -913,7 +893,6 @@ function SpecificationsTab({ product, techFeatures }: { product: Product; techFe
           { label: 'Altura total', value: `${product.height}cm`, icon: Layers },
           { label: 'Peso aproximado', value: product.weight ? `${product.weight}kg` : 'N/A', icon: Package },
           { label: 'Garantía', value: `${product.warranty} años`, icon: Shield },
-          { label: 'Período de prueba', value: `${product.trialNights} noches`, icon: Moon },
           { label: 'Stock disponible', value: product.stock > 0 ? `${product.stock} unidades` : 'Agotado', icon: Package },
           { label: 'SKU', value: product.sku || 'N/A', icon: Info }
         ].map((spec, index) => (

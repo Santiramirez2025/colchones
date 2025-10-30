@@ -247,7 +247,6 @@ function ResultsScreen({ recommendations, onRestart }: any) {
     // 4. Último fallback: features genéricos basados en specs
     const fallbackFeatures = []
     if (product.warranty >= 10) fallbackFeatures.push(`${product.warranty} años de garantía`)
-    if (product.trialNights >= 100) fallbackFeatures.push(`${product.trialNights} noches de prueba`)
     if (product.cooling) fallbackFeatures.push('Sistema de refrigeración')
     if (product.hypoallergenic) fallbackFeatures.push('Materiales hipoalergénicos')
     
@@ -410,7 +409,6 @@ function ResultsScreen({ recommendations, onRestart }: any) {
           {[
             { icon: Shield, title: '10 Años Garantía', desc: 'Protección total' },
             { icon: Truck, title: 'Envío Gratis 24-48h', desc: 'A toda España' },
-            { icon: Moon, title: '100 Noches Prueba', desc: 'Devolución gratis' }
           ].map((benefit, i) => (
             <motion.div
               key={i}

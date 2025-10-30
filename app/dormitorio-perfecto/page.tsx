@@ -65,7 +65,6 @@ export default function DormitorioPerfecto() {
         'Colchón firme para boca abajo/espalda, medio para lado',
         'Reemplaza colchón cada 7-10 años',
         'Almohada alta si duermes de lado, baja boca arriba',
-        'Prueba antes de comprar (mínimo 30 noches de prueba)'
       ],
       science: 'El soporte inadecuado causa microdespertares que reducen sueño profundo sin que lo notes.',
       investment: 'Alto - $500-2000 (colchón calidad) + $50-150 (almohada)'

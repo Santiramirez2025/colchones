@@ -1,4 +1,4 @@
-// lib/metadata.ts - SEO Optimizado e Integrado
+// lib/metadata.ts - SEO Optimizado
 import { Metadata } from 'next'
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants'
 import { HERO_PRODUCT, SOCIAL_PROOF } from '@/lib/product-data'
@@ -12,12 +12,23 @@ export const homeMetadata: Metadata = {
   
   title: {
     default: SEO_DEFAULTS.title,
-    template: `%s | ${SITE_CONFIG.name}` // Para otras páginas
+    template: `%s | ${SITE_CONFIG.name}`
   },
   
-  description: SEO_DEFAULTS.description,
+  // OPTIMIZADO: Description con USPs + precio
+  description: 'Colchón Premium 1.800 muelles Multisac®. Envío gratis 24h, Tu descanso asegurado, garantía 3 años. Desde 39€/mes. Test personalizado gratis.',
   
-  keywords: SEO_DEFAULTS.keywords,
+  // OPTIMIZADO: Keywords long-tail específicos
+  keywords: [
+    'colchón premium muelles ensacados',
+    'colchón 1800 muelles',
+    'colchón 32cm altura',
+    'Garantía de Satisfacción Total',
+    'colchón envío 24 horas',
+    'colchón garantía 3 años',
+    'colchón firmeza 70',
+    'colchón Multisac'
+  ],
   
   authors: [{ 
     name: SITE_CONFIG.name, 
@@ -27,39 +38,36 @@ export const homeMetadata: Metadata = {
   creator: SITE_CONFIG.name,
   publisher: SITE_CONFIG.name,
   
-  // Open Graph optimizado
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
     title: SEO_DEFAULTS.title,
-    description: SEO_DEFAULTS.description,
+    description: 'Colchón Premium 1.800 muelles. Envío gratis 24h. Garantía de Satisfacción Total.',
     images: [
       {
-        url: SEO_DEFAULTS.ogImage,
+        url: '/og-colchon-premium-multisac.jpg', // Nombre descriptivo
         width: 1200,
         height: 630,
-        alt: `${SITE_CONFIG.name} - Colchones Premium`,
+        alt: 'Colchón Premium Multisac 1.800 muelles ensacados',
         type: 'image/jpeg',
       },
     ],
   },
   
-  // Twitter Card
   twitter: {
     card: 'summary_large_image',
     site: '@tiendacolchon',
     creator: '@tiendacolchon',
     title: SEO_DEFAULTS.title,
-    description: SEO_DEFAULTS.description,
+    description: 'Colchón Premium 1.800 muelles. Envío gratis 24h. Desde 39€/mes.',
     images: {
-      url: SEO_DEFAULTS.ogImage,
-      alt: `${SITE_CONFIG.name} - Colchones Premium`,
+      url: '/og-colchon-premium-multisac.jpg',
+      alt: 'Colchón Premium Multisac',
     },
   },
   
-  // Robots
   robots: {
     index: true,
     follow: true,
@@ -74,16 +82,15 @@ export const homeMetadata: Metadata = {
     },
   },
   
-  // Verification (actualizar con tus códigos reales)
+  // NOTA: Completar con códigos reales o eliminar antes de producción
   verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    other: {
-      'facebook-domain-verification': 'your-facebook-verification',
-    },
+    google: 'COMPLETAR_GOOGLE_SEARCH_CONSOLE',
+    // yandex: 'tu-codigo-si-aplica',
+    // other: {
+    //   'facebook-domain-verification': 'tu-codigo-facebook',
+    // },
   },
   
-  // Alternates
   alternates: {
     canonical: SITE_CONFIG.url,
     languages: {
@@ -91,17 +98,11 @@ export const homeMetadata: Metadata = {
     },
   },
   
-  // Información adicional
   category: 'Hogar y Descanso',
   classification: 'E-commerce de Colchones',
-  
-  // Manifest
   manifest: '/manifest.json',
-  
-  // App-specific
   applicationName: SITE_CONFIG.name,
   
-  // Icons
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -110,7 +111,6 @@ export const homeMetadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   
-  // Other
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
@@ -119,7 +119,7 @@ export const homeMetadata: Metadata = {
 }
 
 // ============================================
-// STRUCTURED DATA (JSON-LD)
+// STRUCTURED DATA (JSON-LD) - OPTIMIZADO
 // ============================================
 
 export const structuredData = {
@@ -197,7 +197,7 @@ export const structuredData = {
       '@id': `${SITE_CONFIG.url}/#product`,
       name: HERO_PRODUCT.name,
       description: HERO_PRODUCT.description,
-      image: `${SITE_CONFIG.url}${HERO_PRODUCT.images.hero}`,
+      image: HERO_PRODUCT.images.hero,
       brand: {
         '@type': 'Brand',
         name: SITE_CONFIG.name,
@@ -238,7 +238,8 @@ export const structuredData = {
         bestRating: '5',
         worstRating: '1',
       },
-      review: SOCIAL_PROOF.reviews.slice(0, 3).map((review) => ({
+      // OPTIMIZADO: Solo 2 reviews en lugar de 3
+      review: SOCIAL_PROOF.reviews.slice(0, 2).map((review) => ({
         '@type': 'Review',
         author: {
           '@type': 'Person',
@@ -263,21 +264,7 @@ export const structuredData = {
       },
     },
     
-    // Breadcrumb
-    {
-      '@type': 'BreadcrumbList',
-      '@id': `${SITE_CONFIG.url}/#breadcrumb`,
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          position: 1,
-          name: 'Inicio',
-          item: SITE_CONFIG.url,
-        },
-      ],
-    },
-    
-    // FAQ
+    // OPTIMIZADO: FAQ reducido a 3 preguntas clave
     {
       '@type': 'FAQPage',
       '@id': `${SITE_CONFIG.url}/#faq`,
@@ -287,7 +274,7 @@ export const structuredData = {
           name: '¿Cuánto tiempo tarda el envío?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Realizamos envíos gratuitos en 24-48 horas a toda España peninsular. Para Baleares, Canarias, Ceuta y Melilla consultar plazos.',
+            text: 'Realizamos envíos gratuitos en 24-48 horas a toda España peninsular.',
           },
         },
         {
@@ -295,31 +282,15 @@ export const structuredData = {
           name: '¿Qué garantía tienen los colchones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Todos nuestros colchones incluyen 10 años de garantía del fabricante contra defectos de fabricación y hundimientos superiores a 2cm.',
+            text: 'Todos nuestros colchones incluyen 10 años de garantía del fabricante contra defectos de fabricación.',
           },
         },
         {
           '@type': 'Question',
-          name: '¿Puedo probar el colchón antes de comprarlo?',
+          name: '¿Por qué confiar en la calidad de nuestros colchones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sí, ofrecemos 100 noches de prueba sin riesgo. Si no estás satisfecho, te lo recogemos gratis y te devolvemos el 100% del importe.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Cómo funciona el test personalizado?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Nuestro test con inteligencia artificial analiza tus preferencias de sueño en 2 minutos y te recomienda los colchones más adecuados según tu peso, postura al dormir, firmeza preferida y necesidades específicas.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Qué formas de pago aceptan?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Aceptamos tarjetas de crédito/débito (Visa, Mastercard, Amex), PayPal, transferencia bancaria y financiación hasta 12 meses sin intereses.',
+            text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.',
           },
         },
       ],
@@ -331,10 +302,6 @@ export const structuredData = {
 // FUNCIÓN PARA EXPORTAR STRUCTURED DATA
 // ============================================
 
-/**
- * Retorna todos los structured data schemas como array
- * Para usar en page.tsx con map()
- */
 export function getAllStructuredData() {
   return [structuredData]
 }
@@ -343,49 +310,43 @@ export function getAllStructuredData() {
 // HELPERS PARA OTRAS PÁGINAS
 // ============================================
 
-/**
- * Genera metadata para páginas de productos
- */
 export function generateProductMetadata(product: {
-    name: string
-    description: string
-    price: number
-    image: string
-    slug?: string
-  }): Metadata {
-    const url = product.slug 
-      ? `${SITE_CONFIG.url}/producto/${product.slug}`
-      : SITE_CONFIG.url
-  
-    return {
-      title: `${product.name} - Comprar Online`,
-      description: `${product.description} Precio: ${product.price}€. Envío gratis. Garantía 10 años. 100 noches de prueba.`,
-      openGraph: {
-        title: product.name,
-        description: product.description,
-        images: [{ 
-          url: product.image, 
-          width: 1200, 
-          height: 630,
-          alt: product.name
-        }],
-        type: 'website',
-        url,
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: product.name,
-        description: product.description,
-      },
-      alternates: {
-        canonical: url,
-      },
-    }
-  }
+  name: string
+  description: string
+  price: number
+  image: string
+  slug?: string
+}): Metadata {
+  const url = product.slug 
+    ? `${SITE_CONFIG.url}/producto/${product.slug}`
+    : SITE_CONFIG.url
 
-/**
- * Genera metadata para páginas de categoría
- */
+  return {
+    title: `${product.name} - Comprar Online`,
+    description: `${product.description} Precio: ${product.price}€. Envío gratis 24h. Garantía 3 años. Certificados de calidad europea.`,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: [{ 
+        url: product.image, 
+        width: 1200, 
+        height: 630,
+        alt: product.name
+      }],
+      type: 'website',
+      url,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description,
+    },
+    alternates: {
+      canonical: url,
+    },
+  }
+}
+
 export function generateCategoryMetadata(category: {
   name: string
   description: string
@@ -415,9 +376,6 @@ export function generateCategoryMetadata(category: {
   }
 }
 
-/**
- * Genera metadata para artículos de blog
- */
 export function generateBlogMetadata(article: {
   title: string
   excerpt: string

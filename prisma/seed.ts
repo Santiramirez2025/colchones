@@ -226,7 +226,6 @@ async function main() {
         'Viscoelástica: 4cm adaptativa',
         'Altura: 28cm',
         'Densidad núcleo: Alta resistencia',
-        'Prueba: 100 noches'
       ],
       highlights: [
         'Mejor precio garantizado',

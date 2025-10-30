@@ -43,8 +43,8 @@ export default function TerminosPage() {
           <section>
             <h2 className="text-2xl font-bold mb-4">4. Política de Devoluciones</h2>
             <p>
-              Ofrecemos 100 noches de prueba. Si no estás satisfecho, puedes 
-              devolver el producto sin coste adicional dentro de este periodo.
+            Puedes solicitar la devolución de tu colchón si no cumple con tus expectativas o presenta algún defecto de fabricación.
+            Nuestro equipo gestionará el proceso sin complicaciones.
             </p>
           </section>
 

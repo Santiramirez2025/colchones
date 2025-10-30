@@ -45,12 +45,12 @@ export function TrustBar() {
           <div className="hidden sm:block h-4 w-px bg-white/30" aria-hidden="true" />
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4" aria-hidden="true" />
-            <span>Garantía 10 años</span>
+            <span>Garantía 3 años</span>
           </div>
           <div className="hidden sm:block h-4 w-px bg-white/30" aria-hidden="true" />
           <div className="flex items-center gap-2">
             <Moon className="w-4 h-4" aria-hidden="true" />
-            <span>100 noches de prueba</span>
+            <span>Tu descanso asegurado</span>
           </div>
         </div>
       </div>

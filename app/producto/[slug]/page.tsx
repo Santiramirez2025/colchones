@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   return {
     title: `${product.name} | Desde ${Math.round(price / 12)}€/mes - Envío Gratis`,
-    description: `${product.subtitle} ⭐ ${product.rating || 4.8}/5 estrellas · ${discount > 0 ? `-${discount}% de descuento` : 'Mejor precio'} · 100 noches de prueba · Garantía 10 años`,
+    description: `${product.subtitle} ⭐ ${product.rating || 4.8}/5 estrellas · ${discount > 0 ? `-${discount}% de descuento` : 'Mejor precio'} · Diseñado para dormir mejor desde la primera noche · Garantía 3 años`,
     keywords: [
       product.name,
       'colchón premium',
@@ -41,8 +41,8 @@ export async function generateMetadata({
       `firmeza ${product.firmnessValue}%`,
       `${product.height}cm`,
       'envío gratis',
-      '100 noches prueba',
-      'garantía 10 años',
+      'Tu descanso asegurado',
+      'garantía 3 años',
     ],
     openGraph: {
       title: `${product.name}`,
