@@ -104,10 +104,10 @@ export const SOCIAL_PROOF: SocialProofType = {
 }
 
 export const COMPOSITION_LAYERS: CompositionLayer[] = [
-  { num: 1, name: 'Tejido viscosa', description: 'Suave y fresco' },
+  { num: 1, name: 'Muelles Ensacados', description: 'Innovadoras Tecnologías' },
   { num: 2, name: 'Fibras naturales', description: 'Termorregulador' },
   { num: 3, name: 'Látex 65kg/m³', description: 'Adaptación perfecta' },
-  { num: 4, name: 'Winesoja 50kg/m³', description: 'Eco-friendly' },
+  { num: 4, name: 'Tecnología HR', description: 'Eco-friendly' },
   { num: 5, name: 'Multisac® 1.800', description: 'Independencia total' }
 ]
 
