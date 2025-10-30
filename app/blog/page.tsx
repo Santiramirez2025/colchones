@@ -1,18 +1,41 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { 
-  Calendar, Clock, ArrowRight, Sparkles, TrendingUp, 
-  BookOpen, Search, X, Tag, User, Heart,
-  Bookmark, Zap, Star
+  Calendar, Clock, ArrowRight, BookOpen, 
+  Bookmark, Check, Moon, Sunrise,
+  Wind, ThermometerSun, BookMarked, Volume2,
+  VolumeX, Play, Pause, ChevronRight, Trophy,
+  Lightbulb, CheckCircle2
 } from 'lucide-react'
 
+// Tipos para el ritual del descanso
+interface RitualStep {
+  id: number
+  title: string
+  description: string
+  icon: any
+  type: 'info' | 'timer' | 'interactive' | 'audio' | 'journal'
+  completed: boolean
+  relatedArticles: number[]
+}
+
+interface DailyProgress {
+  date: string
+  stepsCompleted: number[]
+  journalEntry: string
+}
+
 export default function BlogPage() {
-  const [selectedCategory, setSelectedCategory] = useState('Todos')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [likedArticles, setLikedArticles] = useState<number[]>([])
-  const [savedArticles, setSavedArticles] = useState<number[]>([])
+  // Estados del ritual del descanso
+  const [currentStep, setCurrentStep] = useState(0)
+  const [ritualSteps, setRitualSteps] = useState<RitualStep[]>([])
+  const [breathingActive, setBreathingActive] = useState(false)
+  const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale')
+  const [audioPlaying, setAudioPlaying] = useState(false)
+  const [journalText, setJournalText] = useState('')
+  const [dailyTip, setDailyTip] = useState('')
 
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -23,26 +46,144 @@ export default function BlogPage() {
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
 
-  const toggleLike = (id: number) => {
-    setLikedArticles(prev => 
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
-    )
+  // Inicializar ritual del descanso
+  useEffect(() => {
+    const initialSteps: RitualStep[] = [
+      {
+        id: 1,
+        title: 'Apaga las pantallas',
+        description: 'La luz azul de los dispositivos interfiere con la producción de melatonina. Apaga tus pantallas 1 hora antes de dormir.',
+        icon: Moon,
+        type: 'info',
+        completed: false,
+        relatedArticles: [1]
+      },
+      {
+        id: 2,
+        title: 'Respira profundo',
+        description: 'La respiración 4-7-8 ayuda a activar el sistema nervioso parasimpático. Inhala 4 seg, mantén 7 seg, exhala 8 seg.',
+        icon: Wind,
+        type: 'timer',
+        completed: false,
+        relatedArticles: [2]
+      },
+      {
+        id: 3,
+        title: 'Ajusta la temperatura',
+        description: 'La temperatura ideal para dormir es entre 15-19°C. Un ambiente fresco mejora la calidad del sueño profundo.',
+        icon: ThermometerSun,
+        type: 'interactive',
+        completed: false,
+        relatedArticles: [3]
+      },
+      {
+        id: 4,
+        title: 'Medita o relaja',
+        description: 'La meditación nocturna reduce el cortisol y prepara tu mente para el descanso. 10 minutos pueden marcar la diferencia.',
+        icon: Volume2,
+        type: 'audio',
+        completed: false,
+        relatedArticles: [2]
+      },
+      {
+        id: 5,
+        title: 'Diario del sueño',
+        description: 'Registrar tus patrones de sueño te ayuda a identificar qué funciona mejor para ti. Sé consciente de tu descanso.',
+        icon: BookMarked,
+        type: 'journal',
+        completed: false,
+        relatedArticles: [1]
+      }
+    ]
+
+    // Cargar progreso desde localStorage
+    const savedProgress = localStorage.getItem('sleepRitualProgress')
+    if (savedProgress) {
+      const progress: DailyProgress = JSON.parse(savedProgress)
+      const today = new Date().toDateString()
+      
+      if (progress.date === today) {
+        setRitualSteps(initialSteps.map(step => ({
+          ...step,
+          completed: progress.stepsCompleted.includes(step.id)
+        })))
+        setJournalText(progress.journalEntry)
+      } else {
+        setRitualSteps(initialSteps)
+      }
+    } else {
+      setRitualSteps(initialSteps)
+    }
+
+    // Generar consejo diario aleatorio
+    const tips = [
+      'La consistencia es clave: intenta acostarte y levantarte a la misma hora todos los días, incluso los fines de semana.',
+      'Evita la cafeína 6 horas antes de dormir. Su vida media en el cuerpo es de 5-6 horas.',
+      'Ejercicio regular mejora el sueño, pero evítalo 3 horas antes de acostarte.',
+      'Tu colchón debe renovarse cada 7-10 años para mantener el soporte adecuado.',
+      'La exposición a luz natural durante el día mejora tu ritmo circadiano.',
+      'Una almohada adecuada puede reducir el dolor de cuello hasta un 50%.',
+      'Los baños tibios 90 minutos antes de dormir aumentan la calidad del sueño.',
+      'Mantén tu habitación oscura: incluso pequeñas fuentes de luz pueden afectar el sueño.'
+    ]
+    const randomTip = tips[Math.floor(Math.random() * tips.length)]
+    setDailyTip(randomTip)
+  }, [])
+
+  // Guardar progreso en localStorage
+  useEffect(() => {
+    if (ritualSteps.length > 0) {
+      const progress: DailyProgress = {
+        date: new Date().toDateString(),
+        stepsCompleted: ritualSteps.filter(s => s.completed).map(s => s.id),
+        journalEntry: journalText
+      }
+      localStorage.setItem('sleepRitualProgress', JSON.stringify(progress))
+    }
+  }, [ritualSteps, journalText])
+
+  // Animación de respiración
+  useEffect(() => {
+    if (!breathingActive) return
+
+    const phases: Array<'inhale' | 'hold' | 'exhale'> = ['inhale', 'hold', 'exhale']
+    const durations = { inhale: 4000, hold: 7000, exhale: 8000 }
+    let currentPhaseIndex = 0
+
+    const breathingInterval = setInterval(() => {
+      setBreathingPhase(phases[currentPhaseIndex])
+      currentPhaseIndex = (currentPhaseIndex + 1) % 3
+    }, durations[breathingPhase])
+
+    return () => clearInterval(breathingInterval)
+  }, [breathingActive, breathingPhase])
+
+  const completeStep = (stepId: number) => {
+    setRitualSteps(prev => prev.map(step => 
+      step.id === stepId ? { ...step, completed: true } : step
+    ))
   }
 
-  const toggleSave = (id: number) => {
-    setSavedArticles(prev => 
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
-    )
+  const toggleBreathing = () => {
+    setBreathingActive(!breathingActive)
+    if (breathingActive) {
+      completeStep(2)
+    }
   }
 
-  const filteredArticles = articles.filter(article => {
-    const matchesCategory = selectedCategory === 'Todos' || article.category === selectedCategory
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  const completedSteps = ritualSteps.filter(s => s.completed).length
+  const totalSteps = ritualSteps.length
+  const progressPercentage = (completedSteps / totalSteps) * 100
 
-  const featuredArticle = articles[0]
+  // Artículos sugeridos según progreso
+  const getSuggestedArticles = () => {
+    const currentStepData = ritualSteps[currentStep]
+    if (!currentStepData) return []
+    
+    return essentialGuides.filter(guide => 
+      currentStepData.relatedArticles.includes(guide.id)
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950">
@@ -84,365 +225,564 @@ export default function BlogPage() {
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                 Consejos respaldados por la ciencia sobre sueño saludable, ergonomía y bienestar
               </p>
-
-              {/* Search Bar */}
-              <div className="max-w-2xl mx-auto">
-                <div className="relative group">
-                  <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-purple-400 transition-colors" />
-                  <input
-                    type="text"
-                    placeholder="Buscar artículos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-14 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:border-purple-500/50 focus:bg-white/10 focus:outline-none transition-all"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm('')}
-                      className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-              </div>
             </motion.div>
           </div>
         </motion.div>
       </section>
 
-      {/* Categories */}
-      <section className="relative py-8 border-y border-white/10 backdrop-blur-xl">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {categories.map((category, index) => (
-              <motion.button
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedCategory(category)}
-                className={`group relative px-6 py-2.5 rounded-full font-semibold transition-all ${
-                  selectedCategory === category
-                    ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:border-purple-500/30'
-                }`}
-              >
-                {category}
-                {selectedCategory === category && (
-                  <motion.div
-                    layoutId="activeCategory"
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 -z-10"
-                  />
-                )}
-              </motion.button>
-            ))}
+      {/* Consejo del día - Sticky */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="sticky top-4 z-40 container mx-auto px-4 mb-8"
+      >
+        <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-pink-500/20 backdrop-blur-xl border border-amber-500/30 rounded-2xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0">
+              <Lightbulb className="w-6 h-6 text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-amber-300 mb-1">💡 Tu consejo del día</h3>
+              <p className="text-sm text-gray-300">{dailyTip}</p>
+            </div>
           </div>
-          {searchTerm && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center mt-4 text-gray-400"
-            >
-              Buscando: <span className="text-purple-400 font-semibold">"{searchTerm}"</span>
-            </motion.div>
-          )}
         </div>
-      </section>
+      </motion.div>
 
-      {/* Main Content */}
-      <div className="relative container mx-auto px-4 py-16">
-        {/* Featured Article */}
-        <motion.section
+      {/* SECCIÓN: Ritual del Descanso */}
+      <section className="relative container mx-auto px-4 mb-16">
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-20"
+          className="relative"
         >
-          <div className="flex items-center gap-3 mb-8">
-            <Sparkles className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-3xl font-bold text-white">Artículo Destacado</h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-purple-500/50 transition-all group">
-            {/* Image */}
-            <div className="relative h-[400px] md:h-auto overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                <motion.span
-                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="text-9xl"
-                >
-                  {featuredArticle.emoji}
-                </motion.span>
+          {/* Header del ritual */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                <Moon className="w-6 h-6 text-white" />
               </div>
-              
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              
-              {/* Featured badge */}
-              <div className="absolute top-6 left-6 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-white fill-current" />
-                  <span className="text-sm font-bold text-white">Destacado</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="absolute top-6 right-6 flex gap-2">
-                <button
-                  onClick={() => toggleLike(featuredArticle.id)}
-                  className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-                >
-                  <Heart className={`w-5 h-5 ${likedArticles.includes(featuredArticle.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-                </button>
-                <button
-                  onClick={() => toggleSave(featuredArticle.id)}
-                  className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-                >
-                  <Bookmark className={`w-5 h-5 ${savedArticles.includes(featuredArticle.id) ? 'fill-cyan-400 text-cyan-400' : 'text-white'}`} />
-                </button>
+              <div>
+                <h2 className="text-3xl font-bold text-white">💤 Tu ritual del descanso</h2>
+                <p className="text-gray-400 text-sm">Completa los pasos para un sueño perfecto</p>
               </div>
             </div>
-
-            {/* Content */}
-            <div className="p-8 md:p-10 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-300 text-sm font-semibold mb-4 w-fit">
-                <Tag className="w-3 h-3" />
-                {featuredArticle.category}
+            
+            {/* Barra de progreso */}
+            <div className="hidden md:flex items-center gap-3">
+              <Trophy className={`w-6 h-6 ${progressPercentage === 100 ? 'text-yellow-400' : 'text-gray-600'}`} />
+              <div className="text-right">
+                <div className="text-2xl font-bold text-white">{completedSteps}/{totalSteps}</div>
+                <div className="text-xs text-gray-400">pasos completados</div>
               </div>
-
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
-                {featuredArticle.title}
-              </h3>
-
-              <p className="text-lg text-gray-400 mb-6 leading-relaxed">
-                {featuredArticle.excerpt}
-              </p>
-
-              <div className="flex items-center gap-6 text-sm text-gray-500 mb-8">
-                <span className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-cyan-400" />
-                  <span className="text-gray-400">{featuredArticle.date}</span>
-                </span>
-                <span className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-purple-400" />
-                  <span className="text-gray-400">{featuredArticle.readTime}</span>
-                </span>
-                <span className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-pink-400" />
-                  <span className="text-gray-400">{featuredArticle.author}</span>
-                </span>
-              </div>
-
-              <button className="group/btn inline-flex items-center gap-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-bold px-8 py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-purple-500/50 w-fit">
-                Leer artículo completo
-                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Articles Grid */}
-        <section>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-white">
-              Últimos Artículos
-            </h2>
-            <div className="text-gray-400">
-              <span className="text-white font-bold">{filteredArticles.length}</span> artículos
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            {filteredArticles.length > 0 ? (
+          {/* Barra de progreso visual */}
+          <div className="mb-8">
+            <div className="h-3 bg-white/10 rounded-full overflow-hidden backdrop-blur-xl">
               <motion.div
-                key="articles"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-full relative"
               >
-                {filteredArticles.slice(1).map((article, index) => (
-                  <motion.article
-                    key={article.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group relative"
+                {progressPercentage === 100 && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
                   >
-                    <div className="h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/20 transition-all">
-                      {/* Image */}
-                      <div className={`relative h-56 bg-gradient-to-br ${article.gradient} overflow-hidden`}>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.span
-                            whileHover={{ scale: 1.2, rotate: 10 }}
-                            className="text-7xl"
-                          >
-                            {article.emoji}
-                          </motion.span>
-                        </div>
+                    <div className="w-4 h-4 text-yellow-300">⭐</div>
+                  </motion.div>
+                )}
+              </motion.div>
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <span>Inicio</span>
+              <span>{progressPercentage.toFixed(0)}% completado</span>
+              <span>Listo para dormir</span>
+            </div>
+          </div>
 
-                        {/* Trending badge */}
-                        {article.trending && (
-                          <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-lg">
-                            <div className="flex items-center gap-1">
-                              <TrendingUp className="w-3 h-3 text-white" />
-                              <span className="text-xs font-bold text-white">Trending</span>
-                            </div>
-                          </div>
+          {/* Steps del ritual */}
+          <div className="grid md:grid-cols-5 gap-4 mb-8">
+            {ritualSteps.map((step, index) => {
+              const Icon = step.icon
+              const isActive = index === currentStep
+              
+              return (
+                <motion.button
+                  key={step.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  onClick={() => setCurrentStep(index)}
+                  className={`relative group p-6 rounded-2xl transition-all ${
+                    step.completed
+                      ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-500/50'
+                      : isActive
+                      ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 scale-105'
+                      : 'bg-white/5 border-2 border-white/10 hover:border-purple-500/30 hover:bg-white/10'
+                  }`}
+                >
+                  {/* Número del paso */}
+                  <div className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    step.completed
+                      ? 'bg-green-500 text-white'
+                      : isActive
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-white/10 text-gray-400'
+                  }`}>
+                    {step.completed ? <Check className="w-5 h-5" /> : index + 1}
+                  </div>
+
+                  {/* Icono */}
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center ${
+                    step.completed
+                      ? 'bg-green-500/20'
+                      : isActive
+                      ? 'bg-purple-500/20'
+                      : 'bg-white/10'
+                  }`}>
+                    <Icon className={`w-8 h-8 ${
+                      step.completed
+                        ? 'text-green-400'
+                        : isActive
+                        ? 'text-purple-400'
+                        : 'text-gray-400'
+                    }`} />
+                  </div>
+
+                  {/* Título */}
+                  <h3 className={`text-sm font-bold mb-1 ${
+                    step.completed || isActive ? 'text-white' : 'text-gray-400'
+                  }`}>
+                    {step.title}
+                  </h3>
+
+                  {/* Indicador activo */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeStep"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full"
+                    />
+                  )}
+                </motion.button>
+              )
+            })}
+          </div>
+
+          {/* Contenido del paso actual */}
+          <AnimatePresence mode="wait">
+            {ritualSteps[currentStep] && (
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8"
+              >
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Columna izquierda: Información */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      {React.createElement(ritualSteps[currentStep].icon, {
+                        className: "w-8 h-8 text-purple-400"
+                      })}
+                      <h3 className="text-2xl font-bold text-white">
+                        {ritualSteps[currentStep].title}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-gray-300 mb-6 leading-relaxed">
+                      {ritualSteps[currentStep].description}
+                    </p>
+
+                    {/* Contenido interactivo según el tipo */}
+                    {ritualSteps[currentStep].type === 'info' && (
+                      <button
+                        onClick={() => completeStep(ritualSteps[currentStep].id)}
+                        disabled={ritualSteps[currentStep].completed}
+                        className={`w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                          ritualSteps[currentStep].completed
+                            ? 'bg-green-500/20 text-green-300 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400'
+                        }`}
+                      >
+                        {ritualSteps[currentStep].completed ? (
+                          <>
+                            <CheckCircle2 className="w-5 h-5" />
+                            Completado
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-5 h-5" />
+                            Marcar como listo
+                          </>
                         )}
+                      </button>
+                    )}
 
-                        {/* Actions */}
-                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => toggleLike(article.id)}
-                            className="w-8 h-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
+                    {ritualSteps[currentStep].type === 'timer' && (
+                      <div className="space-y-4">
+                        {/* Visualización de respiración */}
+                        <div className="relative h-64 flex items-center justify-center">
+                          <motion.div
+                            animate={{
+                              scale: breathingActive
+                                ? breathingPhase === 'inhale'
+                                  ? [1, 1.5]
+                                  : breathingPhase === 'hold'
+                                  ? 1.5
+                                  : [1.5, 1]
+                                : 1,
+                            }}
+                            transition={{
+                              duration: breathingPhase === 'inhale' ? 4 : breathingPhase === 'exhale' ? 8 : 7,
+                              ease: "easeInOut"
+                            }}
+                            className="w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center"
                           >
-                            <Heart className={`w-4 h-4 ${likedArticles.includes(article.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-                          </button>
-                          <button
-                            onClick={() => toggleSave(article.id)}
-                            className="w-8 h-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-                          >
-                            <Bookmark className={`w-4 h-4 ${savedArticles.includes(article.id) ? 'fill-cyan-400 text-cyan-400' : 'text-white'}`} />
-                          </button>
+                            <div className="text-white text-center">
+                              <div className="text-sm font-semibold mb-1">
+                                {breathingActive ? (
+                                  breathingPhase === 'inhale' ? 'Inhala' :
+                                  breathingPhase === 'hold' ? 'Mantén' : 'Exhala'
+                                ) : 'Listo'}
+                              </div>
+                              <div className="text-2xl font-bold">
+                                {breathingActive ? (
+                                  breathingPhase === 'inhale' ? '4' :
+                                  breathingPhase === 'hold' ? '7' : '8'
+                                ) : '4-7-8'}
+                              </div>
+                            </div>
+                          </motion.div>
                         </div>
 
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-6">
-                        {/* Category */}
-                        <div className="inline-flex items-center gap-1 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-semibold text-gray-300 mb-3">
-                          <Tag className="w-3 h-3" />
-                          {article.category}
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
-                          {article.title}
-                        </h3>
-
-                        {/* Excerpt */}
-                        <p className="text-gray-400 mb-4 line-clamp-3 text-sm leading-relaxed">
-                          {article.excerpt}
-                        </p>
-
-                        {/* Meta */}
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-4 pb-4 border-b border-white/5">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-cyan-400" />
-                            <span className="text-gray-400">{article.date}</span>
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-purple-400" />
-                            <span className="text-gray-400">{article.readTime}</span>
-                          </span>
-                        </div>
-
-                        {/* CTA */}
-                        <button className="group/link flex items-center gap-2 text-sm font-semibold text-purple-400 hover:text-purple-300 transition-colors">
-                          Leer más
-                          <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                        <button
+                          onClick={toggleBreathing}
+                          className="w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400 transition-all"
+                        >
+                          {breathingActive ? (
+                            <>
+                              <Pause className="w-5 h-5" />
+                              Detener ejercicio
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-5 h-5" />
+                              Comenzar respiración
+                            </>
+                          )}
                         </button>
                       </div>
+                    )}
+
+                    {ritualSteps[currentStep].type === 'interactive' && (
+                      <div className="space-y-4">
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-gray-400">Temperatura recomendada:</span>
+                            <span className="text-2xl font-bold text-cyan-400">15-19°C</span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Un ambiente fresco ayuda a tu cuerpo a reducir su temperatura interna, señal clave para el sueño profundo.
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={() => completeStep(ritualSteps[currentStep].id)}
+                          disabled={ritualSteps[currentStep].completed}
+                          className={`w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                            ritualSteps[currentStep].completed
+                              ? 'bg-green-500/20 text-green-300 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400'
+                          }`}
+                        >
+                          {ritualSteps[currentStep].completed ? (
+                            <>
+                              <CheckCircle2 className="w-5 h-5" />
+                              Temperatura ajustada
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-5 h-5" />
+                              Ya ajusté la temperatura
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {ritualSteps[currentStep].type === 'audio' && (
+                      <div className="space-y-4">
+                        <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl p-6 text-center">
+                          <motion.div
+                            animate={{
+                              scale: audioPlaying ? [1, 1.1, 1] : 1,
+                              rotate: audioPlaying ? [0, 5, -5, 0] : 0
+                            }}
+                            transition={{ duration: 2, repeat: audioPlaying ? Infinity : 0 }}
+                            className="text-6xl mb-4"
+                          >
+                            🎵
+                          </motion.div>
+                          <p className="text-sm text-gray-400 mb-4">
+                            Sonidos relajantes para meditación nocturna
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            setAudioPlaying(!audioPlaying)
+                            if (!audioPlaying) {
+                              setTimeout(() => {
+                                completeStep(ritualSteps[currentStep].id)
+                              }, 3000)
+                            }
+                          }}
+                          className="w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-400 hover:to-pink-400 transition-all"
+                        >
+                          {audioPlaying ? (
+                            <>
+                              <VolumeX className="w-5 h-5" />
+                              Detener sonidos
+                            </>
+                          ) : (
+                            <>
+                              <Volume2 className="w-5 h-5" />
+                              Reproducir meditación guiada
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {ritualSteps[currentStep].type === 'journal' && (
+                      <div className="space-y-4">
+                        <textarea
+                          value={journalText}
+                          onChange={(e) => setJournalText(e.target.value)}
+                          placeholder="¿Cómo dormiste anoche? ¿Qué te ayudó o qué te despertó? Escribe tus observaciones..."
+                          className="w-full h-32 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-purple-500/50 focus:bg-white/10 focus:outline-none transition-all resize-none"
+                        />
+                        
+                        <button
+                          onClick={() => {
+                            if (journalText.trim()) {
+                              completeStep(ritualSteps[currentStep].id)
+                            }
+                          }}
+                          disabled={!journalText.trim() || ritualSteps[currentStep].completed}
+                          className={`w-full py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                            ritualSteps[currentStep].completed
+                              ? 'bg-green-500/20 text-green-300 cursor-not-allowed'
+                              : !journalText.trim()
+                              ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                              : 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-400 hover:to-purple-400'
+                          }`}
+                        >
+                          {ritualSteps[currentStep].completed ? (
+                            <>
+                              <CheckCircle2 className="w-5 h-5" />
+                              Entrada guardada
+                            </>
+                          ) : (
+                            <>
+                              <BookMarked className="w-5 h-5" />
+                              Guardar entrada
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Columna derecha: Artículos relacionados */}
+                  <div>
+                    <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-purple-400" />
+                      Lectura recomendada
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      {getSuggestedArticles().map((guide) => (
+                        <motion.div
+                          key={guide.id}
+                          whileHover={{ scale: 1.02 }}
+                          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 hover:border-purple-500/50 transition-all cursor-pointer group"
+                        >
+                          <div className="flex gap-3">
+                            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${guide.gradient} flex items-center justify-center flex-shrink-0`}>
+                              <span className="text-2xl">{guide.emoji}</span>
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-bold text-white text-sm mb-1 group-hover:text-purple-400 transition-colors">
+                                {guide.title}
+                              </h5>
+                              <p className="text-xs text-gray-400 line-clamp-2 mb-2">
+                                {guide.excerpt}
+                              </p>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <Clock className="w-3 h-3" />
+                                {guide.readTime}
+                              </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                          </div>
+                        </motion.div>
+                      ))}
+                      
+                      {getSuggestedArticles().length === 0 && (
+                        <div className="text-center py-8 text-gray-400">
+                          <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No hay artículos relacionados</p>
+                        </div>
+                      )}
                     </div>
-                  </motion.article>
-                ))}
-              </motion.div>
-            ) : (
-              /* No results */
-              <motion.div
-                key="no-results"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="text-center py-20"
-              >
-                <div className="inline-block bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 max-w-md mx-auto">
-                  <div className="text-7xl mb-6">📚</div>
-                  <h3 className="text-3xl font-bold text-white mb-4">
-                    No encontramos artículos
-                  </h3>
-                  <p className="text-gray-400 mb-8">
-                    Prueba con otra categoría o término de búsqueda
-                  </p>
+                  </div>
+                </div>
+
+                {/* Navegación entre pasos */}
+                <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/10">
                   <button
-                    onClick={() => {
-                      setSearchTerm('')
-                      setSelectedCategory('Todos')
-                    }}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-3 rounded-xl font-bold hover:from-cyan-400 hover:to-purple-400 transition-all"
+                    onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                    disabled={currentStep === 0}
+                    className="px-6 py-2 rounded-xl font-semibold text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                   >
-                    <X className="w-5 h-5" />
-                    Limpiar filtros
+                    ← Anterior
+                  </button>
+                  
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500">Paso {currentStep + 1} de {totalSteps}</div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setCurrentStep(Math.min(totalSteps - 1, currentStep + 1))}
+                    disabled={currentStep === totalSteps - 1}
+                    className="px-6 py-2 rounded-xl font-semibold text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    Siguiente →
                   </button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </section>
 
-        {/* Newsletter CTA */}
-        <motion.section
+          {/* Mensaje de felicitación al completar todo */}
+          {progressPercentage === 100 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mt-8 bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20 backdrop-blur-xl border-2 border-green-500/50 rounded-3xl p-8 text-center"
+            >
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 0.5, repeat: 3 }}
+              >
+                <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-white mb-2">
+                ¡Felicitaciones! 🎉
+              </h3>
+              <p className="text-gray-300 mb-4">
+                Has completado tu ritual del descanso. Estás listo para una noche de sueño reparador.
+              </p>
+              <button
+                onClick={() => {
+                  setRitualSteps(prev => prev.map(s => ({ ...s, completed: false })))
+                  setCurrentStep(0)
+                  setJournalText('')
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-semibold text-white transition-all"
+              >
+                Reiniciar ritual mañana
+              </button>
+            </motion.div>
+          )}
+        </motion.div>
+      </section>
+
+      {/* SECCIÓN: Guías Esenciales (Solo 3 artículos) */}
+      <section className="relative container mx-auto px-4 py-16">
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20"
+          className="text-center mb-12"
         >
-          <div className="relative bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 rounded-3xl overflow-hidden">
-            {/* Animated blobs */}
-            <div className="absolute inset-0 opacity-30">
-              <motion.div
-                animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-                transition={{ duration: 20, repeat: Infinity }}
-                className="absolute top-0 left-0 w-96 h-96 bg-white/20 rounded-full blur-3xl"
-              />
-              <motion.div
-                animate={{ scale: [1.2, 1, 1.2], rotate: [0, -90, 0] }}
-                transition={{ duration: 15, repeat: Infinity }}
-                className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl"
-              />
-            </div>
+          <h2 className="text-4xl font-bold text-white mb-3">
+            📚 Guías esenciales para tu mejor descanso
+          </h2>
+          <p className="text-gray-400 text-lg">
+            Información práctica y científica que realmente mejorará tu sueño
+          </p>
+        </motion.div>
 
-            <div className="relative p-12 text-center max-w-2xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur-xl mb-6">
-                <Zap className="w-8 h-8 text-white" />
+        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {essentialGuides.map((guide, index) => (
+            <motion.article
+              key={guide.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15 }}
+              className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden hover:border-purple-500/50 hover:scale-[1.03] transition-all cursor-pointer"
+              onClick={() => window.location.href = guide.url}
+            >
+              {/* Emoji grande */}
+              <div className={`relative h-56 bg-gradient-to-br ${guide.gradient} flex items-center justify-center`}>
+                <motion.span
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="text-8xl"
+                >
+                  {guide.emoji}
+                </motion.span>
               </div>
 
-              <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
-                Suscríbete a nuestra newsletter
-              </h3>
-              <p className="text-lg text-white/90 mb-8">
-                Recibe consejos semanales sobre descanso, salud y bienestar directamente en tu email
-              </p>
+              {/* Contenido */}
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">
+                  {guide.title}
+                </h3>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="email"
-                  placeholder="tu@email.com"
-                  className="flex-1 px-6 py-4 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:bg-white/20 focus:border-white/40 transition-all"
-                />
-                <button className="group bg-white text-purple-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-                  Suscribirme
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <p className="text-gray-400 leading-relaxed mb-4">
+                  {guide.excerpt}
+                </p>
+
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    {guide.readTime}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {guide.date}
+                  </div>
+                </div>
+
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    window.location.href = guide.url
+                  }}
+                  className="w-full py-3 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 rounded-xl font-bold text-white transition-all flex items-center justify-center gap-2 group/btn"
+                >
+                  Leer guía completa
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
                 </button>
               </div>
-
-              <p className="text-xs text-white/60 mt-4">
-                Sin spam. Cancela cuando quieras.
-              </p>
-            </div>
-          </div>
-        </motion.section>
-      </div>
+            </motion.article>
+          ))}
+        </div>
+      </section>
 
       {/* CSS Animations */}
       <style jsx>{`
@@ -466,101 +806,36 @@ export default function BlogPage() {
   )
 }
 
-const categories = [
-  'Todos',
-  'Salud del Sueño',
-  'Ergonomía',
-  'Consejos',
-  'Tecnología',
-  'Bienestar',
-]
-
-const articles = [
-  {
-    id: 0,
-    title: 'Cómo elegir la firmeza perfecta para tu colchón',
-    excerpt: 'Descubre qué nivel de firmeza necesitas según tu peso, postura al dormir y preferencias personales. Una guía completa respaldada por expertos en ergonomía.',
-    category: 'Consejos',
-    date: '15 Oct 2025',
-    readTime: '5 min',
-    slug: 'como-elegir-firmeza-colchon',
-    emoji: '💪',
-    author: 'Dr. Ana Martínez',
-    gradient: 'from-orange-500 to-red-600',
-    trending: true
-  },
+// Solo 3 guías esenciales y prácticas
+const essentialGuides = [
   {
     id: 1,
-    title: '7 hábitos para mejorar tu calidad de sueño',
-    excerpt: 'Rutinas nocturnas respaldadas por la ciencia que transformarán tu descanso y energía diaria.',
-    category: 'Salud del Sueño',
-    date: '12 Oct 2025',
-    readTime: '7 min',
-    slug: 'habitos-mejorar-sueno',
-    emoji: '😴',
-    author: 'Carlos Ruiz',
-    gradient: 'from-purple-500 to-pink-600',
-    trending: true
+    title: 'La guía definitiva de higiene del sueño',
+    excerpt: 'Hábitos científicamente comprobados para mejorar la calidad del sueño: horarios consistentes, exposición a luz natural, evitar cafeína 6 horas antes de dormir, rutina nocturna relajante, y mantener tu habitación oscura y fresca.',
+    emoji: '🌙',
+    readTime: '8 min',
+    date: 'Oct 2025',
+    gradient: 'from-purple-600 to-indigo-700',
+    url: '/higiene-sueno' // Ruta a HigieneSueno.tsx
   },
   {
     id: 2,
-    title: 'La importancia de renovar tu colchón',
-    excerpt: 'Señales de que necesitas cambiar de colchón y beneficios de hacerlo para tu salud.',
-    category: 'Consejos',
-    date: '8 Oct 2025',
-    readTime: '4 min',
-    slug: 'cuando-renovar-colchon',
-    emoji: '🔄',
-    author: 'Laura Gómez',
-    gradient: 'from-cyan-500 to-blue-600'
+    title: 'Técnicas comprobadas para dormirse en 10 minutos',
+    excerpt: 'Método de respiración 4-7-8, relajación muscular progresiva, visualización guiada y técnica de escaneo corporal. Estrategias efectivas respaldadas por la ciencia del sueño para conciliar el sueño rápidamente.',
+    emoji: '😴',
+    readTime: '6 min',
+    date: 'Oct 2025',
+    gradient: 'from-cyan-600 to-blue-700',
+    url: '/dormir-rapido' // Ruta a DormirRapido.tsx
   },
   {
     id: 3,
-    title: 'Tecnología de espumas: Memory Foam vs Látex',
-    excerpt: 'Comparativa completa de los materiales más populares en colchones premium modernos.',
-    category: 'Tecnología',
-    date: '5 Oct 2025',
-    readTime: '6 min',
-    slug: 'memory-foam-vs-latex',
-    emoji: '🔬',
-    author: 'Ing. Pedro López',
-    gradient: 'from-green-500 to-emerald-600',
-    trending: true
-  },
-  {
-    id: 4,
-    title: 'Posturas para dormir y salud de la espalda',
-    excerpt: 'Cómo tu posición al dormir afecta tu columna vertebral y cómo mejorarla hoy.',
-    category: 'Ergonomía',
-    date: '1 Oct 2025',
-    readTime: '5 min',
-    slug: 'posturas-dormir-espalda',
-    emoji: '🏥',
-    author: 'Dra. Elena Santos',
-    gradient: 'from-indigo-500 to-purple-600'
-  },
-  {
-    id: 5,
-    title: 'Temperatura ideal para dormir mejor',
-    excerpt: 'Por qué la temperatura de tu habitación es clave para un sueño reparador profundo.',
-    category: 'Bienestar',
-    date: '28 Sep 2025',
-    readTime: '4 min',
-    slug: 'temperatura-ideal-dormir',
-    emoji: '🌡️',
-    author: 'María Fernández',
-    gradient: 'from-lime-500 to-green-600'
-  },
-  {
-    id: 6,
-    title: 'Meditación nocturna para dormir mejor',
-    excerpt: 'Técnicas de meditación y mindfulness que te ayudarán a conciliar el sueño más rápido.',
-    category: 'Bienestar',
-    date: '25 Sep 2025',
-    readTime: '6 min',
-    slug: 'meditacion-nocturna',
-    emoji: '🧘',
-    author: 'Sofia Ramírez',
-    gradient: 'from-pink-500 to-rose-600'
+    title: 'Crea el dormitorio perfecto para dormir mejor',
+    excerpt: 'Temperatura ideal entre 15-19°C, importancia de la oscuridad total, cómo elegir el colchón y almohada correctos, beneficios de materiales transpirables, y estrategias para reducir el ruido ambiental.',
+    emoji: '🛏️',
+    readTime: '7 min',
+    date: 'Oct 2025',
+    gradient: 'from-emerald-600 to-teal-700',
+    url: '/dormitorio-perfecto' // Ruta a DormitorioPerfecto.tsx
   }
 ]

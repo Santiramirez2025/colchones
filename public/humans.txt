@@ -1,0 +1,153 @@
+/* TEAM */
+
+Founder & CEO: Juan García
+Contact: juan [at] tiendacolchon.es
+Twitter: @juangarcia
+Location: Madrid, España
+
+Lead Developer: María López
+Contact: maria [at] tiendacolchon.es
+GitHub: @marialopez
+Location: Barcelona, España
+
+UX/UI Designer: Carlos Martínez
+Contact: carlos [at] tiendacolchon.es
+Dribbble: @carlosmartinez
+Location: Valencia, España
+
+Marketing Manager: Laura Sánchez
+Contact: laura [at] tiendacolchon.es
+LinkedIn: /in/laurasanchez
+Location: Sevilla, España
+
+/* THANKS */
+
+Technology Partners:
+- Next.js team por su increíble framework
+- Vercel por el hosting y deployment
+- Stripe por la pasarela de pagos
+- Cloudinary por la gestión de imágenes
+
+Community:
+- A todos nuestros clientes por su confianza
+- A los beta testers que probaron la plataforma
+- A la comunidad open-source
+
+/* SITE */
+
+Last update: 2024/10/29
+Standards: HTML5, CSS3, ES2024
+Components: React 18, Next.js 15, TypeScript 5
+Software: Visual Studio Code, Figma, Photoshop
+Fonts: Inter, Geist Sans, Geist Mono
+Analytics: Google Analytics 4, Meta Pixel
+Hosting: Vercel
+CDN: Vercel Edge Network
+Database: PostgreSQL (Railway)
+Payments: Stripe
+Email: SendGrid
+
+/* TECHNOLOGIES */
+
+Frontend:
+- Next.js 15 (App Router)
+- React 18
+- TypeScript 5
+- Tailwind CSS 3
+- Framer Motion
+- Zustand
+
+Backend:
+- Next.js API Routes
+- Prisma ORM
+- PostgreSQL
+- Stripe API
+- OpenAI API
+
+Tools:
+- ESLint
+- Prettier
+- Husky
+- Git
+
+Infrastructure:
+- Vercel (Hosting)
+- GitHub (Version Control)
+- GitHub Actions (CI/CD)
+- Cloudflare (DNS)
+
+/* VALUES */
+
+🌱 Sostenibilidad
+Nos comprometemos con el medio ambiente usando materiales reciclables y procesos de fabricación responsables.
+
+💚 Calidad
+Todos nuestros colchones pasan rigurosos controles de calidad y cumplen con las certificaciones europeas.
+
+🚀 Innovación
+Investigamos constantemente nuevas tecnologías para mejorar el descanso de nuestros clientes.
+
+🤝 Transparencia
+Creemos en ser honestos sobre nuestros productos, precios y procesos.
+
+👥 Cliente primero
+Tu satisfacción es nuestra prioridad. 100 noches de prueba sin riesgo.
+
+/* CERTIFICATIONS */
+
+✓ ISO 9001:2015 - Gestión de Calidad
+✓ OEKO-TEX Standard 100 - Textiles seguros
+✓ CertiPUR - Espumas certificadas
+✓ GDPR Compliant - Protección de datos
+✓ PCI DSS Level 1 - Seguridad en pagos
+
+/* CONTACT */
+
+Website: https://tiendacolchon.es
+Email: hola@tiendacolchon.es
+Phone: +34 900 123 456
+WhatsApp: +34 600 123 456
+
+Social Media:
+- Instagram: @tiendacolchon
+- Facebook: /tiendacolchon
+- Twitter: @tiendacolchon
+- LinkedIn: /company/tiendacolchon
+- TikTok: @tiendacolchon
+
+Address:
+TiendaColchon S.L.
+Calle del Descanso, 123
+28001 Madrid, España
+
+/* LEGAL */
+
+Company: TiendaColchon S.L.
+VAT: ESB12345678
+Registry: Registro Mercantil de Madrid
+Tomo: 12345, Libro: 0, Folio: 123
+Hoja: M-123456, Inscripción: 1
+
+                           .--._
+                          /  ` |
+                         |  ,- |
+                          \  `-'
+                           `.  \
+                             |  |
+                             |  |
+                            /  /
+                           (  (
+                            `--`
+                    
+              ¡Gracias por visitarnos!
+         Hecho con ❤️ en España para España
+
+/* ASCII ART */
+                                                        
+  _____ _               _        ____      _      _                
+ |_   _(_) ___ _ __  __| | __ _ / ___|___ | | ___| |__   ___  _ __  
+   | | | |/ _ \ '_ \/ _` |/ _` | |   / _ \| |/ __| '_ \ / _ \| '_ \ 
+   | | | |  __/ | | | (_| | (_| | |__| (_) | | (__| | | | (_) | | | |
+   |_| |_|\___|_| |_|\__,_|\__,_|\____\___/|_|\___|_| |_|\___/|_| |_|
+                                                                      
+            El mejor descanso, garantizado desde 2020

@@ -1,19 +1,146 @@
-# robots.txt
+# robots.txt - TiendaColchon.es
+# Optimizado para SEO y rastreo eficiente
+
+# ============================================
+# CONFIGURACIÓN PARA TODOS LOS BOTS
+# ============================================
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://descansopremium.es/sitemap.xml
-
-# Disallow admin areas (cuando se creen)
-Disallow: /api/
+# Bloquear rutas administrativas y privadas
 Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /dashboard/
+Disallow: /checkout/
+Disallow: /carrito/
+Disallow: /cuenta/
+Disallow: /gracias/
 
-# Allow important pages
+# Bloquear parámetros de búsqueda y filtros
+Disallow: /*?*utm_source=
+Disallow: /*?*utm_medium=
+Disallow: /*?*utm_campaign=
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+Disallow: /*?*ref=
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Bloquear archivos y directorios técnicos
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /static/
+
+# ============================================
+# CONFIGURACIÓN ESPECÍFICA POR BOT
+# ============================================
+
+# Google Bot (prioridad alta)
+User-agent: Googlebot
 Allow: /
-Allow: /simulador
-Allow: /catalogo
-Allow: /blog
-Allow: /comparador
-Allow: /profesional
-Allow: /contacto
+Crawl-delay: 0
+
+# Googlebot Images (permitir imágenes)
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.avif$
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Baiduspider (China)
+User-agent: Baiduspider
+Crawl-delay: 2
+Disallow: /
+
+# Yandex (Rusia)
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
+
+# Facebook Bot (para Open Graph)
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter Bot (para Twitter Cards)
+User-agent: Twitterbot
+Allow: /
+
+# LinkedIn Bot
+User-agent: LinkedInBot
+Allow: /
+
+# Pinterest Bot
+User-agent: Pinterestbot
+Allow: /images/
+Allow: /productos/
+
+# WhatsApp Bot
+User-agent: WhatsApp
+Allow: /
+
+# ============================================
+# BLOQUEAR BOTS MALICIOSOS Y SCRAPERS
+# ============================================
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: SeznamBot
+Disallow: /
+
+# ============================================
+# BLOQUEAR AI SCRAPERS (opcional)
+# ============================================
+# Descomentar si quieres evitar que IA entrene con tu contenido
+
+# User-agent: GPTBot
+# Disallow: /
+
+# User-agent: ChatGPT-User
+# Disallow: /
+
+# User-agent: CCBot
+# Disallow: /
+
+# User-agent: anthropic-ai
+# Disallow: /
+
+# User-agent: Claude-Web
+# Disallow: /
+
+# User-agent: Google-Extended
+# Disallow: /
+
+# ============================================
+# SITEMAPS
+# ============================================
+Sitemap: https://tiendacolchon.es/sitemap.xml
+Sitemap: https://tiendacolchon.es/sitemap-0.xml
+Sitemap: https://tiendacolchon.es/sitemap-products.xml
+Sitemap: https://tiendacolchon.es/sitemap-blog.xml
+
+# ============================================
+# HOST PREFERIDO (importante para SEO)
+# ============================================
+Host: https://tiendacolchon.es

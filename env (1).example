@@ -1,0 +1,17 @@
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=https://tiendacolchon.es
+NEXT_PUBLIC_SITE_NAME=TiendaColchon
+
+# Analytics (opcional)
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
+
+# SEO
+NEXT_PUBLIC_GOOGLE_VERIFICATION=your-google-verification-code
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your-site-verification-code
+
+# API Keys (si aplica)
+# NEXT_PUBLIC_API_URL=https://api.tiendacolchon.es
+
+# Environment
+NODE_ENV=production

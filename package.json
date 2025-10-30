@@ -1,14 +1,58 @@
 {
-  "name": "descanso-premium",
-  "version": "1.0.0",
+  "name": "tiendacolchon",
+  "version": "2.0.0",
+  "description": "E-commerce de colchones premium con tecnología Multisac® - Landing page optimizada para conversión",
   "private": true,
+  "author": {
+    "name": "TiendaColchon",
+    "url": "https://tiendacolchon.es"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "e-commerce",
+    "colchones",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
+    "build:analyze": "cross-env ANALYZE=true next build",
+    "build:production": "npm run type-check && npm run lint && npm run build",
     "start": "next start",
+    "start:production": "cross-env NODE_ENV=production next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "clean": "rm -rf .next out node_modules/.cache",
+    "clean:all": "rm -rf .next out node_modules node_modules/.cache package-lock.json && npm install",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:reset": "prisma migrate reset",
+    "postinstall": "prisma generate",
+    "test": "echo \"No tests configured yet\"",
+    "test:e2e": "echo \"E2E tests not configured\"",
+    "test:lighthouse": "npm run build && npm run start & sleep 5 && lighthouse http://localhost:3000 --view --only-categories=performance,accessibility,best-practices,seo",
+    "test:size": "du -sh .next/static && du -sh .next/server",
+    "analyze:bundle": "npm run build:analyze",
+    "check": "npm run type-check && npm run lint && npm run format:check",
+    "prepare": "husky install || true",
+    "precommit": "npm run lint && npm run type-check",
+    "prepush": "npm run check",
+    "validate": "npm run check && npm run build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,17 +70,46 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.0.3",
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "dotenv-cli": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "husky": "^9.1.6",
+    "next-sitemap": "^4.2.3",
     "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.8",
     "prisma": "^6.18.0",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.20.6",
     "typescript": "^5.6.3"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-arm64": "^15.0.3",
+    "@next/swc-darwin-x64": "^15.0.3",
+    "@next/swc-linux-x64-gnu": "^15.0.3",
+    "@next/swc-win32-x64-msvc": "^15.0.3"
+  },
+  "packageManager": "npm@10.2.3",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

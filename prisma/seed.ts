@@ -3,448 +3,654 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// Helper function para calcular firmeza en texto
+// Helper para firmeza
 function getFirmnessText(percentage: number): string {
   if (percentage <= 40) return 'Suave'
-  if (percentage <= 55) return 'Media-Suave'
-  if (percentage <= 75) return 'Media'
-  if (percentage <= 85) return 'Media-Firme'
+  if (percentage <= 60) return 'Media'
+  if (percentage <= 80) return 'Media-Firme'
   return 'Firme'
 }
 
-// Helper para generar gradientes basados en firmeza
+// Helper para gradientes
 function getGradient(firmness: number): string {
-  if (firmness <= 40) return 'from-blue-400 to-cyan-400'
-  if (firmness <= 55) return 'from-indigo-400 to-blue-500'
-  if (firmness <= 75) return 'from-purple-500 to-indigo-500'
-  if (firmness <= 85) return 'from-violet-500 to-purple-600'
-  return 'from-slate-600 to-gray-700'
+  if (firmness <= 40) return 'from-blue-500 to-cyan-500'
+  if (firmness <= 60) return 'from-violet-500 to-fuchsia-600'
+  if (firmness <= 80) return 'from-purple-500 to-pink-600'
+  return 'from-slate-600 to-zinc-700'
 }
 
 async function main() {
-  console.log('🌱 Iniciando seed de la base de datos Sonpura...')
+  console.log('🌱 Iniciando seed...')
 
   // Limpiar datos existentes
-  console.log('🗑️  Limpiando datos existentes...')
+  console.log('🗑️  Limpiando datos...')
   await prisma.review.deleteMany()
+  await prisma.productVariant.deleteMany()
   await prisma.product.deleteMany()
   await prisma.category.deleteMany()
+  await prisma.coupon.deleteMany()
+  await prisma.newsletter.deleteMany()
 
-  // Crear categorías
+  // ============================================================================
+  // CATEGORÍAS
+  // ============================================================================
   console.log('📁 Creando categorías...')
+  
   const categoryPremium = await prisma.category.create({
     data: {
-      name: 'Colchones Premium Sonpura',
-      slug: 'premium-sonpura',
-      description: 'Colección premium de colchones Sonpura con la mejor tecnología'
+      name: 'Colchones Premium',
+      slug: 'premium',
+      description: 'Colección premium con la mejor tecnología',
+      icon: '✨',
+      gradient: 'from-violet-500 to-fuchsia-600',
+      order: 1,
+      isActive: true,
+      isFeatured: true,
     }
   })
 
-  const categoryCorteIngles = await prisma.category.create({
+  const categoryMemoryFoam = await prisma.category.create({
     data: {
-      name: 'Colección El Corte Inglés',
-      slug: 'el-corte-ingles',
-      description: 'Colección exclusiva disponible en El Corte Inglés'
+      name: 'Memory Foam',
+      slug: 'memory-foam',
+      description: 'Colchones de viscoelástica de alta densidad',
+      icon: '☁️',
+      gradient: 'from-blue-500 to-cyan-600',
+      order: 2,
+      isActive: true,
+      isFeatured: true,
     }
   })
 
-  // Crear productos Sonpura
-  console.log('🛏️  Creando colchones Sonpura...')
+  const categoryHybrid = await prisma.category.create({
+    data: {
+      name: 'Híbridos',
+      slug: 'hibridos',
+      description: 'Combinación perfecta de muelles y viscoelástica',
+      icon: '⚡',
+      gradient: 'from-orange-500 to-red-600',
+      order: 3,
+      isActive: true,
+    }
+  })
+
+  // ============================================================================
+  // CUPONES
+  // ============================================================================
+  console.log('🎟️  Creando cupones...')
   
+  await prisma.coupon.create({
+    data: {
+      code: 'BIENVENIDO10',
+      name: 'Descuento bienvenida',
+      description: '10% de descuento en tu primera compra',
+      discountType: 'percentage',
+      discountValue: 10,
+      minPurchase: 300,
+      maxDiscount: 150,
+      usageLimit: 1000,
+      isActive: true,
+      expiresAt: new Date('2025-12-31')
+    }
+  })
+
+  await prisma.coupon.create({
+    data: {
+      code: 'VERANO2025',
+      name: 'Campaña verano',
+      description: '100€ de descuento en compras superiores a 800€',
+      discountType: 'fixed',
+      discountValue: 100,
+      minPurchase: 800,
+      isActive: true,
+      expiresAt: new Date('2025-09-30')
+    }
+  })
+
+  // ============================================================================
+  // PRODUCTOS PRINCIPALES (Solo 8 top)
+  // ============================================================================
+  console.log('🛏️  Creando productos principales...')
+
   const products = [
     {
-      name: 'Colchón Lexus',
-      price: 1367,
-      firmness: 80,
-      transpirability: 90,
-      height: 30,
-      collection: 'premium',
-      features: ['Firmeza adaptable', 'Máxima transpirabilidad', 'Tecnología Multisac'],
-      techFeatures: ['Núcleo de muelles ensacados', 'Capa viscoelástica premium', 'Tejido Air Fresh'],
-      story: 'El colchón más exclusivo de Sonpura, diseñado para quienes buscan el máximo confort y durabilidad'
-    },
-    {
-      name: 'Colchón Serena',
-      price: 1306,
-      firmness: 70,
-      transpirability: 80,
-      height: 28,
-      collection: 'premium',
-      features: ['Confort equilibrado', 'Alta transpirabilidad', 'Diseño ergonómico'],
-      techFeatures: ['Sistema Multiadapt', 'Gel termorregulador', 'Acolchado de lujo'],
-      story: 'Diseñado para proporcionar un descanso sereno y reparador cada noche'
-    },
-    {
-      name: 'Colchón Royal',
-      price: 855,
-      originalPrice: 1140,
-      discount: 25,
-      firmness: 70,
-      transpirability: 90,
+      name: 'Colchón Lexus Premium',
+      categoryId: categoryPremium.id,
+      price: 1299,
+      originalPrice: 1599,
+      firmnessValue: 75,
+      transpirability: 95,
       height: 32,
-      collection: 'corte-ingles',
-      badge: 'Oferta',
-      features: ['Altura extra confort', 'Excelente transpirabilidad', 'Garantía premium'],
-      techFeatures: ['32cm de altura', 'Sistema Advanced', 'Tratamiento higiénico'],
-      story: 'Calidad real para un descanso digno de realeza'
-    },
-    {
-      name: 'Colchón Carisma',
-      price: 855,
-      originalPrice: 1140,
-      discount: 25,
-      firmness: 50,
-      transpirability: 90,
-      height: 32,
-      collection: 'corte-ingles',
-      badge: 'Oferta',
-      features: ['Suavidad media', 'Alta transpirabilidad', 'Gran altura'],
-      techFeatures: ['Viscoelástica de alta densidad', 'Micromuelles', 'Tejido Strech'],
-      story: 'El carisma del buen descanso en cada noche'
-    },
-    {
-      name: 'Colchón Spirit',
-      price: 803,
-      originalPrice: 1071,
-      discount: 25,
-      firmness: 50,
-      transpirability: 80,
-      height: 30,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Confort envolvente', 'Adaptabilidad progresiva', 'Diseño moderno'],
-      techFeatures: ['Espuma HR alta densidad', 'Sistema de ventilación', 'Funda extraíble'],
-      story: 'El espíritu del descanso perfecto'
-    },
-    {
-      name: 'Colchón Titán',
-      price: 739,
-      originalPrice: 985,
-      discount: 25,
-      firmness: 100,
-      transpirability: 90,
-      height: 32,
-      collection: 'premium',
-      badge: 'Extra Firme',
-      features: ['Firmeza máxima', 'Para durmientes pesados', 'Ultra resistente'],
-      techFeatures: ['Núcleo HR de alta densidad', 'Refuerzos perimetrales', 'Capa de firmeza'],
-      story: 'Firmeza titánica para un soporte incomparable'
-    },
-    {
-      name: 'Colchón Gaudí 25',
-      price: 691,
-      originalPrice: 921,
-      discount: 25,
-      firmness: 70,
-      transpirability: 90,
-      height: 25,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Diseño compacto', 'Confort equilibrado', 'Fácil manejo'],
-      techFeatures: ['25cm de altura optimizada', 'Muelles Multisac', 'Acolchado Soft'],
-      story: 'Inspirado en la genialidad de Gaudí, arte y confort'
-    },
-    {
-      name: 'Colchón Gaudí',
-      price: 691,
-      originalPrice: 921,
-      discount: 25,
-      firmness: 70,
-      transpirability: 90,
-      height: 31,
-      collection: 'premium',
-      badge: 'Oferta',
+      weight: 38,
+      isFeatured: true,
       isBestSeller: true,
-      features: ['Altura premium', 'Excelente ventilación', 'Confort superior'],
-      techFeatures: ['31cm de grosor', 'Tecnología Multisac System', 'Tejido 3D transpirable'],
-      story: 'La obra maestra del descanso'
+      isNew: false,
+      badge: 'PREMIUM',
+      cooling: true,
+      hypoallergenic: true,
+      eco: true,
+      washable: true,
+      satisfaction: 98,
+      subtitle: 'El colchón más exclusivo de nuestra colección',
+      description: 'Tecnología europea de última generación con 7 zonas diferenciadas de confort. Sistema de muelles ensacados de precisión con capa superior de gel viscoelástico termorregulador.',
+      story: 'Diseñado para quienes buscan el máximo confort y durabilidad. Cada detalle ha sido pensado para proporcionar el descanso perfecto.',
+      features: [
+        'Sistema de muelles ensacados de precisión',
+        'Capa de gel viscoelástico termorregulador',
+        '7 zonas diferenciadas de confort',
+        'Tejido Air Fresh con tratamiento antiácaros',
+        'Refuerzos perimetrales HD'
+      ],
+      techFeatures: [
+        'Núcleo: 1200 muelles ensacados individuales',
+        'Capa viscoelástica: 5cm de gel memory foam',
+        'Altura total: 32cm',
+        'Peso aproximado: 38kg',
+        'Certificaciones: CertiPUR-US, OEKO-TEX Standard 100'
+      ],
+      highlights: [
+        'Máxima adaptabilidad',
+        'Sistema cooling avanzado',
+        'Independencia de lechos total'
+      ]
     },
     {
-      name: 'Colchón Silence',
-      price: 647,
-      originalPrice: 862,
-      discount: 25,
-      firmness: 60,
-      transpirability: 80,
-      height: 29,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Confort silencioso', 'Independencia de lechos', 'Aislamiento de movimientos'],
-      techFeatures: ['Muelles silenciosos', 'Capa anti-ruido', 'Viscoelástica adaptativa'],
-      story: 'El silencio perfecto para noches sin interrupciones'
-    },
-    {
-      name: 'Colchón Brisa',
-      price: 849,
-      firmness: 70,
+      name: 'Colchón Gaudí Elite',
+      categoryId: categoryHybrid.id,
+      price: 899,
+      originalPrice: 1199,
+      firmnessValue: 70,
       transpirability: 90,
-      height: 29,
-      collection: 'premium',
-      features: ['Máxima frescura', 'Ventilación óptima', 'Confort veraniego'],
-      techFeatures: ['Tejido Air Cool', 'Canales de ventilación', 'Gel refrigerante'],
-      story: 'Como una brisa fresca en las noches de verano'
+      height: 30,
+      weight: 33,
+      isFeatured: true,
+      isBestSeller: true,
+      badge: '-25%',
+      cooling: true,
+      hypoallergenic: true,
+      eco: false,
+      washable: true,
+      satisfaction: 96,
+      subtitle: 'Obra maestra del descanso híbrido',
+      description: 'Colchón híbrido que combina lo mejor de muelles ensacados y viscoelástica. Sistema Multisac de última generación para adaptación perfecta.',
+      story: 'Inspirado en la genialidad de Gaudí, este colchón es una obra de arte funcional que transforma tu descanso.',
+      features: [
+        'Sistema híbrido muelles + viscoelástica',
+        'Tecnología Multisac System',
+        'Tejido 3D transpirable',
+        'Acolchado progresivo',
+        'Tratamiento higiénico permanente'
+      ],
+      techFeatures: [
+        'Núcleo: 800 muelles Multisac',
+        'Viscoelástica: 3cm de alta densidad',
+        'Espuma HR: 2cm de transición',
+        'Funda: Tejido Strech 3D',
+        'Garantía: 10 años'
+      ],
+      highlights: [
+        'Confort equilibrado',
+        'Excelente ventilación',
+        'Relación calidad-precio óptima'
+      ]
     },
     {
-      name: 'Colchón Golden',
-      price: 424,
-      originalPrice: 848,
-      discount: 50,
-      firmness: 70,
-      transpirability: 90,
-      height: 29,
-      collection: 'corte-ingles',
+      name: 'Colchón Golden Supreme',
+      categoryId: categoryMemoryFoam.id,
+      price: 649,
+      originalPrice: 1299,
+      firmnessValue: 65,
+      transpirability: 85,
+      height: 28,
+      weight: 29,
+      isFeatured: true,
+      isBestSeller: true,
       badge: '50% OFF',
-      isBestSeller: true,
-      features: ['Mejor precio', 'Calidad garantizada', 'Oferta limitada'],
-      techFeatures: ['Muelles bonell', 'Acolchado confort', 'Tejido acolchado'],
-      story: 'Oro puro en calidad-precio'
+      cooling: false,
+      hypoallergenic: true,
+      eco: false,
+      washable: true,
+      satisfaction: 94,
+      subtitle: 'Lujo accesible para todos',
+      description: 'Memory foam de alta densidad con adaptación progresiva. Perfecto equilibrio entre soporte y confort a un precio excepcional.',
+      story: 'Oro puro en relación calidad-precio. Un colchón premium ahora al alcance de todos.',
+      features: [
+        'Viscoelástica de alta densidad',
+        'Adaptación progresiva al cuerpo',
+        'Sistema de ventilación integrado',
+        'Funda acolchada extraíble',
+        'Tratamiento antiácaros'
+      ],
+      techFeatures: [
+        'Núcleo: Espuma HR 30kg/m³',
+        'Viscoelástica: 4cm adaptativa',
+        'Altura: 28cm',
+        'Densidad núcleo: Alta resistencia',
+        'Prueba: 100 noches'
+      ],
+      highlights: [
+        'Mejor precio garantizado',
+        'Confort viscoelástico',
+        'Oferta por tiempo limitado'
+      ]
     },
     {
-      name: 'Colchón Indra',
-      price: 600,
-      originalPrice: 800,
-      discount: 25,
-      firmness: 90,
-      transpirability: 90,
-      height: 31,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Alta firmeza', 'Soporte reforzado', 'Muy transpirable'],
-      techFeatures: ['Núcleo extra firme', 'Sistema de refuerzo lumbar', 'Tejido 4D'],
-      story: 'Soporte divino para tu espalda'
-    },
-    {
-      name: 'Colchón Element',
-      price: 565,
-      originalPrice: 753,
-      discount: 25,
-      firmness: 60,
-      transpirability: 80,
-      height: 28,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Balance natural', 'Confort adaptable', 'Diseño versátil'],
-      techFeatures: ['Espumas HR combinadas', 'Sistema de zonas', 'Funda lavable'],
-      story: 'Los elementos perfectos del descanso unidos'
-    },
-    {
-      name: 'Colchón Zenit',
-      price: 565,
-      originalPrice: 753,
-      discount: 25,
-      firmness: 80,
-      transpirability: 80,
-      height: 27,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Firmeza superior', 'Soporte óptimo', 'Compacto y eficiente'],
-      techFeatures: ['Alta densidad', 'Refuerzos laterales', 'Núcleo estable'],
-      story: 'Alcanza el cenit del descanso'
-    },
-    {
-      name: 'Colchón Lotus',
-      price: 565,
-      originalPrice: 753,
-      discount: 25,
-      firmness: 60,
-      transpirability: 90,
+      name: 'Colchón Titán Ultra',
+      categoryId: categoryPremium.id,
+      price: 1099,
+      originalPrice: null,
+      firmnessValue: 95,
+      transpirability: 88,
       height: 30,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Pureza y confort', 'Alta ventilación', 'Adaptabilidad zen'],
-      techFeatures: ['Muelles Micro', 'Viscoelástica natural', 'Tejido orgánico'],
-      story: 'Como una flor de loto, puro y natural'
+      weight: 42,
+      isFeatured: false,
+      isBestSeller: false,
+      badge: 'EXTRA FIRME',
+      cooling: true,
+      hypoallergenic: true,
+      eco: true,
+      washable: true,
+      satisfaction: 97,
+      subtitle: 'Máxima firmeza para soporte total',
+      description: 'Diseñado específicamente para personas que necesitan firmeza extra. Ideal para durmientes de espalda y personas con peso elevado.',
+      story: 'Firmeza titánica sin comprometer el confort. La solución definitiva para quienes necesitan soporte máximo.',
+      features: [
+        'Firmeza máxima 95%',
+        'Refuerzos perimetrales reforzados',
+        'Núcleo HR de ultra alta densidad',
+        'Sistema de soporte lumbar',
+        'Ideal para +90kg'
+      ],
+      techFeatures: [
+        'Núcleo: HR 40kg/m³',
+        'Capa firmeza: Espuma HD',
+        'Refuerzos: Perimetrales 3D',
+        'Sistema: Soporte lumbar activo',
+        'Garantía: 15 años'
+      ],
+      highlights: [
+        'Firmeza extrema',
+        'Para durmientes pesados',
+        'Soporte lumbar avanzado'
+      ]
     },
     {
-      name: 'Colchón Bloom',
-      price: 417,
-      originalPrice: 556,
-      discount: 25,
-      firmness: 90,
-      transpirability: 70,
-      height: 27,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Firmeza elevada', 'Precio accesible', 'Calidad garantizada'],
-      techFeatures: ['Núcleo firme HR', 'Acolchado básico', 'Tratamiento higiénico'],
-      story: 'Florece tu descanso cada mañana'
-    },
-    {
-      name: 'Colchón Fusión',
-      price: 417,
-      originalPrice: 556,
-      discount: 25,
-      firmness: 60,
-      transpirability: 90,
-      height: 30,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Tecnología combinada', 'Excelente ventilación', 'Precio competitivo'],
-      techFeatures: ['Fusión de espumas', 'Muelles y viscoelástica', 'Sistema híbrido'],
-      story: 'La fusión perfecta de tecnologías'
-    },
-    {
-      name: 'Colchón Solei',
-      price: 417,
-      originalPrice: 556,
-      discount: 25,
-      firmness: 80,
-      transpirability: 90,
-      height: 30,
-      collection: 'premium',
-      badge: 'Oferta',
-      features: ['Firmeza media-alta', 'Gran transpirabilidad', 'Relación calidad-precio'],
-      techFeatures: ['Núcleo HR plus', 'Capa confort', 'Tejido transpirable'],
-      story: 'Brilla con energía cada mañana'
-    },
-    {
-      name: 'Colchón Prisma24',
-      price: 360,
-      originalPrice: 480,
-      discount: 25,
-      firmness: 70,
+      name: 'Colchón Serena Cloud',
+      categoryId: categoryMemoryFoam.id,
+      price: 799,
+      originalPrice: 999,
+      firmnessValue: 45,
       transpirability: 80,
-      height: 24,
-      collection: 'premium',
-      badge: 'Mejor Precio',
-      isBestSeller: true,
-      features: ['Altura compacta', 'Excelente calidad', 'Precio imbatible'],
-      techFeatures: ['24cm optimizados', 'Espuma confort', 'Funda acolchada'],
-      story: 'La mejor opción para presupuestos ajustados'
+      height: 26,
+      weight: 26,
+      isFeatured: true,
+      isBestSeller: false,
+      isNew: true,
+      badge: 'NUEVO',
+      cooling: false,
+      hypoallergenic: true,
+      eco: true,
+      washable: true,
+      satisfaction: 95,
+      subtitle: 'Suavidad envolvente como una nube',
+      description: 'Viscoelástica premium de baja firmeza para quienes prefieren un colchón suave y acogedor. Perfecto para durmientes laterales.',
+      story: 'Como descansar en una nube. Diseñado para proporcionar el abrazo perfecto durante toda la noche.',
+      features: [
+        'Suavidad premium',
+        'Ideal para durmientes laterales',
+        'Viscoelástica de célula abierta',
+        'Acolchado extra mullido',
+        'Funda ultra suave'
+      ],
+      techFeatures: [
+        'Firmeza: Suave (45%)',
+        'Viscoelástica: 6cm de baja densidad',
+        'Núcleo: Espuma Soft HR',
+        'Funda: Bambú hipoalergénico',
+        'Certificado: OEKO-TEX'
+      ],
+      highlights: [
+        'Máxima suavidad',
+        'Perfecto para lateral',
+        'Materiales ecológicos'
+      ]
     },
     {
-      name: 'Colchón Prisma',
-      price: 360,
-      originalPrice: 480,
-      discount: 25,
-      firmness: 70,
-      transpirability: 80,
+      name: 'Colchón Brisa Fresh',
+      categoryId: categoryHybrid.id,
+      price: 949,
+      originalPrice: null,
+      firmnessValue: 68,
+      transpirability: 98,
       height: 29,
-      collection: 'premium',
-      badge: 'Mejor Precio',
-      features: ['Altura estándar', 'Confort garantizado', 'Precio excepcional'],
-      techFeatures: ['29cm de confort', 'Espumas HR', 'Acabado premium'],
-      story: 'Refleja el mejor descanso a un precio brillante'
+      weight: 31,
+      isFeatured: true,
+      isBestSeller: false,
+      isNew: true,
+      badge: 'COOLING',
+      cooling: true,
+      hypoallergenic: true,
+      eco: false,
+      washable: true,
+      satisfaction: 96,
+      subtitle: 'Máxima frescura toda la noche',
+      description: 'Tecnología cooling avanzada con gel termorregulador y canales de ventilación. Ideal para personas calurosas y climas cálidos.',
+      story: 'Como una brisa fresca en las noches de verano. Duerme fresco incluso en las noches más calurosas.',
+      features: [
+        'Sistema Cooling Pro',
+        'Gel termorregulador activo',
+        'Canales de ventilación 360º',
+        'Tejido Air Cool transpirable',
+        'Disipación rápida del calor'
+      ],
+      techFeatures: [
+        'Gel cooling: Capa de 2cm',
+        'Ventilación: Sistema 3D Flow',
+        'Muelles: Micro ensacados',
+        'Tejido: Air Cool Tech',
+        'Transpirabilidad: 98%'
+      ],
+      highlights: [
+        'Efecto refrigerante',
+        'Perfecto para verano',
+        'Sin sudoración nocturna'
+      ]
+    },
+    {
+      name: 'Colchón Element Natural',
+      categoryId: categoryMemoryFoam.id,
+      price: 699,
+      originalPrice: 899,
+      firmnessValue: 60,
+      transpirability: 82,
+      height: 27,
+      weight: 27,
+      isFeatured: false,
+      isBestSeller: false,
+      badge: null,
+      cooling: false,
+      hypoallergenic: true,
+      eco: true,
+      washable: true,
+      satisfaction: 93,
+      subtitle: 'Equilibrio natural perfecto',
+      description: 'Materiales naturales y ecológicos. Látex natural combinado con espumas certificadas. Para los que buscan un descanso sostenible.',
+      story: 'Los elementos de la naturaleza unidos para tu descanso. Sostenible y confortable.',
+      features: [
+        'Látex 100% natural',
+        'Materiales ecológicos certificados',
+        'Libre de químicos nocivos',
+        'Tejido orgánico de algodón',
+        'Producción sostenible'
+      ],
+      techFeatures: [
+        'Látex: Natural Talalay',
+        'Espumas: CertiPUR certificadas',
+        'Funda: Algodón orgánico',
+        'Certificaciones: GOTS, OEKO-TEX',
+        'Reciclable: 95%'
+      ],
+      highlights: [
+        'Materiales naturales',
+        'Ecológico certificado',
+        'Hipoalergénico total'
+      ]
+    },
+    {
+      name: 'Colchón Prisma Classic',
+      categoryId: categoryMemoryFoam.id,
+      price: 449,
+      originalPrice: 599,
+      firmnessValue: 70,
+      transpirability: 75,
+      height: 24,
+      weight: 22,
+      isFeatured: false,
+      isBestSeller: true,
+      badge: 'MEJOR PRECIO',
+      cooling: false,
+      hypoallergenic: true,
+      eco: false,
+      washable: false,
+      satisfaction: 91,
+      subtitle: 'Calidad esencial a precio increíble',
+      description: 'Colchón de calidad esencial perfecto para habitaciones de invitados, segundas residencias o presupuestos ajustados sin renunciar al confort.',
+      story: 'La opción inteligente. Calidad garantizada al mejor precio del mercado.',
+      features: [
+        'Precio imbatible',
+        'Calidad garantizada',
+        'Confort equilibrado',
+        'Fácil mantenimiento',
+        'Entrega rápida'
+      ],
+      techFeatures: [
+        'Altura: 24cm compactos',
+        'Espuma: HR 25kg/m³',
+        'Acolchado: Confort basic',
+        'Funda: Tejido acolchado',
+        'Garantía: 10 años'
+      ],
+      highlights: [
+        'Precio excepcional',
+        'Calidad garantizada',
+        'Ideal segunda vivienda'
+      ]
     }
   ]
 
-  // Crear todos los productos
-  for (let index = 0; index < products.length; index++) {
-    const productData = products[index]
-    const categoryId = productData.collection === 'corte-ingles' 
-      ? categoryCorteIngles.id 
-      : categoryPremium.id
+  // Tallas disponibles
+  const sizes = [
+    { size: '90x190', multiplier: 1 },
+    { size: '105x190', multiplier: 1.15 },
+    { size: '135x190', multiplier: 1.35 },
+    { size: '150x190', multiplier: 1.5 },
+    { size: '160x200', multiplier: 1.65 },
+    { size: '180x200', multiplier: 1.85 }
+  ]
 
-    const slug = productData.name.toLowerCase()
+  // Crear productos
+  for (let i = 0; i < products.length; i++) {
+    const p = products[i]
+    const slug = p.name.toLowerCase()
       .replace('colchón ', '')
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '')
 
-    await prisma.product.create({
+    const discount = p.originalPrice 
+      ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
+      : 0
+
+    const product = await prisma.product.create({
       data: {
-        name: productData.name,
+        name: p.name,
         slug: slug,
-        subtitle: `Firmeza ${productData.firmness}% - Transpirabilidad ${productData.transpirability}%`,
-        description: `${productData.story}. Altura de ${productData.height}cm para máximo confort.`,
-        price: productData.price,
-        originalPrice: productData.originalPrice || null,
-        firmness: getFirmnessText(productData.firmness),
-        rating: 4.5 + Math.random() * 0.4, // Entre 4.5 y 4.9
-        reviewCount: Math.floor(Math.random() * 2000) + 500,
-        story: productData.story,
-        image: `/products/${slug}.jpg`,
+        subtitle: p.subtitle,
+        description: p.description,
+        story: p.story,
+        
+        price: p.price,
+        originalPrice: p.originalPrice,
+        discount: discount,
+        
+        firmnessValue: p.firmnessValue,
+        firmness: getFirmnessText(p.firmnessValue),
+        transpirability: p.transpirability,
+        height: p.height,
+        weight: p.weight,
+        
+        rating: 4.5 + Math.random() * 0.5,
+        reviewCount: Math.floor(Math.random() * 1500) + 300,
+        salesCount: Math.floor(Math.random() * 500) + 100,
+        viewsCount: Math.floor(Math.random() * 5000) + 1000,
+        
+        image: `/products/${slug}/main.jpg`,
         images: JSON.stringify([
-          `/products/${slug}.jpg`,
-          `/products/${slug}-2.jpg`
+          `/products/${slug}/main.jpg`,
+          `/products/${slug}/detail-1.jpg`,
+          `/products/${slug}/detail-2.jpg`,
+          `/products/${slug}/lifestyle.jpg`
         ]),
-        features: JSON.stringify([
-          ...productData.features,
-          `Altura: ${productData.height}cm`,
-          `Transpirabilidad: ${productData.transpirability}%`
-        ]),
-        techFeatures: JSON.stringify(productData.techFeatures),
+        videoUrl: null,
+        gradient: getGradient(p.firmnessValue),
+        
+        features: JSON.stringify(p.features),
+        techFeatures: JSON.stringify(p.techFeatures),
+        highlights: JSON.stringify(p.highlights),
         certifications: JSON.stringify([
-          'Oeko-Tex Standard 100',
-          'CertiPUR',
-          'ISO 9001',
-          'Garantía Sonpura'
+          'CertiPUR-US®',
+          'OEKO-TEX Standard 100',
+          'ISO 9001:2015'
         ]),
-        badge: productData.badge || null,
-        isNew: false,
-        isBestSeller: productData.isBestSeller || false,
+        tags: JSON.stringify([
+          p.badge?.toLowerCase() || '',
+          getFirmnessText(p.firmnessValue).toLowerCase(),
+          p.cooling ? 'cooling' : '',
+          p.eco ? 'eco' : ''
+        ].filter(Boolean)),
+        
+        materials: JSON.stringify([
+          'Viscoelástica premium',
+          'Espuma HR',
+          'Tejido técnico'
+        ]),
+        
+        badge: p.badge,
+        isNew: p.isNew || false,
+        isBestSeller: p.isBestSeller,
+        isFeatured: p.isFeatured,
         isActive: true,
-        gradient: getGradient(productData.firmness),
-        discount: productData.discount || 0,
-        stock: Math.floor(Math.random() * 50) + 10,
-        sku: `SP-${String(index + 1).padStart(3, '0')}-${Date.now().toString().slice(-4)}`,
-        categoryId: categoryId,
-        metaTitle: `${productData.name} - Sonpura | Descanso Premium`,
-        metaDescription: `${productData.name} con ${productData.firmness}% de firmeza y ${productData.transpirability}% de transpirabilidad. ${productData.story}`
+        isEco: p.eco,
+        
+        cooling: p.cooling,
+        hypoallergenic: p.hypoallergenic,
+        eco: p.eco,
+        washable: p.washable,
+        verified: true,
+        bestValue: discount >= 40,
+        satisfaction: p.satisfaction,
+        
+        stock: Math.floor(Math.random() * 40) + 15,
+        inStock: true,
+        lowStockThreshold: 10,
+        sku: `SP-${String(i + 1).padStart(3, '0')}`,
+        deliveryDays: 2,
+        freeShipping: true,
+        warranty: 10,
+        trialNights: 100,
+        
+        position: i,
+        categoryId: p.categoryId,
+        
+        metaTitle: `${p.name} - Descanso Premium | Envío Gratis`,
+        metaDescription: `${p.subtitle}. ${p.description.substring(0, 150)}...`,
+        metaKeywords: `${slug}, colchón, ${getFirmnessText(p.firmnessValue)}`
       }
     })
+
+    // Crear variantes
+    for (const sizeData of sizes) {
+      await prisma.productVariant.create({
+        data: {
+          productId: product.id,
+          size: sizeData.size,
+          dimensions: `${sizeData.size.split('x')[0]}cm x ${sizeData.size.split('x')[1]}cm x ${p.height}cm`,
+          price: Math.round(p.price * sizeData.multiplier),
+          originalPrice: p.originalPrice ? Math.round(p.originalPrice * sizeData.multiplier) : null,
+          stock: Math.floor(Math.random() * 15) + 5,
+          sku: `${product.sku}-${sizeData.size.replace('x', '')}`,
+          weight: p.weight ? p.weight * sizeData.multiplier : null,
+          isAvailable: true
+        }
+      })
+    }
+
+    console.log(`   ✓ ${p.name}`)
   }
 
-  // Crear algunas reviews de ejemplo
-  console.log('⭐ Creando reviews de ejemplo...')
-  
-  const allProducts = await prisma.product.findMany()
-  
-  const reviewTemplates = [
+  // ============================================================================
+  // REVIEWS
+  // ============================================================================
+  console.log('⭐ Creando reviews...')
+
+  const allProducts = await prisma.product.findMany({ take: 5 })
+
+  const reviews = [
     {
       rating: 5,
-      title: 'Excelente calidad',
-      comment: 'Muy contento con la compra. La calidad es excepcional y el confort es justo lo que buscaba.',
+      title: 'Excelente inversión',
+      comment: 'Llevaba años buscando el colchón perfecto y finalmente lo encontré. Mi espalda lo agradece cada mañana. La calidad es excepcional.',
       userName: 'María González',
-      userLocation: 'Madrid'
+      userLocation: 'Madrid, España',
+      comfortRating: 5,
+      qualityRating: 5,
+      valueRating: 5,
+      usageDays: 60
     },
     {
       rating: 5,
       title: 'Muy recomendable',
-      comment: 'El mejor colchón que he tenido. Mi espalda lo nota cada mañana.',
+      comment: 'Después de 3 meses de uso puedo decir que es el mejor colchón que he tenido. Duermo profundamente y sin dolores. 100% recomendado.',
       userName: 'Carlos Rodríguez',
-      userLocation: 'Barcelona'
+      userLocation: 'Barcelona, España',
+      comfortRating: 5,
+      qualityRating: 5,
+      valueRating: 4,
+      usageDays: 90
     },
     {
       rating: 4,
-      title: 'Buena compra',
-      comment: 'Relación calidad-precio muy buena. Estoy satisfecho con la elección.',
+      title: 'Buena calidad-precio',
+      comment: 'Muy satisfecho con la compra. Es firme pero cómodo. La única pega es que tardó un par de días en expandirse completamente.',
       userName: 'Ana Martínez',
-      userLocation: 'Valencia'
+      userLocation: 'Valencia, España',
+      comfortRating: 4,
+      qualityRating: 5,
+      valueRating: 5,
+      usageDays: 45
     }
   ]
 
-  // Añadir 2-3 reviews a algunos productos
-  for (let i = 0; i < Math.min(5, allProducts.length); i++) {
-    const product = allProducts[i]
-    const numReviews = Math.floor(Math.random() * 2) + 1
-    
-    for (let j = 0; j < numReviews; j++) {
-      const template = reviewTemplates[j % reviewTemplates.length]
+  for (const product of allProducts) {
+    for (let i = 0; i < 2; i++) {
+      const review = reviews[i]
       await prisma.review.create({
         data: {
           productId: product.id,
-          rating: template.rating,
-          title: template.title,
-          comment: template.comment,
+          rating: review.rating,
+          title: review.title,
+          comment: review.comment,
           verified: true,
-          userName: template.userName,
-          userLocation: template.userLocation
+          purchaseVerified: true,
+          isPublished: true,
+          userName: review.userName,
+          userLocation: review.userLocation,
+          comfortRating: review.comfortRating,
+          qualityRating: review.qualityRating,
+          valueRating: review.valueRating,
+          usageDays: review.usageDays,
+          wouldRecommend: true,
+          helpfulCount: Math.floor(Math.random() * 30) + 5
         }
       })
     }
   }
 
-  console.log('✅ Seed completado exitosamente!')
-  console.log(`📊 Creados:`)
+  // ============================================================================
+  // RESUMEN
+  // ============================================================================
+  console.log('\n✅ Seed completado exitosamente!')
+  console.log(`📊 Resumen:`)
   console.log(`   - ${await prisma.category.count()} categorías`)
-  console.log(`   - ${await prisma.product.count()} productos Sonpura`)
+  console.log(`   - ${await prisma.product.count()} productos`)
+  console.log(`   - ${await prisma.productVariant.count()} variantes`)
   console.log(`   - ${await prisma.review.count()} reviews`)
-  console.log(`\n🛏️  Catálogo Sonpura listo para usar!`)
+  console.log(`   - ${await prisma.coupon.count()} cupones`)
+  console.log(`\n🛏️  ¡Todo listo para usar!`)
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error durante el seed:', e)
+    console.error('❌ Error:', e)
     process.exit(1)
   })
   .finally(async () => {
