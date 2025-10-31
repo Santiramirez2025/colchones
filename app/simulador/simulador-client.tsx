@@ -368,42 +368,6 @@ function ResultsScreen({ recommendations, onRestart }: any) {
           </div>
         </motion.div>
 
-        {/* Other recommendations */}
-        {recommendations.length > 1 && (
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {recommendations.slice(1, 3).map((product: any, i: number) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + i * 0.1 }}
-                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">🛏️</span>
-                  <span className="px-3 py-1 bg-violet-500/20 text-violet-300 text-xs font-bold rounded-full">
-                    {product.matchPercentage}% match
-                  </span>
-                </div>
-                <h4 className="text-xl font-black text-white mb-2">{product.name}</h4>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-black text-white">{product.price}€</span>
-                  {product.originalPrice && (
-                    <span className="text-sm text-zinc-500 line-through">{product.originalPrice}€</span>
-                  )}
-                </div>
-                <Link
-                  href={`/producto/${product.slug}`}
-                  className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-semibold text-sm transition-colors"
-                >
-                  Ver detalles
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        )}
-
         {/* Benefits */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {[
