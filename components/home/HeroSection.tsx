@@ -158,11 +158,11 @@
               >
                 <h1 id="hero-heading" className="text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter">
                   <span className="block text-white">
-                    Duerme como nunca,
+                  Dormir bien,
                   </span>
                   <span className="block relative">
                     <span className="relative z-10 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                      despierta invencible
+                    es vivir mejor
                     </span>
                     {!prefersReducedMotion && (
                       <motion.div
