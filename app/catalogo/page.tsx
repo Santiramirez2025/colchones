@@ -51,7 +51,8 @@ function CatalogoLoading() {
 }
 
 export default async function CatalogoPage() {
-  const products = await getProducts()
+  // getProducts() retorna { data: [], total, page, limit, hasMore }
+  const { data: products, total } = await getProducts()
 
   if (!products || products.length === 0) {
     return (
@@ -77,10 +78,32 @@ export default async function CatalogoPage() {
     )
   }
 
-  const normalizedProducts = products.map((product: any) => ({
-    ...product,
-    images: Array.isArray(product.images) ? product.images[0] : product.images,
-  }))
+  // Normalizamos TODOS los campos array a strings
+  const normalizedProducts = products.map((product) => {
+    const normalized: any = { ...product }
+    
+    // Lista de campos que son arrays y deben convertirse a strings
+    const arrayFields = [
+      'images', 'features', 'techFeatures', 'certifications', 
+      'tags', 'highlights', 'benefits', 'specifications'
+    ]
+    
+    arrayFields.forEach(field => {
+      if (field === 'images') {
+        // Para images, solo tomamos la primera
+        normalized[field] = Array.isArray(product[field as keyof typeof product]) 
+          ? (product[field as keyof typeof product] as string[])[0] || '' 
+          : product[field as keyof typeof product]
+      } else {
+        // Para el resto, unimos con saltos de línea
+        normalized[field] = Array.isArray(product[field as keyof typeof product])
+          ? (product[field as keyof typeof product] as string[]).join('\n')
+          : product[field as keyof typeof product]
+      }
+    })
+    
+    return normalized
+  })
 
   return (
     <Suspense fallback={<CatalogoLoading />}>

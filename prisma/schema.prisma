@@ -1,4 +1,4 @@
-// prisma/schema.prisma - Versión Optimizada y Completa
+// prisma/schema.prisma - Versión Corregida
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,166 +9,175 @@ datasource db {
 }
 
 // ============================================================================
-// PRODUCT MODEL - Colchones y Productos
+// ENUMS
+// ============================================================================
+enum Firmness {
+  SUAVE
+  MEDIA
+  MEDIA_ALTA
+  FIRME
+  EXTRA_FIRME
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+}
+
+enum FAQCategory {
+  ENVIO
+  GARANTIA
+  PRODUCTO
+  PAGO
+  GENERAL
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+// ============================================================================
+// MODELS
 // ============================================================================
 model Product {
   id            String   @id @default(cuid())
   
-  // ===== Basic Info =====
   name          String
   slug          String   @unique
   subtitle      String
-  description   String?  @default("")
-  story         String?  @default("")  // Historia del producto para página de detalle
+  description   String   @default("")
+  story         String   @default("")
   
-  // ===== Pricing =====
   price         Float
   originalPrice Float?
-  compareAtPrice Float?  // Precio de comparación (si es diferente a originalPrice)
-  discount      Int      @default(0)  // Porcentaje de descuento calculado
+  compareAtPrice Float?
+  discount      Int      @default(0)
   
-  // ===== Características Físicas/Técnicas =====
-  firmnessValue      Int      @default(70)   // 0-100% (numérico para filtros)
-  firmness           String   @default("Media")  // "Suave", "Media", "Firme", "Extra Firme"
-  transpirability    Int      @default(80)   // 0-100%
-  height            Int      @default(25)    // Altura en cm
-  weight            Float?                   // Peso en kg del colchón
+  firmnessValue      Int      @default(70)
+  firmness           Firmness @default(MEDIA)
+  transpirability    Int      @default(80)
+  adaptability       Int      @default(80)
+  height            Int      @default(25)
+  weight            Float?
+  maxWeightPerPerson Int?
   
-  // ===== Visual & Media =====
-  image         String   // Imagen principal (URL o path)
-  images        String   // JSON array: ["url1", "url2", "url3"] - Galería de imágenes
-  videoUrl      String?  // URL del video de YouTube/Vimeo
-  gradient      String   @default("from-violet-500 to-fuchsia-600")  // Para cards
+  image         String
+  images        String   @default("[]")
+  videoUrl      String?
+  gradient      String   @default("from-violet-500 to-fuchsia-600")
   
-  // ===== Ratings & Social Proof =====
   rating        Float    @default(4.8)
   reviewCount   Int      @default(0)
-  salesCount    Int      @default(0)  // Número de ventas (para ordenar por popularidad)
-  viewsCount    Int      @default(0)  // Vistas del producto
+  salesCount    Int      @default(0)
+  viewsCount    Int      @default(0)
   
-  // ===== Features & Specs (JSON strings) =====
-  // Formato JSON: ["Feature 1", "Feature 2", "Feature 3"]
-  features      String   @default("[]")  // Características principales
-  techFeatures  String   @default("[]")  // Características técnicas detalladas
-  certifications String  @default("[]")  // Certificaciones (CertiPUR, OEKO-TEX, etc)
-  tags          String   @default("[]")  // Tags para categorización flexible
-  highlights    String   @default("[]")  // Highlights para tarjetas de producto
+  features      String   @default("[]")
+  techFeatures  String   @default("[]")
+  certifications String  @default("[]")
+  tags          String   @default("[]")
+  highlights    String   @default("[]")
   
-  // ===== Especificaciones del Producto =====
-  warranty      Int      @default(10)   // Años de garantía
-  trialNights   Int      @default(100)  // Noches de prueba
-  materials     String   @default("[]") // JSON: ["Memory Foam", "Látex", etc]
-  layers        String   @default("[]") // JSON: Descripción de capas
+  warranty      Int      @default(10)
+  trialNights   Int      @default(100)
+  materials     String   @default("[]")
+  layers        String   @default("[]")
   
-  // ===== Badges & Status =====
-  badge         String?  // "NUEVO", "OFERTA", "-30%", etc
+  badge         String?
   isNew         Boolean  @default(false)
   isBestSeller  Boolean  @default(false)
-  isFeatured    Boolean  @default(false)  // Destacado en home
-  isActive      Boolean  @default(true)   // Visible en el catálogo
-  isEco         Boolean  @default(false)  // Producto ecológico
+  isFeatured    Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  isEco         Boolean  @default(false)
   
-  // ===== Inventory & Shipping =====
   stock         Int      @default(100)
   inStock       Boolean  @default(true)
-  lowStockThreshold Int  @default(10)  // Alerta de stock bajo
+  lowStockThreshold Int  @default(10)
   sku           String?  @unique
-  barcode       String?  // Código de barras
+  barcode       String?
   
-  deliveryDays  Int      @default(2)      // Días de entrega
+  deliveryDays  Int      @default(2)
   freeShipping  Boolean  @default(true)
-  shippingCost  Float    @default(0)      // Coste de envío si no es gratis
+  shippingCost  Float    @default(0)
   
-  // ===== Características para Comparador =====
-  cooling           Boolean  @default(false)  // Sistema de refrigeración
-  hypoallergenic    Boolean  @default(true)   // Hipoalergénico
-  eco               Boolean  @default(false)  // Certificado ecológico
-  washable          Boolean  @default(true)   // Funda lavable
-  verified          Boolean  @default(true)   // Producto verificado
-  bestValue         Boolean  @default(false)  // Mejor valor
-  satisfaction      Int      @default(95)     // % de satisfacción
+  cooling           Boolean  @default(false)
+  hypoallergenic    Boolean  @default(true)
+  washable          Boolean  @default(true)
+  antiDustMite      Boolean  @default(false)
+  reversible        Boolean  @default(false)
+  silent            Boolean  @default(true)
+  motionIsolation   Boolean  @default(false)
+  edgeSupport       Boolean  @default(false)
+  verified          Boolean  @default(true)
+  bestValue         Boolean  @default(false)
+  satisfaction      Int      @default(95)
   
-  // ===== SEO =====
   metaTitle       String?
   metaDescription String?
-  metaKeywords    String?  // "colchón, memory foam, premium"
+  metaKeywords    String?
   
-  // ===== Ordering & Organization =====
-  position      Int      @default(0)  // Orden manual de productos
+  position      Int      @default(0)
   categoryId    String?
-  category      Category? @relation(fields: [categoryId], references: [id])
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   
-  // ===== Relations =====
   reviews       Review[]
   variants      ProductVariant[]
   
-  // ===== Timestamps =====
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  publishedAt   DateTime?  // Para programar publicaciones
+  publishedAt   DateTime?
   
-  // ===== Indexes para Performance =====
   @@index([slug])
   @@index([categoryId])
   @@index([isActive])
-  @@index([isBestSeller])
-  @@index([isFeatured])
   @@index([price])
-  @@index([firmnessValue])
   @@index([rating])
-  @@index([salesCount])
-  @@index([position])
-  @@index([createdAt])
 }
 
-// ============================================================================
-// PRODUCT VARIANT - Tallas/Medidas del Colchón
-// ============================================================================
 model ProductVariant {
   id          String   @id @default(cuid())
   productId   String
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   
-  // Variant Info
-  size        String   // "90x190", "135x190", "150x190", "180x200", etc.
-  dimensions  String?  // Dimensiones detalladas: "90cm x 190cm x 25cm"
-  price       Float    // Precio específico de esta variante
-  originalPrice Float? // Precio original de esta variante
+  size        String
+  width       Int
+  length      Int
+  dimensions  String?
+  price       Float
+  originalPrice Float?
   stock       Int      @default(0)
   sku         String   @unique
   barcode     String?
-  weight      Float?   // Peso específico de esta variante
+  weight      Float?
   isAvailable Boolean  @default(true)
+  isPopular   Boolean  @default(false)
   
-  // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([productId])
   @@index([size])
-  @@index([isAvailable])
-  @@index([price])
 }
 
-// ============================================================================
-// CATEGORY - Categorías de Productos
-// ============================================================================
 model Category {
   id          String    @id @default(cuid())
   name        String
   slug        String    @unique
   description String?
   image       String?
-  icon        String?   // Icono para el menú (emoji o nombre de icono)
+  icon        String?
   gradient    String    @default("from-blue-500 to-cyan-500")
   
-  // Organization
-  parentId    String?   // Para subcategorías
+  parentId    String?
   order       Int       @default(0)
   isActive    Boolean   @default(true)
   isFeatured  Boolean   @default(false)
   
-  // SEO
   metaTitle       String?
   metaDescription String?
   
@@ -178,144 +187,107 @@ model Category {
   updatedAt   DateTime  @updatedAt
   
   @@index([slug])
-  @@index([order])
-  @@index([isActive])
-  @@index([parentId])
 }
 
-// ============================================================================
-// REVIEW - Opiniones de Clientes
-// ============================================================================
 model Review {
   id          String   @id @default(cuid())
   productId   String
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   
-  // Review Data
-  rating      Int      // 1-5 estrellas
+  rating      Int
   title       String
   comment     String
   
-  // Ratings Detallados
-  comfortRating    Int?  // 1-5
-  qualityRating    Int?  // 1-5
-  valueRating      Int?  // 1-5
+  comfortRating    Int?
+  qualityRating    Int?
+  valueRating      Int?
+  deliveryRating   Int?
   
-  // Status
-  verified         Boolean @default(false)   // Compra verificada
-  isPublished      Boolean @default(true)    // Moderación
+  verified         Boolean @default(false)
+  isPublished      Boolean @default(true)
   purchaseVerified Boolean @default(false)
   wouldRecommend   Boolean @default(true)
   
-  // User Info
   userName     String
   userEmail    String?
   userLocation String?
   userAvatar   String?
   
-  // Additional Info
-  usageDays    Int?    // Días de uso antes de review
-  pros         String? // JSON array de pros
-  cons         String? // JSON array de contras
+  usageDays    Int?
+  productSize  String?
+  pros         String   @default("[]")
+  cons         String   @default("[]")
   
-  // Engagement
   helpfulCount    Int      @default(0)
   notHelpfulCount Int      @default(0)
   
-  // Media
-  images       String?  // JSON array de URLs de imágenes del review
+  images       String   @default("[]")
   
-  // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([productId])
   @@index([rating])
-  @@index([verified])
-  @@index([isPublished])
-  @@index([createdAt])
-  @@index([helpfulCount])
 }
 
-// ============================================================================
-// COUPON - Cupones y Descuentos
-// ============================================================================
 model Coupon {
-  id              String   @id @default(cuid())
-  code            String   @unique
-  name            String?  // Nombre interno del cupón
+  id              String       @id @default(cuid())
+  code            String       @unique
+  name            String?
   description     String?
   
-  // Discount
-  discountType    String   // "percentage" | "fixed" | "freeShipping"
-  discountValue   Float    // Porcentaje o cantidad fija
+  discountType    DiscountType
+  discountValue   Float
   
-  // Restrictions
-  minPurchase     Float?   // Compra mínima requerida
-  maxDiscount     Float?   // Descuento máximo (para porcentajes)
-  usageLimit      Int?     // Límite de usos totales
-  usagePerUser    Int?     @default(1)  // Usos por usuario
+  minPurchase     Float?
+  maxDiscount     Float?
+  usageLimit      Int?
+  usagePerUser    Int?     @default(1)
   usageCount      Int      @default(0)
   
-  // Applicability
-  categoryIds     String?  // JSON array de category IDs
-  productIds      String?  // JSON array de product IDs
-  excludeProductIds String? // JSON array de productos excluidos
+  categoryIds     String   @default("[]")
+  productIds      String   @default("[]")
+  excludeProductIds String @default("[]")
   
-  // Validity
   isActive        Boolean  @default(true)
   startsAt        DateTime?
   expiresAt       DateTime?
   
-  // Timestamps
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
   @@index([code])
-  @@index([isActive])
-  @@index([expiresAt])
 }
 
-// ============================================================================
-// NEWSLETTER - Suscriptores Newsletter
-// ============================================================================
 model Newsletter {
   id          String   @id @default(cuid())
   email       String   @unique
   name        String?
+  source      String?
   isActive    Boolean  @default(true)
   
-  // Preferences (JSON)
-  preferences String?  // {"interests": ["ofertas", "nuevos"], "frequency": "weekly"}
-  tags        String?  // JSON array para segmentación
+  preferences String   @default("{}")
+  tags        String   @default("[]")
   
-  // Engagement
-  openRate    Float?   @default(0)  // Tasa de apertura
-  clickRate   Float?   @default(0)  // Tasa de clicks
+  openRate    Float    @default(0)
+  clickRate   Float    @default(0)
   
-  // Timestamps
   subscribedAt DateTime @default(now())
   unsubscribedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([email])
-  @@index([isActive])
-  @@index([createdAt])
 }
 
-// ============================================================================
-// FAQ - Preguntas Frecuentes
-// ============================================================================
 model FAQ {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   question    String
   answer      String
-  category    String?  // "envio", "garantia", "producto", "pago"
-  order       Int      @default(0)
-  isActive    Boolean  @default(true)
+  category    FAQCategory @default(GENERAL)
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
   
-  // Stats
   viewsCount  Int      @default(0)
   helpfulCount Int     @default(0)
   
@@ -323,51 +295,73 @@ model FAQ {
   updatedAt   DateTime @updatedAt
   
   @@index([category])
-  @@index([order])
-  @@index([isActive])
 }
 
-// ============================================================================
-// BLOG POST - Blog/Artículos
-// ============================================================================
 model BlogPost {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
   excerpt     String?
-  content     String   // Markdown o HTML
+  content     String
   
-  // Media
   coverImage  String?
-  images      String?  // JSON array
+  images      String   @default("[]")
   
-  // Organization
-  categoryId  String?
-  tags        String?  // JSON array
+  categorySlug String?
+  tags        String   @default("[]")
   
-  // Author
   author      String   @default("Equipo Descanso Premium")
   authorImage String?
+  authorBio   String?
   
-  // Status
   isPublished Boolean  @default(false)
   isFeatured  Boolean  @default(false)
   
-  // SEO
   metaTitle       String?
   metaDescription String?
   metaKeywords    String?
   
-  // Stats
   viewsCount  Int      @default(0)
-  readTime    Int?     // Minutos de lectura estimados
+  readTime    Int?
+  likesCount  Int      @default(0)
   
   publishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([slug])
-  @@index([isPublished])
-  @@index([isFeatured])
-  @@index([publishedAt])
+}
+
+model ContactForm {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String
+  
+  isRead      Boolean  @default(false)
+  isReplied   Boolean  @default(false)
+  
+  source      String?
+  productId   String?
+  userAgent   String?
+  ipAddress   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([email])
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  type        String   @default("string")
+  
+  updatedAt   DateTime @updatedAt
+  
+  @@index([key])
 }

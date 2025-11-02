@@ -44,7 +44,8 @@ function ComparadorLoading() {
 }
 
 export default async function ComparadorPage() {
-  const products = await getProducts()
+  // ✅ CORRECCIÓN: Acceder a .data del resultado paginado
+  const { data: products } = await getProducts()
 
   if (!products || products.length === 0) {
     return (
@@ -61,13 +62,21 @@ export default async function ComparadorPage() {
     )
   }
 
-  // Normalizar productos
+  // ✅ Los productos ya vienen parseados desde la API
+  // Solo aseguramos valores por defecto
   const normalizedProducts = products.map((product: any) => ({
     ...product,
-    images: Array.isArray(product.images) ? product.images : [product.images || product.image],
-    features: Array.isArray(product.features) 
-      ? product.features 
-      : product.features?.split(',').map((f: string) => f.trim()) || [],
+    // images ya es un array, solo aseguramos que no esté vacío
+    images: Array.isArray(product.images) && product.images.length > 0 
+      ? product.images 
+      : [product.image].filter(Boolean),
+    // features ya es un array desde la API
+    features: product.features || [],
+    techFeatures: product.techFeatures || [],
+    highlights: product.highlights || [],
+    materials: product.materials || [],
+    layers: product.layers || [],
+    certifications: product.certifications || [],
   }))
 
   return (

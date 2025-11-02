@@ -1,37 +1,80 @@
-// lib/api/products.ts
+// lib/api/products.ts - VERSIÓN OPTIMIZADA Y CORREGIDA (SQLite Compatible)
+import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { Product, Category, Review, ProductVariant } from '@prisma/client'
+import { Product, Category, Review, ProductVariant, Prisma } from '@prisma/client'
 import { parseJsonField } from '@/lib/utils/parse-product'
-import { 
-  ProductWithCategory, 
-  ProductWithRelations,
-  ProductFilterOptions 
-} from '@/lib/types/product'
 
-/**
- * ⚡ Parsear un producto de Prisma a ProductWithParsedJson
- * 
- * Convierte todos los campos JSON (string) a arrays
- */
-function parseProduct<T extends Product>(product: T): T & {
+// ============================================================================
+// TIPOS
+// ============================================================================
+
+type ParsedJsonFields = {
   features: string[]
   techFeatures: string[]
   certifications: string[]
   images: string[]
   tags: string[]
-} {
+  highlights: string[]
+  materials: string[]
+  layers: Array<{ name: string; description: string }>
+}
+
+type ParsedProduct<T extends Product> = Omit<T, keyof ParsedJsonFields> & ParsedJsonFields
+
+export type ProductWithCategory = ParsedProduct<Product> & {
+  category: Category | null
+}
+
+export type ProductWithRelations = ParsedProduct<Product> & {
+  category: Category | null
+  reviews: Review[]
+  variants: ProductVariant[]
+}
+
+export type ProductFilterOptions = {
+  firmness?: string
+  minPrice?: number
+  maxPrice?: number
+  minRating?: number
+  categoryId?: string
+  inStock?: boolean
+  isEco?: boolean
+  cooling?: boolean
+  hypoallergenic?: boolean
+  sortBy?: 'featured' | 'price-asc' | 'price-desc' | 'rating' | 'newest' | 'popular'
+}
+
+export type PaginatedResult<T> = {
+  data: T[]
+  total: number
+  page: number
+  limit: number
+  hasMore: boolean
+}
+
+// ============================================================================
+// FUNCIONES DE PARSING
+// ============================================================================
+
+/**
+ * Parsear un producto de Prisma a ProductWithParsedJson
+ */
+function parseProduct<T extends Product>(product: T): ParsedProduct<T> {
   return {
     ...product,
     features: parseJsonField(product.features),
     techFeatures: parseJsonField(product.techFeatures),
     certifications: parseJsonField(product.certifications),
     images: parseJsonField(product.images),
-    tags: parseJsonField(product.tags)
-  }
+    tags: parseJsonField(product.tags),
+    highlights: parseJsonField(product.highlights),
+    materials: parseJsonField(product.materials),
+    layers: parseJsonField(product.layers),
+  } as ParsedProduct<T>
 }
 
 /**
- * ⚡ Parsear producto con categoría
+ * Parsear producto con categoría
  */
 function parseProductWithCategory(
   product: Product & { category: Category | null }
@@ -43,7 +86,7 @@ function parseProductWithCategory(
 }
 
 /**
- * ⚡ Parsear producto con todas las relaciones
+ * Parsear producto con todas las relaciones
  */
 function parseProductWithRelations(
   product: Product & { 
@@ -61,171 +104,344 @@ function parseProductWithRelations(
 }
 
 // ============================================================================
-// FUNCIONES PÚBLICAS
+// FUNCIONES PÚBLICAS - CON CACHÉ
 // ============================================================================
 
 /**
- * Obtener todos los productos activos
+ * Obtener todos los productos activos con paginación
  */
-export async function getProducts(): Promise<ProductWithCategory[]> {
+export async function getProducts(options?: {
+  page?: number
+  limit?: number
+  categoryId?: string
+}): Promise<PaginatedResult<ProductWithCategory>> {
   try {
-    const products = await prisma.product.findMany({
-      where: {
-        isActive: true
-      },
-      include: {
-        category: true
-      },
-      orderBy: [
-        { isBestSeller: 'desc' },
-        { rating: 'desc' },
-        { createdAt: 'desc' }
-      ]
-    })
+    const page = options?.page || 1
+    const limit = options?.limit || 20
+    const skip = (page - 1) * limit
+
+    const where: Prisma.ProductWhereInput = { isActive: true }
+    if (options?.categoryId) {
+      where.categoryId = options.categoryId
+    }
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          category: true
+        },
+        orderBy: [
+          { position: 'asc' },
+          { isBestSeller: 'desc' },
+          { rating: 'desc' },
+          { createdAt: 'desc' }
+        ],
+        skip,
+        take: limit
+      }),
+      prisma.product.count({ where })
+    ])
     
-    return products.map(parseProductWithCategory)
+    return {
+      data: products.map(parseProductWithCategory),
+      total,
+      page,
+      limit,
+      hasMore: skip + limit < total
+    }
   } catch (error) {
     console.error('Error fetching products:', error)
-    return []
+    return {
+      data: [],
+      total: 0,
+      page: 1,
+      limit: options?.limit || 20,
+      hasMore: false
+    }
   }
 }
 
 /**
- * Obtener producto por slug con todas sus relaciones
+ * Obtener todos los productos (para generateStaticParams) - CON CACHÉ
  */
-export async function getProductBySlug(slug: string): Promise<ProductWithRelations | null> {
-  try {
-    const product = await prisma.product.findUnique({
-      where: {
-        slug
-      },
-      include: {
-        category: true,
-        reviews: {
-          where: {
-            verified: true
+export const getAllProductsSlugs = unstable_cache(
+  async (filters?: { isActive?: boolean }) => {
+    try {
+      const where: Prisma.ProductWhereInput = {}
+      if (filters?.isActive !== undefined) {
+        where.isActive = filters.isActive
+      }
+
+      const products = await prisma.product.findMany({
+        where,
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          isActive: true,
+        }
+      })
+      
+      return products
+    } catch (error) {
+      console.error('Error fetching all products:', error)
+      return []
+    }
+  },
+  ['all-products-slugs'],
+  { 
+    revalidate: 3600, // 1 hora
+    tags: ['products']
+  }
+)
+
+/**
+ * Obtener producto por slug con todas sus relaciones - CON CACHÉ
+ */
+export const getProductBySlug = unstable_cache(
+  async (slug: string): Promise<ProductWithRelations | null> => {
+    try {
+      const product = await prisma.product.findUnique({
+        where: { slug },
+        include: {
+          category: true,
+          reviews: {
+            where: {
+              isPublished: true
+            },
+            orderBy: [
+              { verified: 'desc' },
+              { helpfulCount: 'desc' },
+              { createdAt: 'desc' }
+            ],
+            take: 20
           },
-          orderBy: {
-            createdAt: 'desc'
-          },
-          take: 20
-        },
-        variants: {
-          where: {
-            isAvailable: true
-          },
-          orderBy: {
-            size: 'asc'
+          variants: {
+            where: {
+              isAvailable: true
+            },
+            orderBy: [
+              { isPopular: 'desc' },
+              { price: 'asc' }
+            ]
           }
         }
+      })
+      
+      if (!product) {
+        return null
       }
-    })
-    
-    // Validar que el producto exista y esté activo
-    if (!product || !product.isActive) {
+      
+      return parseProductWithRelations(product)
+    } catch (error) {
+      console.error('Error fetching product:', error)
       return null
     }
-    
-    return parseProductWithRelations(product)
+  },
+  ['product-by-slug'],
+  { 
+    revalidate: 1800, // 30 minutos
+    tags: ['products', 'reviews']
+  }
+)
+
+/**
+ * Obtener variantes de un producto
+ */
+export async function getProductVariants(productId: string): Promise<ProductVariant[]> {
+  try {
+    return await prisma.productVariant.findMany({
+      where: { 
+        productId,
+        isAvailable: true
+      },
+      orderBy: [
+        { isPopular: 'desc' },
+        { price: 'asc' },
+      ],
+    })
   } catch (error) {
-    console.error('Error fetching product:', error)
-    return null
+    console.error('Error fetching product variants:', error)
+    return []
   }
 }
 
 /**
- * Obtener productos por categoría
+ * Obtener reviews de un producto con paginación
  */
-export async function getProductsByCategory(categorySlug: string): Promise<ProductWithCategory[]> {
+export async function getProductReviews(
+  productId: string,
+  options: { 
+    limit?: number
+    offset?: number
+    verified?: boolean 
+  } = {}
+): Promise<PaginatedResult<Review>> {
   try {
+    const { limit = 10, offset = 0, verified } = options
+
+    const where: Prisma.ReviewWhereInput = {
+      productId,
+      isPublished: true,
+    }
+
+    if (verified !== undefined) {
+      where.verified = verified
+    }
+
+    const [reviews, total] = await Promise.all([
+      prisma.review.findMany({
+        where,
+        orderBy: [
+          { verified: 'desc' },
+          { helpfulCount: 'desc' },
+          { createdAt: 'desc' }
+        ],
+        skip: offset,
+        take: limit,
+      }),
+      prisma.review.count({ where })
+    ])
+
+    return {
+      data: reviews,
+      total,
+      page: Math.floor(offset / limit) + 1,
+      limit,
+      hasMore: offset + limit < total
+    }
+  } catch (error) {
+    console.error('Error fetching product reviews:', error)
+    return {
+      data: [],
+      total: 0,
+      page: 1,
+      limit: options.limit || 10,
+      hasMore: false
+    }
+  }
+}
+
+/**
+ * Obtener productos por categoría - CON CACHÉ
+ */
+export const getProductsByCategory = unstable_cache(
+  async (categorySlug: string): Promise<ProductWithCategory[]> => {
+    try {
+      const products = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          category: {
+            slug: categorySlug,
+            isActive: true
+          }
+        },
+        include: {
+          category: true
+        },
+        orderBy: [
+          { position: 'asc' },
+          { rating: 'desc' },
+          { reviewCount: 'desc' }
+        ]
+      })
+      
+      return products.map(parseProductWithCategory)
+    } catch (error) {
+      console.error('Error fetching products by category:', error)
+      return []
+    }
+  },
+  ['products-by-category'],
+  { 
+    revalidate: 1800,
+    tags: ['products', 'categories']
+  }
+)
+
+/**
+ * Obtener productos destacados - CON CACHÉ
+ */
+export const getFeaturedProducts = unstable_cache(
+  async (limit: number = 6): Promise<ProductWithCategory[]> => {
+    try {
+      const products = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          OR: [
+            { isBestSeller: true },
+            { isNew: true },
+            { isFeatured: true }
+          ]
+        },
+        include: {
+          category: true
+        },
+        orderBy: [
+          { position: 'asc' },
+          { isFeatured: 'desc' },
+          { isBestSeller: 'desc' },
+          { rating: 'desc' }
+        ],
+        take: limit
+      })
+      
+      return products.map(parseProductWithCategory)
+    } catch (error) {
+      console.error('Error fetching featured products:', error)
+      return []
+    }
+  },
+  ['featured-products'],
+  { 
+    revalidate: 3600,
+    tags: ['products']
+  }
+)
+
+/**
+ * Buscar productos - OPTIMIZADO para SQLite (sin mode: insensitive)
+ */
+export async function searchProducts(
+  query: string,
+  options?: {
+    limit?: number
+    categoryId?: string
+  }
+): Promise<ProductWithCategory[]> {
+  try {
+    if (!query || query.trim() === '') {
+      return []
+    }
+
+    const searchTerm = query.trim()
+    const limit = options?.limit || 50
+
+    const where: Prisma.ProductWhereInput = {
+      isActive: true,
+      OR: [
+        { name: { contains: searchTerm } },
+        { subtitle: { contains: searchTerm } },
+        { description: { contains: searchTerm } },
+      ]
+    }
+
+    if (options?.categoryId) {
+      where.categoryId = options.categoryId
+    }
+    
     const products = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        category: {
-          slug: categorySlug,
-          isActive: true
-        }
-      },
+      where,
       include: {
         category: true
       },
       orderBy: [
+        { isBestSeller: 'desc' },
         { rating: 'desc' },
         { reviewCount: 'desc' }
-      ]
-    })
-    
-    return products.map(parseProductWithCategory)
-  } catch (error) {
-    console.error('Error fetching products by category:', error)
-    return []
-  }
-}
-
-/**
- * Obtener productos destacados
- */
-export async function getFeaturedProducts(limit: number = 6): Promise<ProductWithCategory[]> {
-  try {
-    const products = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          { isBestSeller: true },
-          { isNew: true },
-          { isFeatured: true }
-        ]
-      },
-      include: {
-        category: true
-      },
-      orderBy: [
-        { isFeatured: 'desc' },
-        { isBestSeller: 'desc' },
-        { rating: 'desc' }
       ],
       take: limit
-    })
-    
-    return products.map(parseProductWithCategory)
-  } catch (error) {
-    console.error('Error fetching featured products:', error)
-    return []
-  }
-}
-
-/**
- * Buscar productos
- */
-export async function searchProducts(query: string): Promise<ProductWithCategory[]> {
-  try {
-    const products = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          {
-            name: {
-              contains: query
-            }
-          },
-          {
-            subtitle: {
-              contains: query
-            }
-          },
-          {
-            description: {
-              contains: query
-            }
-          }
-        ]
-      },
-      include: {
-        category: true
-      },
-      orderBy: {
-        rating: 'desc'
-      }
     })
     
     return products.map(parseProductWithCategory)
@@ -238,15 +454,17 @@ export async function searchProducts(query: string): Promise<ProductWithCategory
 /**
  * Filtrar productos con opciones avanzadas
  */
-export async function filterProducts(options: ProductFilterOptions): Promise<ProductWithCategory[]> {
+export async function filterProducts(
+  options: ProductFilterOptions
+): Promise<ProductWithCategory[]> {
   try {
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       isActive: true
     }
 
     // Filtro de firmeza
     if (options.firmness && options.firmness !== 'Todas') {
-      where.firmness = options.firmness
+      where.firmness = options.firmness as any
     }
 
     // Filtro de precio
@@ -277,28 +495,44 @@ export async function filterProducts(options: ProductFilterOptions): Promise<Pro
       where.inStock = options.inStock
     }
 
+    // Filtros booleanos adicionales
+    if (options.isEco) {
+      where.isEco = true
+    }
+    if (options.cooling) {
+      where.cooling = true
+    }
+    if (options.hypoallergenic) {
+      where.hypoallergenic = true
+    }
+
     // Configurar ordenamiento
-    let orderBy: any = [
+    let orderBy: Prisma.ProductOrderByWithRelationInput[] = [
+      { position: 'asc' },
       { isBestSeller: 'desc' },
       { rating: 'desc' }
     ]
 
     switch (options.sortBy) {
       case 'price-asc':
-        orderBy = { price: 'asc' }
+        orderBy = [{ price: 'asc' }]
         break
       case 'price-desc':
-        orderBy = { price: 'desc' }
+        orderBy = [{ price: 'desc' }]
         break
       case 'rating':
-        orderBy = { rating: 'desc' }
+        orderBy = [{ rating: 'desc' }]
         break
       case 'newest':
-        orderBy = { createdAt: 'desc' }
+        orderBy = [{ createdAt: 'desc' }]
+        break
+      case 'popular':
+        orderBy = [{ salesCount: 'desc' }]
         break
       case 'featured':
       default:
         orderBy = [
+          { position: 'asc' },
           { isFeatured: 'desc' },
           { isBestSeller: 'desc' },
           { rating: 'desc' }
@@ -321,38 +555,46 @@ export async function filterProducts(options: ProductFilterOptions): Promise<Pro
 }
 
 /**
- * Obtener productos relacionados (misma categoría, excluyendo el actual)
+ * Obtener productos relacionados (misma categoría) - CON CACHÉ
  */
-export async function getRelatedProducts(
-  productId: string, 
-  categoryId: string | null,
-  limit: number = 3
-): Promise<ProductWithCategory[]> {
-  try {
-    if (!categoryId) return []
+export const getRelatedProducts = unstable_cache(
+  async (
+    productId: string, 
+    categoryId: string | null,
+    limit: number = 4
+  ): Promise<ProductWithCategory[]> => {
+    try {
+      if (!categoryId) return []
 
-    const products = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        categoryId: categoryId,
-        id: { not: productId }
-      },
-      include: {
-        category: true
-      },
-      orderBy: [
-        { rating: 'desc' },
-        { reviewCount: 'desc' }
-      ],
-      take: limit
-    })
+      const products = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          categoryId: categoryId,
+          id: { not: productId }
+        },
+        include: {
+          category: true
+        },
+        orderBy: [
+          { isBestSeller: 'desc' },
+          { rating: 'desc' },
+          { reviewCount: 'desc' }
+        ],
+        take: limit
+      })
 
-    return products.map(parseProductWithCategory)
-  } catch (error) {
-    console.error('Error fetching related products:', error)
-    return []
+      return products.map(parseProductWithCategory)
+    } catch (error) {
+      console.error('Error fetching related products:', error)
+      return []
+    }
+  },
+  ['related-products'],
+  { 
+    revalidate: 3600,
+    tags: ['products']
   }
-}
+)
 
 /**
  * Obtener productos similares (por firmeza similar)
@@ -360,7 +602,7 @@ export async function getRelatedProducts(
 export async function getSimilarProducts(
   productId: string,
   firmnessValue: number,
-  limit: number = 3
+  limit: number = 4
 ): Promise<ProductWithCategory[]> {
   try {
     const products = await prisma.product.findMany({
@@ -375,9 +617,10 @@ export async function getSimilarProducts(
       include: {
         category: true
       },
-      orderBy: {
-        rating: 'desc'
-      },
+      orderBy: [
+        { rating: 'desc' },
+        { reviewCount: 'desc' }
+      ],
       take: limit
     })
 
@@ -389,78 +632,186 @@ export async function getSimilarProducts(
 }
 
 /**
- * Obtener categorías con contador de productos activos
+ * Obtener categorías con contador de productos - CON CACHÉ
  */
-export async function getCategories() {
-  try {
-    const categories = await prisma.category.findMany({
-      where: {
-        isActive: true
-      },
-      include: {
-        _count: {
-          select: {
-            products: {
-              where: {
-                isActive: true
+export const getCategories = unstable_cache(
+  async () => {
+    try {
+      const categories = await prisma.category.findMany({
+        where: {
+          isActive: true
+        },
+        include: {
+          _count: {
+            select: {
+              products: {
+                where: {
+                  isActive: true
+                }
               }
             }
           }
+        },
+        orderBy: {
+          order: 'asc'
         }
-      },
-      orderBy: {
-        order: 'asc'
-      }
-    })
-    
-    return categories
-  } catch (error) {
-    console.error('Error fetching categories:', error)
-    return []
+      })
+      
+      return categories
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+      return []
+    }
+  },
+  ['categories-list'],
+  { 
+    revalidate: 7200, // 2 horas
+    tags: ['categories']
   }
-}
+)
 
 /**
- * Calcular valoraciones promedio detalladas de un producto
+ * Calcular valoraciones promedio - OPTIMIZADO con aggregations
  */
 export async function getProductRatings(productId: string) {
   try {
-    const reviews = await prisma.review.findMany({
-      where: {
-        productId,
-        isPublished: true
-      },
-      select: {
-        rating: true,
-        comfortRating: true,
-        qualityRating: true,
-        valueRating: true
-      }
+    // Usar aggregate para cálculos eficientes
+    const [avgResult, distribution] = await Promise.all([
+      prisma.review.aggregate({
+        where: {
+          productId,
+          isPublished: true
+        },
+        _avg: {
+          rating: true,
+          comfortRating: true,
+          qualityRating: true,
+          valueRating: true,
+          deliveryRating: true
+        },
+        _count: {
+          rating: true
+        }
+      }),
+      prisma.review.groupBy({
+        by: ['rating'],
+        where: {
+          productId,
+          isPublished: true
+        },
+        _count: {
+          rating: true
+        }
+      })
+    ])
+
+    // Construir distribución
+    const dist: Record<number, number> = {
+      5: 0, 4: 0, 3: 0, 2: 0, 1: 0
+    }
+    
+    distribution.forEach(d => {
+      dist[d.rating] = d._count.rating
     })
 
-    if (reviews.length === 0) {
-      return {
-        comfort: 0,
-        quality: 0,
-        value: 0
-      }
-    }
-
-    const comfort = reviews.reduce((sum, r) => sum + (r.comfortRating || 0), 0) / reviews.length
-    const quality = reviews.reduce((sum, r) => sum + (r.qualityRating || 0), 0) / reviews.length
-    const value = reviews.reduce((sum, r) => sum + (r.valueRating || 0), 0) / reviews.length
-
     return {
-      comfort: Math.round(comfort * 10) / 10,
-      quality: Math.round(quality * 10) / 10,
-      value: Math.round(value * 10) / 10
+      average: Math.round((avgResult._avg.rating || 0) * 10) / 10,
+      count: avgResult._count.rating,
+      comfort: Math.round((avgResult._avg.comfortRating || 0) * 10) / 10,
+      quality: Math.round((avgResult._avg.qualityRating || 0) * 10) / 10,
+      value: Math.round((avgResult._avg.valueRating || 0) * 10) / 10,
+      delivery: Math.round((avgResult._avg.deliveryRating || 0) * 10) / 10,
+      distribution: dist
     }
   } catch (error) {
     console.error('Error calculating product ratings:', error)
     return {
+      average: 0,
+      count: 0,
       comfort: 0,
       quality: 0,
-      value: 0
+      value: 0,
+      delivery: 0,
+      distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    }
+  }
+}
+
+/**
+ * Incrementar contador de vistas - Fire and forget
+ */
+export function incrementProductViews(productId: string): void {
+  // Fire and forget - no bloquea la respuesta
+  prisma.product.update({
+    where: { id: productId },
+    data: {
+      viewsCount: {
+        increment: 1
+      }
+    }
+  }).catch(error => {
+    console.error('Error incrementing product views:', error)
+  })
+}
+
+/**
+ * Marcar review como útil/no útil
+ */
+export async function markReviewHelpful(
+  reviewId: string, 
+  helpful: boolean
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await prisma.review.update({
+      where: { id: reviewId },
+      data: helpful 
+        ? { helpfulCount: { increment: 1 } }
+        : { notHelpfulCount: { increment: 1 } }
+    })
+    
+    return { success: true }
+  } catch (error) {
+    console.error('Error marking review as helpful:', error)
+    return { 
+      success: false, 
+      error: 'Failed to update review' 
+    }
+  }
+}
+
+/**
+ * Obtener estadísticas de productos
+ */
+export async function getProductStats() {
+  try {
+    const [
+      totalProducts,
+      activeProducts,
+      avgRating,
+      totalReviews
+    ] = await Promise.all([
+      prisma.product.count(),
+      prisma.product.count({ where: { isActive: true } }),
+      prisma.product.aggregate({
+        where: { isActive: true },
+        _avg: { rating: true }
+      }),
+      prisma.review.count({ where: { isPublished: true } })
+    ])
+
+    return {
+      totalProducts,
+      activeProducts,
+      averageRating: Math.round((avgRating._avg.rating || 0) * 10) / 10,
+      totalReviews
+    }
+  } catch (error) {
+    console.error('Error fetching product stats:', error)
+    return {
+      totalProducts: 0,
+      activeProducts: 0,
+      averageRating: 0,
+      totalReviews: 0
     }
   }
 }

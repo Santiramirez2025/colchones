@@ -12,22 +12,36 @@ import {
 import Link from 'next/link'
 import { Product } from '@prisma/client'
 
-// ⚡ Helper para parsear campos JSON de SQLite de forma segura
+// ⚡ Tipo extendido para productos normalizados
+type NormalizedProduct = Omit<Product, 'images' | 'features' | 'techFeatures' | 'certifications'> & {
+  images: string
+  features: string
+  techFeatures: string
+  certifications: string
+}
+
+// ⚡ Helper para parsear campos normalizados (string con \n o JSON)
 const parseJsonField = (field: any): any[] => {
   if (Array.isArray(field)) return field
   if (typeof field === 'string') {
+    // Si es un string con saltos de línea (normalizado desde page.tsx)
+    if (field.includes('\n')) {
+      return field.split('\n').filter(Boolean)
+    }
+    // Si es JSON string
     try {
-      return JSON.parse(field)
+      const parsed = JSON.parse(field)
+      return Array.isArray(parsed) ? parsed : []
     } catch (e) {
-      console.warn('Error parsing JSON field:', e)
-      return []
+      // Si no es JSON válido, retornar como array de un elemento
+      return field ? [field] : []
     }
   }
   return []
 }
 
 interface CatalogoClientProps {
-  initialProducts: Product[]
+  initialProducts: NormalizedProduct[]
 }
 
 const filters = {
@@ -319,7 +333,7 @@ function ProductCard({
   onHover,
   onLeave
 }: { 
-  product: Product
+  product: NormalizedProduct
   index: number
   isFavorite: boolean
   onToggleFavorite: () => void

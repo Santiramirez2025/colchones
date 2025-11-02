@@ -32,8 +32,8 @@ function SimuladorLoading() {
 }
 
 export default async function SimuladorPage() {
-  // 1. Obtener productos activos y en stock
-  const rawProducts = await getProducts()
+  // 1. Obtener productos activos - getProducts() retorna { data, total, page, limit, hasMore }
+  const { data: rawProducts } = await getProducts()
 
   // 2. Validar que hay productos
   if (!rawProducts || rawProducts.length === 0) {
@@ -63,60 +63,44 @@ export default async function SimuladorPage() {
     )
   }
 
-  // 3. 🔥 PARSEAR JSON STRINGS - CRÍTICO PARA QUE FUNCIONE EL ALGORITMO
-  const products = rawProducts.map((product: any) => {
-    // Helper para parsear de forma segura
-    const safeJsonParse = (field: any, fallback: any = []) => {
-      try {
-        if (typeof field === 'string') {
-          return JSON.parse(field)
-        }
-        if (Array.isArray(field)) {
-          return field
-        }
-        return fallback
-      } catch (e) {
-        return fallback
-      }
-    }
-
-    return {
-      ...product,
-      // Parsear arrays JSON
-      features: safeJsonParse(product.features, []),
-      techFeatures: safeJsonParse(product.techFeatures, []),
-      highlights: safeJsonParse(product.highlights, []),
-      materials: safeJsonParse(product.materials, []),
-      tags: safeJsonParse(product.tags, []),
-      certifications: safeJsonParse(product.certifications, []),
-      layers: safeJsonParse(product.layers, []),
-      
-      // Parsear images (puede venir como JSON string o ya parseado)
-      images: safeJsonParse(product.images, [product.image]),
-      
-      // Asegurar valores numéricos críticos para el algoritmo
-      firmnessValue: product.firmnessValue || 70,
-      transpirability: product.transpirability || 80,
-      height: product.height || 25,
-      satisfaction: product.satisfaction || 95,
-      
-      // Asegurar booleanos
-      cooling: product.cooling || false,
-      eco: product.eco || false,
-      isEco: product.isEco || false,
-      hypoallergenic: product.hypoallergenic || true,
-      washable: product.washable || true,
-      isBestSeller: product.isBestSeller || false,
-      isNew: product.isNew || false,
-      inStock: product.inStock !== false, // Por defecto true
-      
-      // Asegurar números
-      price: Number(product.price) || 0,
-      originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
-      rating: Number(product.rating) || 4.8,
-      reviewCount: Number(product.reviewCount) || 0,
-    }
-  })
+  // 3. ✅ Los productos YA VIENEN PARSEADOS desde getProducts()
+  // La función parseProductWithCategory() ya convirtió todos los JSON strings a arrays
+  // Solo necesitamos asegurar valores por defecto para el algoritmo
+  const products = rawProducts.map((product: any) => ({
+    ...product,
+    
+    // Los arrays ya están parseados, solo aseguramos que existan
+    features: product.features || [],
+    techFeatures: product.techFeatures || [],
+    highlights: product.highlights || [],
+    materials: product.materials || [],
+    tags: product.tags || [],
+    certifications: product.certifications || [],
+    layers: product.layers || [],
+    images: product.images || [],
+    
+    // Asegurar valores numéricos críticos para el algoritmo
+    firmnessValue: product.firmnessValue || 70,
+    transpirability: product.transpirability || 80,
+    height: product.height || 25,
+    satisfaction: product.satisfaction || 95,
+    
+    // Asegurar booleanos
+    cooling: product.cooling || false,
+    eco: product.eco || false,
+    isEco: product.isEco || false,
+    hypoallergenic: product.hypoallergenic || true,
+    washable: product.washable || true,
+    isBestSeller: product.isBestSeller || false,
+    isNew: product.isNew || false,
+    inStock: product.inStock !== false, // Por defecto true
+    
+    // Asegurar números
+    price: Number(product.price) || 0,
+    originalPrice: product.originalPrice ? Number(product.originalPrice) : null,
+    rating: Number(product.rating) || 4.8,
+    reviewCount: Number(product.reviewCount) || 0,
+  }))
 
   // 4. Filtrar productos válidos para el simulador
   const validProducts = products.filter((p: any) => 
@@ -133,6 +117,7 @@ export default async function SimuladorPage() {
     firmnessValue: validProducts[0].firmnessValue,
     featuresType: typeof validProducts[0].features,
     featuresLength: validProducts[0].features?.length,
+    imagesLength: validProducts[0].images?.length,
   } : 'No products')
 
   return (

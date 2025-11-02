@@ -1,99 +1,80 @@
-// app/producto/[slug]/product-client.tsx
+// app/producto/[slug]/product-client.tsx - VERSIÓN CORREGIDA
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Star,
-  Shield,
-  Truck,
-  Moon,
-  Zap,
-  Heart,
-  Share2,
-  ChevronRight,
-  ChevronLeft,
-  CheckCircle2,
-  AlertCircle,
-  Package,
-  Award,
-  TrendingUp,
-  Layers,
-  Clock,
-  Users,
-  Lock,
-  ArrowRight,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Info,
-  RotateCcw,
-  Sparkles,
-  ThumbsUp,
-  MessageCircle,
-  ExternalLink,
-  X,
-  Play,
-  ZoomIn,
-  Check,
-  BadgeCheck,
-  Ruler,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Mail,
-  Bed  // ✅ ASEGÚRATE QUE ESTÉ AQUÍ
+  Star, Shield, Truck, Zap, Heart, Share2, ChevronRight, ChevronLeft,
+  CheckCircle2, AlertCircle, Package, Award, TrendingUp, Layers,
+  Users, Lock, ArrowRight, Minus, Plus, ShoppingCart, Info,
+  Sparkles, ThumbsUp, MessageCircle, X, Play, ZoomIn, Check,
+  BadgeCheck, Ruler, ChevronDown, ChevronUp, Copy, Facebook, Twitter,
+  Linkedin, Mail, Bed, Wind, Moon
 } from 'lucide-react'
-import { Product, ProductVariant, Review, Category } from '@prisma/client'
 import { useCartStore } from '@/lib/store/cart-store'
-
-
-// Helper para parsear JSON
-const parseJsonField = (field: any): any[] => {
-  if (Array.isArray(field)) return field
-  if (typeof field === 'string') {
-    try {
-      return JSON.parse(field)
-    } catch {
-      return []
-    }
-  }
-  return []
-}
+import type { 
+  ProductWithRelations, 
+  StockInfo,
+  Breadcrumb 
+} from '@/lib/types/product'
 
 interface ProductClientProps {
-  product: Product & {
-    category: Category | null
-    variants: ProductVariant[]
-    reviews: Review[]
-  }
-  relatedProducts: Product[]
-  similarProducts: Product[]
-  averageRatings: {
-    comfort: number
-    quality: number
-    value: number
-  }
-  stockInfo: {
-    available: boolean
-    quantity: number
-    lowStock: boolean
-  }
+  product: ProductWithRelations
+  relatedProducts: any[]
+  similarProducts: any[]
+  reviews: any[]
+  stockInfo: StockInfo
+  breadcrumbs: Breadcrumb[]
 }
 
 export default function ProductClient({ 
   product, 
-  relatedProducts,
-  similarProducts,
-  averageRatings,
-  stockInfo
+  relatedProducts = [],
+  similarProducts = [],
+  reviews = [],
+  stockInfo,
+  breadcrumbs = []
 }: ProductClientProps) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0] || null)
+  // SAFE ARRAY PARSING
+  const images = Array.isArray(product.images) ? product.images : []
+  const features = Array.isArray(product.features) ? product.features : []
+  const techFeatures = Array.isArray(product.techFeatures) ? product.techFeatures : []
+  const materials = Array.isArray(product.materials) ? product.materials : []
+  const layers = Array.isArray(product.layers) ? product.layers : []
+  const highlights = Array.isArray(product.highlights) ? product.highlights : []
+  const certifications = Array.isArray(product.certifications) ? product.certifications : []
+  const variants = Array.isArray(product.variants) ? product.variants : []
+
+  // COMPUTE RATINGS FROM REVIEWS
+  const averageRatings = {
+    average: reviews.length > 0 
+      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length 
+      : product.rating || 4.8,
+    count: reviews.length,
+    comfort: reviews.length > 0 
+      ? reviews.reduce((acc, r) => acc + (r.comfortRating || 0), 0) / reviews.length 
+      : 4.5,
+    quality: reviews.length > 0 
+      ? reviews.reduce((acc, r) => acc + (r.qualityRating || 0), 0) / reviews.length 
+      : 4.7,
+    value: reviews.length > 0 
+      ? reviews.reduce((acc, r) => acc + (r.valueRating || 0), 0) / reviews.length 
+      : 4.6,
+    delivery: reviews.length > 0 
+      ? reviews.reduce((acc, r) => acc + (r.deliveryRating || 0), 0) / reviews.length 
+      : 4.8,
+    distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+  }
+  
+  reviews.forEach(r => {
+    if (r.rating >= 1 && r.rating <= 5) {
+      averageRatings.distribution[r.rating as keyof typeof averageRatings.distribution]++
+    }
+  })
+
+  // STATE
+  const [selectedVariant, setSelectedVariant] = useState(variants[0] || null)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'reviews' | 'faq'>('description')
   const [imageIndex, setImageIndex] = useState(0)
@@ -107,20 +88,17 @@ export default function ProductClient({
   const addItem = useCartStore(state => state.addItem)
   const productRef = useRef<HTMLDivElement>(null)
   
-  const images = parseJsonField(product.images)
-  const features = parseJsonField(product.features)
-  const techFeatures = parseJsonField(product.techFeatures)
-  const certifications = parseJsonField(product.certifications)
-  const tags = parseJsonField(product.tags)
-
+  // COMPUTED VALUES
   const currentPrice = selectedVariant?.price || product.price
+  const originalPrice = selectedVariant?.originalPrice || product.originalPrice
   const monthlyPayment = Math.round(currentPrice / 12)
-  const savings = product.originalPrice ? product.originalPrice - currentPrice : 0
-  const discountPercent = product.originalPrice 
-    ? Math.round(((product.originalPrice - currentPrice) / product.originalPrice) * 100)
+  const savings = originalPrice ? originalPrice - currentPrice : 0
+  const discountPercent = originalPrice 
+    ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
     : 0
 
-  // Sticky bar on scroll
+  const isOutOfStock = !product.inStock || (selectedVariant && selectedVariant.stock === 0)
+
   useEffect(() => {
     const handleScroll = () => {
       if (productRef.current) {
@@ -133,18 +111,19 @@ export default function ProductClient({
   }, [])
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return
+  
     addItem({
       id: selectedVariant?.id || product.id,
       name: product.name,
       price: currentPrice,
+      originalPrice: originalPrice || undefined,
       quantity: quantity,
-      image: product.image,
+      image: images[0] || product.image,
       size: selectedVariant?.size || 'Estándar',
+      variant: selectedVariant?.dimensions || undefined,
       sku: selectedVariant?.sku || product.sku || undefined
     })
-    
-    // TODO: Show toast notification
-    console.log('Added to cart')
   }
 
   const handleShare = async (platform?: string) => {
@@ -181,11 +160,11 @@ export default function ProductClient({
   const faqs = [
     {
       q: '¿Cuánto tarda en llegar el colchón?',
-      a: `El colchón se entrega en ${product.deliveryDays} días laborables. El envío es gratuito y con seguimiento.`
+      a: `El colchón se entrega en ${product.deliveryDays} días laborables. El envío es ${product.freeShipping ? 'gratuito' : `${product.shippingCost}€`} y con seguimiento.`
     },
     {
-      q: '¿Qué incluye la garantía de 10 años?',
-      a: 'La garantía cubre defectos de fabricación y hundimiento superior a 2,5cm. No cubre desgaste normal ni manchas.'
+      q: `¿Qué incluye la garantía de ${product.warranty} años?`,
+      a: `La garantía cubre defectos de fabricación y hundimiento superior a 2,5cm. Tienes ${product.trialNights} noches de prueba para asegurarte de que es el colchón perfecto para ti.`
     },
     {
       q: '¿Necesito una base especial?',
@@ -200,34 +179,30 @@ export default function ProductClient({
       a: `Sí, ofrecemos financiación en 12 meses sin intereses. Pagarías ${monthlyPayment}€/mes.`
     }
   ]
-
+  
   return (
     <div className="min-h-screen bg-zinc-950">
-      {/* Breadcrumbs Premium */}
+      {/* Breadcrumbs */}
       <div className="border-b border-white/10 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <Link href="/" className="hover:text-white transition-colors">Inicio</Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link href="/catalogo" className="hover:text-white transition-colors">Catálogo</Link>
-            {product.category && (
-              <>
-                <ChevronRight className="w-4 h-4" />
-                <Link 
-                  href={`/catalogo?category=${product.category.slug}`} 
-                  className="hover:text-white transition-colors"
-                >
-                  {product.category.name}
-                </Link>
-              </>
-            )}
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-white font-semibold">{product.name}</span>
+            {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.href} className="flex items-center gap-2">
+                {index > 0 && <ChevronRight className="w-4 h-4" />}
+                {crumb.current ? (
+                  <span className="text-white font-semibold">{crumb.name}</span>
+                ) : (
+                  <Link href={crumb.href} className="hover:text-white transition-colors">
+                    {crumb.name}
+                  </Link>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Sticky Add to Cart Bar */}
+      {/* Sticky Bar */}
       <AnimatePresence>
         {showStickyBar && (
           <motion.div
@@ -240,23 +215,20 @@ export default function ProductClient({
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0">
-                    <div className="w-full h-full flex items-center justify-center text-3xl">
-                      🛏️
-                    </div>
+                    <div className="w-full h-full flex items-center justify-center text-3xl">🛏️</div>
                   </div>
                   <div>
                     <h3 className="font-bold text-white line-clamp-1">{product.name}</h3>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl font-black text-white">{currentPrice}€</span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-zinc-400 line-through">{product.originalPrice}€</span>
+                      {originalPrice && (
+                        <span className="text-sm text-zinc-400 line-through">{originalPrice}€</span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {/* Quantity selector compacto */}
                   <div className="hidden md:flex items-center border border-white/10 rounded-xl overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -275,11 +247,12 @@ export default function ProductClient({
 
                   <button
                     onClick={handleAddToCart}
-                    className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/30"
+                    disabled={isOutOfStock}
+                    className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ShoppingCart className="w-5 h-5" />
-                    <span className="hidden md:inline">Añadir al carrito</span>
-                    <span className="md:hidden">Añadir</span>
+                    <span className="hidden md:inline">{isOutOfStock ? 'Agotado' : 'Añadir al carrito'}</span>
+                    <span className="md:hidden">{isOutOfStock ? 'Agotado' : 'Añadir'}</span>
                   </button>
                 </div>
               </div>
@@ -290,14 +263,13 @@ export default function ProductClient({
 
       <div className="container mx-auto px-4 py-12" ref={productRef}>
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          {/* Image Gallery Premium */}
+          {/* Image Gallery */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:sticky lg:top-32 lg:self-start"
           >
             <div className="relative">
-              {/* Badges flotantes */}
               <div className="absolute top-4 left-4 right-4 z-10 flex items-start justify-between">
                 <div className="flex flex-col gap-2">
                   {product.badge && (
@@ -331,7 +303,6 @@ export default function ProductClient({
                 </button>
               </div>
 
-              {/* Main image */}
               <div className="relative aspect-square bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl overflow-hidden group cursor-pointer mb-4 border border-white/10">
                 <motion.div 
                   key={imageIndex}
@@ -346,7 +317,6 @@ export default function ProductClient({
                   <ZoomIn className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                {/* Navigation arrows */}
                 {images.length > 1 && (
                   <>
                     <button
@@ -364,17 +334,17 @@ export default function ProductClient({
                   </>
                 )}
 
-                {/* Video badge */}
-                <button
-                  onClick={() => setShowVideoModal(true)}
-                  className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-xl transition-all font-semibold"
-                >
-                  <Play className="w-4 h-4" />
-                  Ver video
-                </button>
+                {product.videoUrl && (
+                  <button
+                    onClick={() => setShowVideoModal(true)}
+                    className="absolute bottom-4 left-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-xl transition-all font-semibold"
+                  >
+                    <Play className="w-4 h-4" />
+                    Ver video
+                  </button>
+                )}
               </div>
 
-              {/* Thumbnails */}
               {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-3">
                   {images.slice(0, 4).map((img, index) => (
@@ -387,16 +357,13 @@ export default function ProductClient({
                           : 'border-white/10 hover:border-white/20'
                       }`}
                     >
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
-                        🛏️
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center text-4xl">🛏️</div>
                     </button>
                   ))}
                 </div>
               )}
 
-              {/* Trust badges compactos */}
-              <div className="grid grid-cols-3 gap-3 mt-6">
+              <div className="grid grid-cols-2 gap-3 mt-6">
                 <div className="text-center p-4 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
                   <Truck className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
                   <p className="text-xs font-bold text-white">Envío {product.deliveryDays}h</p>
@@ -405,19 +372,18 @@ export default function ProductClient({
 
                 <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 rounded-xl">
                   <Award className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                  <p className="text-xs font-bold text-white">{product.warranty} 3 años</p>
+                  <p className="text-xs font-bold text-white">{product.warranty} años</p>
                   <p className="text-[10px] text-zinc-400">Garantía</p>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Product Info Premium */}
+          {/* Product Info */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            {/* Header */}
             <div className="mb-6">
               <h1 className="text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
                 {product.name}
@@ -425,7 +391,6 @@ export default function ProductClient({
               
               <p className="text-xl text-zinc-400 mb-6">{product.subtitle}</p>
 
-              {/* Rating & Social Proof */}
               <div className="flex flex-wrap items-center gap-6 pb-6 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <div className="flex">
@@ -433,18 +398,18 @@ export default function ProductClient({
                       <Star
                         key={i}
                         className={`w-5 h-5 ${
-                          i < Math.floor(product.rating)
+                          i < Math.floor(averageRatings.average)
                             ? 'fill-amber-400 text-amber-400'
                             : 'text-zinc-700'
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="font-bold text-white">{product.rating.toFixed(1)}</span>
-                  <span className="text-zinc-500">({product.reviewCount})</span>
+                  <span className="font-bold text-white">{averageRatings.average.toFixed(1)}</span>
+                  <span className="text-zinc-500">({averageRatings.count})</span>
                 </div>
 
-                {product.reviewCount > 50 && (
+                {averageRatings.count > 50 && (
                   <div className="flex items-center gap-2 text-emerald-400">
                     <BadgeCheck className="w-5 h-5" />
                     <span className="text-sm font-semibold">Verificado por compradores</span>
@@ -461,18 +426,14 @@ export default function ProductClient({
               </div>
             </div>
 
-            {/* Precio destacado */}
+            {/* Precio */}
             <div className="mb-8 p-6 bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl border border-white/10">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-baseline gap-4 mb-2">
-                    <span className="text-6xl font-black text-white">
-                      {currentPrice}€
-                    </span>
-                    {product.originalPrice && product.originalPrice > currentPrice && (
-                      <span className="text-3xl text-zinc-500 line-through">
-                        {product.originalPrice}€
-                      </span>
+                    <span className="text-6xl font-black text-white">{currentPrice}€</span>
+                    {originalPrice && originalPrice > currentPrice && (
+                      <span className="text-3xl text-zinc-500 line-through">{originalPrice}€</span>
                     )}
                   </div>
                   {savings > 0 && (
@@ -531,7 +492,7 @@ export default function ProductClient({
             </div>
 
             {/* Variant Selector */}
-            {product.variants.length > 0 && (
+            {variants.length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <label className="block font-bold text-white flex items-center gap-2">
@@ -544,17 +505,18 @@ export default function ProductClient({
                   </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {product.variants.map((variant) => (
+                  {variants.map((variant) => (
                     <motion.button
                       key={variant.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedVariant(variant)}
+                      disabled={variant.stock === 0}
                       className={`relative p-4 rounded-xl border-2 transition-all ${
                         selectedVariant?.id === variant.id
                           ? 'border-violet-500 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10'
                           : 'border-white/10 hover:border-white/20 bg-zinc-900/50'
-                      }`}
+                      } ${variant.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <p className="font-bold text-white">{variant.size}</p>
                       <p className="text-sm text-zinc-400">{variant.price}€</p>
@@ -600,20 +562,20 @@ export default function ProductClient({
               </div>
             </div>
 
-            {/* CTAs Premium */}
+            {/* CTAs */}
             <div className="space-y-4 mb-8">
               <motion.button
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.99 }}
                 onClick={handleAddToCart}
-                disabled={!product.inStock || (selectedVariant && selectedVariant.stock === 0)}
-                className="relative w-full group overflow-hidden"
+                disabled={isOutOfStock}
+                className="relative w-full group overflow-hidden rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] animate-gradient" />
                 <div className="relative py-5 px-8 flex items-center justify-center gap-3 text-white font-black text-lg">
                   <ShoppingCart className="w-6 h-6" />
-                  {product.inStock ? 'Añadir al carrito' : 'Agotado'}
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  {isOutOfStock ? 'Agotado' : 'Añadir al carrito'}
+                  {!isOutOfStock && <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />}
                 </div>
               </motion.button>
 
@@ -643,7 +605,6 @@ export default function ProductClient({
                     <span>Compartir</span>
                   </motion.button>
 
-                  {/* Share menu */}
                   <AnimatePresence>
                     {showShareMenu && (
                       <motion.div
@@ -675,7 +636,7 @@ export default function ProductClient({
               </div>
             </div>
 
-            {/* Key Features destacadas */}
+            {/* Key Features */}
             <div className="mb-8 p-6 bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 rounded-2xl border border-white/10">
               <h3 className="font-black text-white mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-violet-400" />
@@ -691,43 +652,43 @@ export default function ProductClient({
               </div>
             </div>
 
-            {/* Stock & Delivery Info Premium */}
-<div className="space-y-3 mb-8">
-  <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
-    <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-      <Package className="w-6 h-6 text-emerald-400" />
-    </div>
-    <div className="flex-1">
-      <p className="font-bold text-white flex items-center gap-2">
-        En stock - Envío inmediato
-        {stockInfo.quantity > 5 && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-      </p>
-      <p className="text-sm text-zinc-400">
-        Recíbelo en {product.deliveryDays} días laborables
-      </p>
-    </div>
-  </div>
-</div>
+            {/* Stock Info */}
+            <div className="space-y-3 mb-8">
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl">
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Package className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-white flex items-center gap-2">
+                    En stock - Envío inmediato
+                    {stockInfo.quantity > 5 && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+                  </p>
+                  <p className="text-sm text-zinc-400">
+                    Recíbelo en {product.deliveryDays} días laborables
+                  </p>
+                </div>
+              </div>
+            </div>
 
-{/* Certifications */}
-{certifications.length > 0 && (
-  <div className="flex items-center gap-2 flex-wrap mb-8">
-    <span className="text-sm font-bold text-zinc-400 flex items-center gap-2">
-      <Award className="w-4 h-4" />
-      Certificaciones:
-    </span>
-    {certifications.map((cert, i) => (
-      <span 
-        key={i}
-        className="px-3 py-1.5 bg-zinc-900 border border-white/10 text-xs font-bold text-zinc-300 rounded-lg"
-      >
-        {cert}
-      </span>
-    ))}
-  </div>
-)}
+            {/* Certifications */}
+            {certifications.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap mb-8">
+                <span className="text-sm font-bold text-zinc-400 flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Certificaciones:
+                </span>
+                {certifications.map((cert, i) => (
+                  <span 
+                    key={i}
+                    className="px-3 py-1.5 bg-zinc-900 border border-white/10 text-xs font-bold text-zinc-300 rounded-lg"
+                  >
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            )}
 
-            {/* Garantías destacadas */}
+            {/* Trust Badges */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center gap-3 p-4 bg-zinc-900 rounded-xl border border-white/10">
                 <Lock className="w-5 h-5 text-violet-400 flex-shrink-0" />
@@ -747,14 +708,14 @@ export default function ProductClient({
           </motion.div>
         </div>
 
-        {/* Tabs Section Premium */}
+        {/* Tabs Section */}
         <div className="mb-16">
           <div className="border-b border-white/10 mb-8 overflow-x-auto">
             <div className="flex gap-8">
               {[
                 { id: 'description', label: 'Descripción', icon: Info },
                 { id: 'specs', label: 'Especificaciones', icon: Package },
-                { id: 'reviews', label: `Opiniones (${product.reviews.length})`, icon: Star },
+                { id: 'reviews', label: `Opiniones (${reviews.length})`, icon: Star },
                 { id: 'faq', label: 'Preguntas', icon: MessageCircle }
               ].map((tab) => (
                 <button
@@ -775,15 +736,15 @@ export default function ProductClient({
 
           <AnimatePresence mode="wait">
             {activeTab === 'description' && (
-              <DescriptionTab key="description" product={product} features={features} />
+              <DescriptionTab key="description" product={{ ...product, features, highlights }} />
             )}
             {activeTab === 'specs' && (
-              <SpecificationsTab key="specs" product={product} techFeatures={techFeatures} />
+              <SpecificationsTab key="specs" product={{ ...product, techFeatures, materials, layers }} />
             )}
             {activeTab === 'reviews' && (
               <ReviewsTab
                 key="reviews"
-                reviews={product.reviews}
+                reviews={reviews}
                 averageRatings={averageRatings}
                 productId={product.id}
               />
@@ -820,17 +781,19 @@ export default function ProductClient({
       <ImageModal
         isOpen={showImageModal}
         onClose={() => setShowImageModal(false)}
-        images={images.length > 0 ? images : [product.image]}
+        images={images}
         currentIndex={imageIndex}
         productName={product.name}
       />
 
-      <VideoModal
-        isOpen={showVideoModal}
-        onClose={() => setShowVideoModal(false)}
-        videoUrl="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        productName={product.name}
-      />
+      {product.videoUrl && (
+        <VideoModal
+          isOpen={showVideoModal}
+          onClose={() => setShowVideoModal(false)}
+          videoUrl={product.videoUrl}
+          productName={product.name}
+        />
+      )}
 
       <style jsx>{`
         @keyframes gradient {
@@ -845,9 +808,11 @@ export default function ProductClient({
   )
 }
 
-// COMPONENTS AUXILIARES
+// ============================================================================
+// TAB COMPONENTS
+// ============================================================================
 
-function DescriptionTab({ product, features }: { product: Product; features: string[] }) {
+function DescriptionTab({ product }: { product: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -859,24 +824,44 @@ function DescriptionTab({ product, features }: { product: Product; features: str
       
       <div className="prose prose-invert max-w-none mb-8">
         <p className="text-zinc-300 leading-relaxed text-lg">
-          {product.description || 'El ' + product.name + ' combina tecnología avanzada con materiales premium para ofrecerte un descanso excepcional. Diseñado con ' + product.height + 'cm de altura y una firmeza del ' + product.firmnessValue + '%, este colchón se adapta perfectamente a tu cuerpo mientras proporciona el soporte necesario para tu columna vertebral.'}
+          {product.description}
         </p>
+        {product.story && (
+          <div className="mt-6">
+            <h4 className="text-xl font-bold text-white mb-3">Historia del producto</h4>
+            <p className="text-zinc-300 leading-relaxed">{product.story}</p>
+          </div>
+        )}
       </div>
 
       <h4 className="text-xl font-black text-white mb-4">Beneficios principales</h4>
       <div className="grid md:grid-cols-2 gap-4">
-        {features.map((feature, i) => (
+        {product.features.map((feature: string, i: number) => (
           <div key={i} className="flex items-start gap-3 p-4 bg-white/5 rounded-xl">
             <CheckCircle2 className="w-5 h-5 text-violet-400 flex-shrink-0 mt-1" />
             <span className="text-zinc-300">{feature}</span>
           </div>
         ))}
       </div>
+
+      {product.highlights?.length > 0 && (
+        <div className="mt-8">
+          <h4 className="text-xl font-black text-white mb-4">Destacados</h4>
+          <div className="grid md:grid-cols-2 gap-3">
+            {product.highlights.map((highlight: string, i: number) => (
+              <div key={i} className="flex items-center gap-3 p-4 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl">
+                <Sparkles className="w-5 h-5 text-violet-400" />
+                <span className="text-white font-semibold">{highlight}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }
 
-function SpecificationsTab({ product, techFeatures }: { product: Product; techFeatures: string[] }) {
+function SpecificationsTab({ product }: { product: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -889,10 +874,12 @@ function SpecificationsTab({ product, techFeatures }: { product: Product; techFe
       <div className="grid md:grid-cols-2 gap-x-12 gap-y-6 mb-10">
         {[
           { label: 'Firmeza', value: `${product.firmnessValue}% - ${product.firmness}`, icon: TrendingUp },
-          { label: 'Transpirabilidad', value: `${product.transpirability}%`, icon: Zap },
+          { label: 'Adaptabilidad', value: `${product.adaptability}%`, icon: Sparkles },
+          { label: 'Transpirabilidad', value: `${product.transpirability}%`, icon: Wind },
           { label: 'Altura total', value: `${product.height}cm`, icon: Layers },
           { label: 'Peso aproximado', value: product.weight ? `${product.weight}kg` : 'N/A', icon: Package },
           { label: 'Garantía', value: `${product.warranty} años`, icon: Shield },
+          { label: 'Noches de prueba', value: `${product.trialNights} noches`, icon: Moon },
           { label: 'Stock disponible', value: product.stock > 0 ? `${product.stock} unidades` : 'Agotado', icon: Package },
           { label: 'SKU', value: product.sku || 'N/A', icon: Info }
         ].map((spec, index) => (
@@ -908,14 +895,14 @@ function SpecificationsTab({ product, techFeatures }: { product: Product; techFe
         ))}
       </div>
 
-      {techFeatures.length > 0 && (
+      {product.techFeatures?.length > 0 && (
         <>
           <h4 className="text-2xl font-black text-white mb-6 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-violet-400" />
             Características técnicas
           </h4>
           <div className="grid gap-4">
-            {techFeatures.map((feature, i) => (
+            {product.techFeatures.map((feature: string, i: number) => (
               <div key={i} className="flex items-start gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-5 h-5 text-white" />
@@ -926,13 +913,48 @@ function SpecificationsTab({ product, techFeatures }: { product: Product; techFe
           </div>
         </>
       )}
+
+      {product.materials?.length > 0 && (
+        <div className="mt-8">
+          <h4 className="text-2xl font-black text-white mb-6">Materiales</h4>
+          <div className="flex flex-wrap gap-3">
+            {product.materials.map((material: string, i: number) => (
+              <span 
+                key={i}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 text-cyan-400 rounded-xl font-semibold"
+              >
+                {material}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {product.layers?.length > 0 && (
+        <div className="mt-8">
+          <h4 className="text-2xl font-black text-white mb-6">Capas del colchón</h4>
+          <div className="space-y-4">
+            {product.layers.map((layer: any, i: number) => (
+              <div key={i} className="flex gap-4 p-5 bg-white/5 rounded-xl border border-white/10">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center flex-shrink-0 text-white font-black">
+                  {i + 1}
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-bold text-white mb-1">{layer.name}</h5>
+                  <p className="text-sm text-zinc-400">{layer.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }
 
 function ReviewsTab({ reviews, averageRatings, productId }: {
-  reviews: Review[]
-  averageRatings: { comfort: number; quality: number; value: number }
+  reviews: any[]
+  averageRatings: any
   productId: string
 }) {
   return (
@@ -943,20 +965,20 @@ function ReviewsTab({ reviews, averageRatings, productId }: {
     >
       {reviews.length > 0 ? (
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Rating Summary Premium */}
+          {/* Rating Summary */}
           <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl border border-white/10 p-8">
             <h3 className="text-2xl font-black text-white mb-6">Valoración general</h3>
             
             <div className="text-center mb-8">
               <div className="text-7xl font-black bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent mb-4">
-                {averageRatings.comfort.toFixed(1)}
+                {averageRatings.average.toFixed(1)}
               </div>
               <div className="flex justify-center mb-3">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`w-6 h-6 ${
-                      i < Math.floor(averageRatings.comfort)
+                      i < Math.floor(averageRatings.average)
                         ? 'fill-amber-400 text-amber-400'
                         : 'text-zinc-700'
                     }`}
@@ -964,7 +986,7 @@ function ReviewsTab({ reviews, averageRatings, productId }: {
                 ))}
               </div>
               <p className="text-sm text-zinc-400">
-                Basado en <span className="font-bold text-white">{reviews.length}</span> opiniones verificadas
+                Basado en <span className="font-bold text-white">{averageRatings.count}</span> opiniones
               </p>
             </div>
 
@@ -972,7 +994,8 @@ function ReviewsTab({ reviews, averageRatings, productId }: {
               {[
                 { label: 'Confort', value: averageRatings.comfort, color: 'from-violet-500 to-fuchsia-500' },
                 { label: 'Calidad', value: averageRatings.quality, color: 'from-cyan-500 to-blue-500' },
-                { label: 'Relación calidad-precio', value: averageRatings.value, color: 'from-emerald-500 to-green-500' }
+                { label: 'Relación calidad-precio', value: averageRatings.value, color: 'from-emerald-500 to-green-500' },
+                { label: 'Entrega', value: averageRatings.delivery, color: 'from-amber-500 to-orange-500' }
               ].map((rating) => (
                 <div key={rating.label}>
                   <div className="flex justify-between text-sm mb-2">
@@ -988,9 +1011,29 @@ function ReviewsTab({ reviews, averageRatings, productId }: {
                 </div>
               ))}
             </div>
+
+            <div className="mt-6 space-y-2">
+              <p className="text-sm font-bold text-white mb-2">Distribución de estrellas</p>
+              {[5, 4, 3, 2, 1].map((stars) => (
+                <div key={stars} className="flex items-center gap-3">
+                  <span className="text-sm text-zinc-400 w-8">{stars}★</span>
+                  <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-400"
+                      style={{ 
+                        width: `${averageRatings.count > 0 ? (averageRatings.distribution[stars as keyof typeof averageRatings.distribution] / averageRatings.count) * 100 : 0}%` 
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm text-zinc-400 w-8">
+                    {averageRatings.distribution[stars as keyof typeof averageRatings.distribution]}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Reviews List Premium */}
+          {/* Reviews List */}
           <div className="lg:col-span-2 space-y-6">
             {reviews.map((review) => (
               <div 
@@ -1039,7 +1082,9 @@ function ReviewsTab({ reviews, averageRatings, productId }: {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white">{review.userName}</p>
-                      <p className="text-xs text-zinc-500">{review.userLocation}</p>
+                      {review.userLocation && (
+                        <p className="text-xs text-zinc-500">{review.userLocation}</p>
+                      )}
                     </div>
                   </div>
 
@@ -1136,9 +1181,9 @@ function FaqTab({ faqs, expandedFaq, setExpandedFaq }: {
   )
 }
 
-function RelatedProducts({ products, title }: { products: Product[]; title: string }) {
+function RelatedProducts({ products, title }: { products: any[]; title: string }) {
   return (
-    <div>
+    <div className="mb-16">
       <h2 className="text-4xl font-black text-white mb-8 flex items-center gap-3">
         <Sparkles className="w-8 h-8 text-violet-400" />
         {title}
@@ -1179,6 +1224,10 @@ function RelatedProducts({ products, title }: { products: Product[]; title: stri
     </div>
   )
 }
+
+// ============================================================================
+// MODAL COMPONENTS
+// ============================================================================
 
 function ImageModal({ isOpen, onClose, images, currentIndex, productName }: {
   isOpen: boolean
@@ -1243,6 +1292,13 @@ function VideoModal({ isOpen, onClose, videoUrl, productName }: {
 }) {
   if (!isOpen) return null
 
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    const videoId = match && match[2].length === 11 ? match[2] : null
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url
+  }
+
   return (
     <AnimatePresence>
       <motion.div
@@ -1261,7 +1317,7 @@ function VideoModal({ isOpen, onClose, videoUrl, productName }: {
 
         <div className="max-w-5xl w-full aspect-video" onClick={(e) => e.stopPropagation()}>
           <iframe
-            src={videoUrl}
+            src={getYouTubeEmbedUrl(videoUrl)}
             title={`Video de ${productName}`}
             className="w-full h-full rounded-3xl"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
