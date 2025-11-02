@@ -1,7 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react'
+import { Phone, Mail, Clock, Send, CheckCircle, MessageCircle } from 'lucide-react'
 import { useState } from 'react'
 
 export default function ContactoPage() {
@@ -12,276 +11,295 @@ export default function ContactoPage() {
     subject: '',
     message: '',
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    alert('Gracias por contactarnos. Te responderemos pronto.')
+    setIsSubmitting(true)
+    
+    // Simular envío
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    setSubmitted(true)
+    setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+    
+    setTimeout(() => setSubmitted(false), 5000)
+    setIsSubmitting(false)
   }
 
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: 'Teléfono',
+      value: '900 123 456',
+      link: 'tel:+34900123456',
+      color: 'emerald'
+    },
+    {
+      icon: Mail,
+      title: 'Email',
+      value: 'hola@tiendacolchon.es',
+      link: 'mailto:hola@tiendacolchon.es',
+      color: 'blue'
+    },
+    {
+      icon: Clock,
+      title: 'Horario',
+      value: 'Lun-Vie: 9:00-20:00',
+      subtitle: 'Sáb: 10:00-14:00',
+      color: 'violet'
+    }
+  ]
+
+  const faqs = [
+    {
+      q: '¿Cuánto tarda el envío?',
+      a: '3-6 días laborables en península. Envío gratis.'
+    },
+    {
+      q: '¿Puedo devolver el colchón?',
+      a: 'Sí, si presenta defectos o no cumple con las especificaciones.'
+    },
+    {
+      q: '¿Tienen garantía?',
+      a: 'Sí, 3 años de garantía en todos nuestros productos.'
+    }
+  ]
+
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      {/* Hero */}
-      <section className="section-padding bg-gradient-to-br from-warm-50 to-accent-mint">
-        <div className="container-custom text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Contacta con nosotros
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Estamos aquí para ayudarte a encontrar tu descanso perfecto
-            </p>
-          </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 pt-32 pb-20">
+      <div className="container mx-auto px-4 max-w-6xl">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-2xl mb-6 border border-violet-500/30">
+            <MessageCircle className="w-10 h-10 text-violet-400" />
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+            Contacta con nosotros
+          </h1>
+          <p className="text-zinc-400 text-lg">
+            Estamos aquí para ayudarte a encontrar tu descanso perfecto
+          </p>
         </div>
-      </section>
 
-      {/* Contact Info Cards */}
-      <section className="section-padding bg-white">
-        <div className="container-custom">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {contactMethods.map((method, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="card text-center hover:shadow-xl transition-shadow"
+        {/* Contact Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
+          {contactInfo.map((info, index) => (
+            <div
+              key={index}
+              className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-violet-500/30 transition-all text-center"
+            >
+              <div className={`w-14 h-14 bg-${info.color}-500/10 rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                <info.icon className={`w-7 h-7 text-${info.color}-400`} />
+              </div>
+              <h3 className="text-white font-bold mb-2">{info.title}</h3>
+              {info.link ? (
+                <a 
+                  href={info.link}
+                  className="text-zinc-300 hover:text-white transition-colors font-semibold block"
+                >
+                  {info.value}
+                </a>
+              ) : (
+                <p className="text-zinc-300 font-semibold">{info.value}</p>
+              )}
+              {info.subtitle && (
+                <p className="text-sm text-zinc-500 mt-1">{info.subtitle}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-8">
+            <h2 className="text-3xl font-bold text-white mb-2">Envíanos un mensaje</h2>
+            <p className="text-zinc-400 mb-8">Responderemos en menos de 24 horas</p>
+
+            {submitted && (
+              <div className="mb-6 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-center gap-3">
+                <CheckCircle className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                <div>
+                  <p className="text-emerald-400 font-semibold">¡Mensaje enviado!</p>
+                  <p className="text-emerald-400/80 text-sm">Te responderemos pronto</p>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Nombre completo *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
+                  placeholder="Tu nombre"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
+                    placeholder="+34 600 000 000"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Asunto *
+                </label>
+                <select
+                  required
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
+                >
+                  <option value="" className="bg-zinc-900">Selecciona un asunto</option>
+                  <option value="producto" className="bg-zinc-900">Consulta sobre productos</option>
+                  <option value="pedido" className="bg-zinc-900">Estado de mi pedido</option>
+                  <option value="devolucion" className="bg-zinc-900">Devolución o cambio</option>
+                  <option value="garantia" className="bg-zinc-900">Garantía</option>
+                  <option value="otro" className="bg-zinc-900">Otro</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Mensaje *
+                </label>
+                <textarea
+                  required
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all resize-none"
+                  placeholder="Cuéntanos cómo podemos ayudarte..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting || submitted}
+                className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-50 rounded-full mb-4">
-                  <method.icon className="w-8 h-8 text-primary-600" />
-                </div>
-                <h3 className="font-bold mb-2">{method.title}</h3>
-                <p className="text-gray-600 mb-2">{method.value}</p>
-                {method.subtitle && (
-                  <p className="text-sm text-gray-500">{method.subtitle}</p>
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Enviando...</span>
+                  </>
+                ) : submitted ? (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    <span>¡Enviado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    <span>Enviar mensaje</span>
+                  </>
                 )}
-              </motion.div>
-            ))}
+              </button>
+            </form>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="card">
-                <h2 className="text-3xl font-bold mb-2">Envíanos un mensaje</h2>
-                <p className="text-gray-600 mb-8">
-                  Responderemos en menos de 24 horas
-                </p>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Nombre completo *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-primary-600"
-                      placeholder="Tu nombre"
-                    />
+          {/* FAQ & Info */}
+          <div className="space-y-6">
+            {/* FAQs */}
+            <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-white mb-6">Preguntas frecuentes</h3>
+              <div className="space-y-6">
+                {faqs.map((faq, index) => (
+                  <div key={index} className="pb-6 border-b border-white/10 last:border-0">
+                    <h4 className="font-semibold text-white mb-2">{faq.q}</h4>
+                    <p className="text-sm text-zinc-400">{faq.a}</p>
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-primary-600"
-                        placeholder="tu@email.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">
-                        Teléfono
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-primary-600"
-                        placeholder="+34 600 000 000"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Asunto *
-                    </label>
-                    <select
-                      required
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-primary-600"
-                    >
-                      <option value="">Selecciona un asunto</option>
-                      <option value="producto">Consulta sobre productos</option>
-                      <option value="pedido">Estado de mi pedido</option>
-                      <option value="devolucion">Devolución o cambio</option>
-                      <option value="garantia">Garantía</option>
-                      <option value="otro">Otro</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      Mensaje *
-                    </label>
-                    <textarea
-                      required
-                      rows={5}
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-primary-600"
-                      placeholder="Cuéntanos cómo podemos ayudarte..."
-                    />
-                  </div>
-
-                  <button type="submit" className="btn-primary w-full">
-                    Enviar mensaje
-                  </button>
-                </form>
+                ))}
               </div>
-            </motion.div>
+            </div>
 
-            {/* Additional Info */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              {/* FAQ Quick Links */}
-              <div className="card">
-                <h3 className="text-2xl font-bold mb-4">
-                  Preguntas frecuentes
-                </h3>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="pb-4 border-b last:border-0">
-                      <h4 className="font-semibold mb-2">{faq.question}</h4>
-                      <p className="text-sm text-gray-600">{faq.answer}</p>
-                    </div>
-                  ))}
+            {/* Opening Hours */}
+            <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-violet-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Horario de atención</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-400">Lunes - Viernes</span>
+                  <span className="font-bold text-white">9:00 - 20:00</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-400">Sábados</span>
+                  <span className="font-bold text-white">10:00 - 14:00</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-400">Domingos</span>
+                  <span className="font-semibold text-zinc-500">Cerrado</span>
                 </div>
               </div>
+            </div>
 
-              {/* Live Chat */}
-              <div className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white">
-                <MessageCircle className="w-12 h-12 mb-4" />
-                <h3 className="text-2xl font-bold mb-2">
-                  Chat en directo
-                </h3>
-                <p className="mb-6 opacity-90">
-                  ¿Necesitas ayuda inmediata? Habla con nuestro equipo
-                </p>
-                <button className="bg-white text-primary-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-50 transition-all">
-                  Iniciar chat
-                </button>
+            {/* WhatsApp CTA */}
+            <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center">
+              <div className="w-14 h-14 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-7 h-7 text-emerald-400" />
               </div>
-
-              {/* Opening Hours */}
-              <div className="card">
-                <Clock className="w-8 h-8 text-primary-600 mb-4" />
-                <h3 className="text-xl font-bold mb-4">Horario de atención</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Lunes - Viernes</span>
-                    <span className="font-semibold">9:00 - 20:00</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sábados</span>
-                    <span className="font-semibold">10:00 - 14:00</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Domingos</span>
-                    <span className="font-semibold">Cerrado</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="section-padding bg-warm-50">
-        <div className="container-custom">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Visítanos</h2>
-            <p className="text-xl text-gray-600">
-              Estamos en Madrid, pero entregamos en toda España
-            </p>
-          </div>
-
-          <div className="card overflow-hidden">
-            <div className="h-96 bg-gradient-to-br from-warm-100 to-accent-mint flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-16 h-16 text-primary-600 mx-auto mb-4" />
-                <p className="text-xl font-semibold">Paseo de la Castellana 123</p>
-                <p className="text-gray-600">28046 Madrid, España</p>
-              </div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                ¿Necesitas ayuda inmediata?
+              </h3>
+              <p className="text-zinc-400 mb-6 text-sm">
+                Escríbenos por WhatsApp
+              </p>
+              <a
+                href="https://wa.me/34600000000"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Abrir WhatsApp
+              </a>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
     </div>
   )
 }
-
-const contactMethods = [
-  {
-    icon: Phone,
-    title: 'Teléfono',
-    value: '+34 900 123 456',
-    subtitle: 'Lun-Vie 9:00-20:00',
-  },
-  {
-    icon: Mail,
-    title: 'Email',
-    value: 'info@descansopremium.es',
-    subtitle: 'Respuesta en 24h',
-  },
-  {
-    icon: MapPin,
-    title: 'Dirección',
-    value: 'Paseo de la Castellana 123',
-    subtitle: '28046 Madrid',
-  },
-  {
-    icon: MessageCircle,
-    title: 'WhatsApp',
-    value: '+34 600 000 000',
-    subtitle: 'Chat directo',
-  },
-]
-
-const faqs = [
-  {
-    question: '¿Cuánto tarda el envío?',
-    answer: 'Entregamos en 24-48 horas laborables en toda España.',
-  },
-  {
-    question: '¿Puedo devolver el colchón?',
-    answer: 'Sí, aceptamos devoluciones si el producto presenta algún defecto o no cumple con las especificaciones anunciadas. Queremos que estés 100% satisfecho con tu compra.',
-  },
-  {
-    question: '¿Ofrecen garantía?',
-    answer: 'Todos nuestros productos tienen 3 años de garantía.',
-  },
-]

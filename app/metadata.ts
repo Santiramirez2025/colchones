@@ -295,7 +295,7 @@ export const structuredData = {
           name: '¿Qué garantía tienen los colchones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Todos nuestros colchones incluyen 10 años de garantía del fabricante contra defectos de fabricación y hundimientos superiores a 2cm.',
+            text: 'Todos nuestros colchones incluyen 3 años de garantía del fabricante contra defectos de fabricación y hundimientos superiores a 2cm.',
           },
         },
         {

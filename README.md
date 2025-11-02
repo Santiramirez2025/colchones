@@ -190,8 +190,8 @@ Este proyecto es privado y está protegido por derechos de autor.
 ## 📞 Soporte
 
 Para soporte y consultas:
-- Email: info@descansopremium.es
-- Web: https://descansopremium.es
+- Email: info@dtiendacolchon.es
+- Web: https://tiendacolchon.es
 
 ---
 

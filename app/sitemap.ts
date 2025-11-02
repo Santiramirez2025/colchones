@@ -1,214 +1,175 @@
-// app/sitemap.ts - Sitemap dinámico para Next.js 15
+// app/sitemap.ts - Sitemap optimizado profesional
 import { MetadataRoute } from 'next'
-import { SITE_CONFIG } from '@/lib/constants'
-// import { prisma } from '@/lib/prisma' // Si usas Prisma para productos
+
+const BASE_URL = 'https://www.tiendacolchon.es'
+const NOW = new Date()
+
+// ============================================
+// CONFIGURACIÓN DE PRIORIDADES SEO
+// ============================================
+const PRIORITIES = {
+  HOME: 1.0,
+  PRODUCTS_LIST: 0.9,
+  PRODUCT_PAGE: 0.9,
+  CATEGORIES: 0.8,
+  BLOG: 0.7,
+  BLOG_POST: 0.6,
+  INFO_PAGES: 0.6,
+  LEGAL: 0.3
+} as const
+
+const FREQUENCIES = {
+  DAILY: 'daily',
+  WEEKLY: 'weekly',
+  MONTHLY: 'monthly',
+  YEARLY: 'yearly'
+} as const
+
+// ============================================
+// HELPER FUNCTION
+// ============================================
+const createUrl = (
+  path: string, 
+  priority: number, 
+  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
+  lastModified: Date = NOW
+): MetadataRoute.Sitemap[number] => ({
+  url: `${BASE_URL}${path}`,
+  lastModified,
+  changeFrequency,
+  priority
+})
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = SITE_CONFIG.url
-  const currentDate = new Date()
-
   // ============================================
-  // PÁGINAS ESTÁTICAS
+  // PÁGINAS PRINCIPALES
   // ============================================
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: currentDate,
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/productos`,
-      lastModified: currentDate,
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/sobre-nosotros`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/contacto`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/preguntas-frecuentes`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/garantia`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/envios`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/politica-privacidad`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terminos-condiciones`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/politica-cookies`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
+  const mainPages: MetadataRoute.Sitemap = [
+    createUrl('/', PRIORITIES.HOME, FREQUENCIES.DAILY),
+    createUrl('/productos', PRIORITIES.PRODUCTS_LIST, FREQUENCIES.DAILY),
+    createUrl('/blog', PRIORITIES.BLOG, FREQUENCIES.WEEKLY),
   ]
 
   // ============================================
-  // PÁGINAS DINÁMICAS - PRODUCTOS
+  // CATEGORÍAS DE PRODUCTOS
   // ============================================
-  // Opción 1: Productos hardcodeados
-  const productPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/producto/colchon-multisac-premium`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    // Añade más productos aquí
+  const categories = [
+    'colchones-viscoelasticos',
+    'colchones-muelles-ensacados',
+    'colchones-hibridos',
+    'colchones-latex',
+    'almohadas',
+    'bases-somieres'
   ]
 
-  // Opción 2: Productos desde base de datos (Prisma)
-  /*
-  const products = await prisma.product.findMany({
-    where: { published: true },
-    select: { slug: true, updatedAt: true },
-  })
-
-  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
-    url: `${baseUrl}/producto/${product.slug}`,
-    lastModified: product.updatedAt,
-    changeFrequency: 'weekly',
-    priority: 0.9,
-  }))
-  */
+  const categoryPages: MetadataRoute.Sitemap = categories.map(slug =>
+    createUrl(`/categoria/${slug}`, PRIORITIES.CATEGORIES, FREQUENCIES.WEEKLY)
+  )
 
   // ============================================
-  // PÁGINAS DINÁMICAS - CATEGORÍAS
+  // PRODUCTOS DESTACADOS
   // ============================================
-  const categoryPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/categoria/colchones-viscoelasticos`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/categoria/colchones-muelles`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/categoria/colchones-hibridos`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/categoria/almohadas`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
+  const products = [
+    'colchon-multisac-premium',
+    'colchon-viscoelastico-adaptable',
+    'colchon-hibrido-comfort',
+    'colchon-latex-natural',
+    'almohada-viscoelastica'
   ]
 
+  const productPages: MetadataRoute.Sitemap = products.map(slug =>
+    createUrl(`/producto/${slug}`, PRIORITIES.PRODUCT_PAGE, FREQUENCIES.WEEKLY)
+  )
+
   // ============================================
-  // PÁGINAS DINÁMICAS - BLOG
+  // BLOG POSTS
   // ============================================
-  // Opción 1: Posts hardcodeados
-  const blogPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/blog/como-elegir-colchon-perfecto`,
-      lastModified: new Date('2024-10-15'),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    // Añade más posts aquí
+  const blogPosts = [
+    'como-elegir-colchon-perfecto',
+    'guia-firmeza-colchones',
+    'mejor-colchon-dolor-espalda',
+    'diferencias-colchon-viscoelastico-muelles'
   ]
 
-  // Opción 2: Posts desde base de datos
-  /*
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    select: { slug: true, updatedAt: true },
-  })
-
-  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }))
-  */
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map(slug =>
+    createUrl(`/blog/${slug}`, PRIORITIES.BLOG_POST, FREQUENCIES.MONTHLY)
+  )
 
   // ============================================
-  // COMBINAR TODAS LAS PÁGINAS
+  // PÁGINAS INFORMATIVAS
+  // ============================================
+  const infoPages = [
+    { path: '/sobre-nosotros', freq: FREQUENCIES.MONTHLY },
+    { path: '/contacto', freq: FREQUENCIES.MONTHLY },
+    { path: '/preguntas-frecuentes', freq: FREQUENCIES.MONTHLY },
+    { path: '/garantia', freq: FREQUENCIES.MONTHLY },
+    { path: '/envios', freq: FREQUENCIES.MONTHLY },
+    { path: '/devoluciones', freq: FREQUENCIES.MONTHLY }
+  ]
+
+  const infoSitemap: MetadataRoute.Sitemap = infoPages.map(page =>
+    createUrl(page.path, PRIORITIES.INFO_PAGES, page.freq)
+  )
+
+  // ============================================
+  // PÁGINAS LEGALES
+  // ============================================
+  const legalPages: MetadataRoute.Sitemap = [
+    '/politica-privacidad',
+    '/terminos-condiciones',
+    '/politica-cookies'
+  ].map(path => createUrl(path, PRIORITIES.LEGAL, FREQUENCIES.YEARLY))
+
+  // ============================================
+  // COMBINAR TODO
   // ============================================
   return [
-    ...staticPages,
-    ...productPages,
+    ...mainPages,
     ...categoryPages,
+    ...productPages,
     ...blogPages,
+    ...infoSitemap,
+    ...legalPages
   ]
 }
 
 // ============================================
-// SITEMAP INDEX (opcional para sitios grandes)
+// NOTA: INTEGRACIÓN CON BASE DE DATOS
 // ============================================
-// Si tienes >50,000 URLs, crea múltiples sitemaps:
-
 /*
-// app/sitemap-index.xml/route.ts
-export async function GET() {
-  const baseUrl = 'https://tiendacolchon.es'
-  
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-  <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <sitemap>
-      <loc>${baseUrl}/sitemap.xml</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-    </sitemap>
-    <sitemap>
-      <loc>${baseUrl}/sitemap-products.xml</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-    </sitemap>
-    <sitemap>
-      <loc>${baseUrl}/sitemap-blog.xml</loc>
-      <lastmod>${new Date().toISOString()}</lastmod>
-    </sitemap>
-  </sitemapindex>`
+Para sitios con muchos productos, usa tu base de datos:
 
-  return new Response(xml, {
-    headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
-    },
-  })
-}
+import { prisma } from '@/lib/prisma'
+
+// Dentro de sitemap():
+const dbProducts = await prisma.product.findMany({
+  where: { published: true },
+  select: { slug: true, updatedAt: true }
+})
+
+const productPages = dbProducts.map(product =>
+  createUrl(
+    `/producto/${product.slug}`,
+    PRIORITIES.PRODUCT_PAGE,
+    FREQUENCIES.WEEKLY,
+    product.updatedAt
+  )
+)
+*/
+
+// ============================================
+// VERIFICACIÓN
+// ============================================
+/*
+1. Verifica tu sitemap en:
+   https://www.tiendacolchon.es/sitemap.xml
+
+2. Envía a Google Search Console:
+   - https://search.google.com/search-console
+
+3. Valida con:
+   - https://www.xml-sitemaps.com/validate-xml-sitemap.html
+
+4. Robots.txt debe incluir:
+   Sitemap: https://www.tiendacolchon.es/sitemap.xml
 */

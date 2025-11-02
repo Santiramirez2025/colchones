@@ -31,7 +31,7 @@ export const HERO_PRODUCT: HeroProduct = {
     { label: 'Altura', value: '32 cm', icon: Layers },
     { label: 'Muelles', value: '1.800', icon: Zap },
     { label: 'Firmeza', value: '70%', icon: TrendingUp },
-    { label: 'Garantía', value: '10 años', icon: Shield }
+    { label: 'Garantía', value: '3 años', icon: Shield }
   ],
   trustIndicators: [
     { icon: CheckCircle2, text: 'Envío gratis 24-48h', color: 'text-emerald-400' },
@@ -59,7 +59,7 @@ export const SOCIAL_PROOF: SocialProofType = {
     {
       icon: Star,
       label: '4.8/5',
-      sublabel: '2.438 opiniones',
+      sublabel: '322 opiniones',
       gradient: 'from-amber-500/10 via-orange-500/10 to-amber-500/10',
       border: 'border-amber-500/20',
       iconColor: 'text-amber-400'

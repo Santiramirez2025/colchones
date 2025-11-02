@@ -7,7 +7,7 @@ export const SITE_CONFIG = {
     display: '900 123 456'
   },
   tagline: 'Innovación en el sueño',
-  description: 'Colchones premium con tecnología Multisac® de 1.800 muelles ensacados. Certificados de calidad europea, envío gratis y 10 años de garantía.'
+  description: 'Colchones premium con tecnología Multisac® de 1.800 muelles ensacados. Certificados de calidad europea, envío gratis y 3 años de garantía.'
 }
 
 export const TRUST_BAR_ITEMS = [
@@ -31,7 +31,7 @@ export const ANIMATION_CONFIG = {
 
 export const SEO_DEFAULTS = {
   title: 'Colchones Premium con 1.800 Muelles | TiendaColchon',
-  description: 'Descubre colchones premium con tecnología Multisac® de 1.800 muelles ensacados. Certificados de calidad europea, envío gratis y 10 años de garantía.',
+  description: 'Descubre colchones premium con tecnología Multisac® de 1.800 muelles ensacados. Certificados de calidad europea, envío gratis y 3 años de garantía.',
   keywords: 'colchones, colchones premium, muelles ensacados, multisac, colchón viscoelástico, mejor colchón',
   ogImage: '/og-image.jpg',
   twitterCard: 'summary_large_image'

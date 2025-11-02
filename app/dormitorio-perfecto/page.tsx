@@ -381,7 +381,7 @@ export default function DormitorioPerfecto() {
               <div>
                 <h4 className="font-bold text-white mb-1">Colchón viejo hundido</h4>
                 <p className="text-sm text-gray-300">
-                  Si tu colchón tiene más de 10 años o se hunde visiblemente, está causando microdespertares y dolor.
+                  Si tu colchón tiene más de 3 años o se hunde visiblemente, está causando microdespertares y dolor.
                 </p>
               </div>
             </div>

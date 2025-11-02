@@ -38,7 +38,7 @@ const badges = [
   },
   {
     icon: Award,
-    title: '10 Años',
+    title: '3 Años',
     description: 'Garantía total',
   },
   {

@@ -231,7 +231,7 @@ Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
       
       // SEO optimizado
       metaTitle: 'Royal Zen - Colchón Muelles Ensacados + Visco | Envío Gratis',
-      metaDescription: 'Colchón premium de 275 muelles ensacados con doble cara viscoelástica. Independencia de lechos, firmeza media-alta, silencioso. 100 noches de prueba, 10 años de garantía. Envío gratis 24-72h.',
+      metaDescription: 'Colchón premium de 275 muelles ensacados con doble cara viscoelástica. Independencia de lechos, firmeza media-alta, silencioso. 100 noches de prueba, 3 años de garantía. Envío gratis 24-72h.',
       metaKeywords: 'colchón muelles ensacados, colchón viscoelástica, colchón parejas, royal zen, independencia de lechos, colchón silencioso',
       
       // Posición y categoría

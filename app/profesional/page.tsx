@@ -230,7 +230,7 @@ export default function ProfesionalPage() {
             <div className="card text-center">
               <Mail className="w-8 h-8 text-primary-600 mx-auto mb-4" />
               <h3 className="font-bold mb-2">Email</h3>
-              <p className="text-gray-600">profesional@descansopremium.es</p>
+              <p className="text-gray-600">profesional@tiendacolchon.es</p>
               <p className="text-sm text-gray-500 mt-1">Respuesta en 24h</p>
             </div>
           </div>
