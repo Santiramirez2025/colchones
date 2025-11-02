@@ -146,7 +146,7 @@ export default function Header() {
             </div>
             
             <div className="flex items-center gap-4 ml-auto">
-              <Link href="/prueba-100-noches" className="text-gray-400 hover:text-purple-300 transition-colors font-medium text-xs hidden lg:block rounded px-2 py-1">
+              <Link href="/catalogo" className="text-gray-400 hover:text-purple-300 transition-colors font-medium text-xs hidden lg:block rounded px-2 py-1">
                 Tu descanso asegurado
               </Link>
               <a href={`tel:${SITE_CONFIG.phone}`} className="flex items-center gap-1.5 text-gray-300 hover:text-purple-300 transition-colors font-semibold rounded px-2 py-1">

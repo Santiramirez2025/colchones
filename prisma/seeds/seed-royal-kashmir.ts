@@ -75,8 +75,6 @@ Silencioso, transpirable y duradero, el Royal Kashmir transforma tu descanso en 
         '/images/products/royal-kashmir/9-zones.jpg',
         '/images/products/royal-kashmir/springs-detail.jpg',
         '/images/products/royal-kashmir/layers.jpg',
-        '/images/products/royal-kashmir/lifestyle.jpg',
-        '/images/products/royal-kashmir/luxury-detail.jpg'
       ]),
       videoUrl: 'https://www.youtube.com/watch?v=example',
       gradient: 'from-purple-600 via-pink-500 to-rose-500',

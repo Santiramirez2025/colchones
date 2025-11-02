@@ -67,12 +67,10 @@ El tejido Stretch Luxury, suave y resistente, junto al sistema de doble cara, pr
       image: '/images/products/imperial-lux/main.jpg',
       images: JSON.stringify([
         '/images/products/imperial-lux/main.jpg',
-        '/images/products/imperial-lux/detail-1.jpg',
-        '/images/products/imperial-lux/detail-2.jpg',
-        '/images/products/imperial-lux/detail-3.jpg',
-        '/images/products/imperial-lux/lifestyle.jpg',
-        '/images/products/imperial-lux/materials.jpg',
-        '/images/products/imperial-lux/texture.jpg'
+  '/images/products/imperial-lux/detail-1.jpg',
+  '/images/products/imperial-lux/detail-2.jpg',
+  '/images/products/imperial-lux/detail-3.jpg',
+  '/images/products/imperial-lux/lifestyle.jpg'
       ]),
       videoUrl: 'https://www.youtube.com/watch?v=example',
       gradient: 'from-amber-500 via-orange-500 to-red-500',

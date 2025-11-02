@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import Head from 'next/head'
-import { motion, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useTransform, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { ArrowRight, Brain, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef, useState, useEffect, useMemo, memo } from 'react'
 import { FloatingParticles } from './FloatingParticles'
@@ -11,10 +11,10 @@ import { HERO_PRODUCT } from '@/lib/product-data'
 import { useMousePosition } from '@/lib/hooks/useMousePosition'
 import { useScrollProgress } from '@/lib/hooks/useScrollProgress'
 
-// Imágenes del carousel optimizadas con placeholders
+// Imágenes del carousel optimizadas
 const CAROUSEL_IMAGES = [
   {
-    url: '/images/colchon1.jpg',
+    url: '/images/colchongpt.jpg',
     alt: 'Colchón Multisac® Premium - Vista detallada del acabado de alta calidad con tela transpirable',
     label: 'Acabado Premium',
     description: 'Tela transpirable de alta calidad',
@@ -22,7 +22,7 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
   },
   {
-    url: '/images/colchon2.jpg',
+    url: '/images/colchongpt1.jpg',
     alt: 'Tecnología de muelles ensacados independientes del colchón Multisac® - 275 muelles por metro cuadrado',
     label: 'Muelles Ensacados',
     description: '275 muelles/m² independientes',
@@ -30,7 +30,7 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
   },
   {
-    url: '/images/colchon3.jpg',
+    url: '/images/colchongpt4.jpg',
     alt: 'Colchón Multisac® en dormitorio moderno - Confort total diseñado para tu mejor descanso',
     label: 'Confort Total',
     description: 'Diseñado para tu descanso',
@@ -38,6 +38,7 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
   }
 ]
+
 // Datos estructurados JSON-LD para SEO
 const productStructuredData = {
   "@context": "https://schema.org",
@@ -114,12 +115,17 @@ export function HeroSection() {
   const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false])
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   
   const mousePosition = useMousePosition(!isMobile)
   const { scrollYProgress, prefersReducedMotion } = useScrollProgress()
   
   const heroY = useTransform(scrollYProgress, [0, 0.3], ['0%', '30%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
+
+  // Motion values para parallax suave
+  const dragX = useMotionValue(0)
+  const dragProgress = useSpring(dragX, { stiffness: 300, damping: 30 })
 
   // Detectar móvil y reducir animaciones
   useEffect(() => {
@@ -131,13 +137,13 @@ export function HeroSection() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Auto-play optimizado: 4 segundos con transición más suave
+  // Auto-play optimizado: 5 segundos
   useEffect(() => {
     if (!isAutoPlaying) return
 
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % CAROUSEL_IMAGES.length)
-    }, 4000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [isAutoPlaying])
@@ -178,9 +184,10 @@ export function HeroSection() {
     }
   }, [])
 
-  // Manejo de swipe táctil
+  // Manejo de swipe táctil mejorado
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX)
+    setIsDragging(true)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -203,6 +210,7 @@ export function HeroSection() {
 
     setTouchStart(0)
     setTouchEnd(0)
+    setIsDragging(false)
   }
 
   const goToNext = () => {
@@ -231,20 +239,23 @@ export function HeroSection() {
     []
   )
 
+  // Calcular progreso del carousel
+  const carouselProgress = ((currentImage + 1) / CAROUSEL_IMAGES.length) * 100
+
   return (
     <>
       <Head>
         <title>Colchón Multisac® Premium - Dormir bien es vivir mejor | -44% HOY</title>
         <meta name="description" content="Colchón premium con 1800 muelles ensacados independientes. Envío gratis, fabricado en España. Test gratuito en 2 minutos. Ahorra 44% hoy: 449€ (antes 799€)." />
         <meta name="keywords" content="colchón premium, muelles ensacados, colchón España, descanso, Multisac" />
-        <link rel="canonical" href="https://tudominio.com/" />
+        <link rel="canonical" href="https://tiendacolchon.es/" />
         
         {/* Open Graph */}
         <meta property="og:title" content="Colchón Multisac® Premium - Dormir bien es vivir mejor" />
         <meta property="og:description" content="1800 muelles ensacados, 32cm de altura, 7 capas. -44% HOY: 449€" />
         <meta property="og:image" content={CAROUSEL_IMAGES[0].url} />
         <meta property="og:type" content="product" />
-        <meta property="og:url" content="https://tudominio.com/" />
+        <meta property="og:url" content="https://tiendacolchon.es/" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -306,278 +317,314 @@ export function HeroSection() {
         {/* Grid pattern - más sutil en móvil */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,.02)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(139,92,246,.02)_1.5px,transparent_1.5px)] sm:bg-[linear-gradient(rgba(139,92,246,.03)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(139,92,246,.03)_1.5px,transparent_1.5px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_60%,transparent_100%)]" />
 
-        <div className="relative z-10 container mx-auto px-0 sm:px-4 py-12 sm:py-20">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
-            {/* Left Column */}
-            <article className="text-left space-y-6 sm:space-y-8 px-4 sm:px-0">
-              
-              {/* Badge de prueba social */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 backdrop-blur-xl border border-amber-500/20 px-4 py-2.5 rounded-full"
-              >
-                <Star className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
-                <span className="text-white/90 font-bold text-sm">
-                  +15.000 personas duermen mejor
-                </span>
-              </motion.div>
-
-              {/* Título principal */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
-                className="space-y-4"
-              >
-                <h1 id="hero-heading" className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter">
-                  <span className="block text-white">
-                    Dormir bien,
+        <div className="relative z-10 w-full">
+          <div className="container mx-auto px-0 sm:px-4 py-12 sm:py-20">
+            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
+              {/* Left Column */}
+              <article className="text-left space-y-6 sm:space-y-8 px-4 sm:px-0 order-2 lg:order-1">
+                
+                {/* Badge de prueba social */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-500/10 to-orange-500/10 backdrop-blur-xl border border-amber-500/20 px-4 py-2.5 rounded-full"
+                >
+                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
+                  <span className="text-white/90 font-bold text-sm">
+                    +15.000 personas duermen mejor
                   </span>
-                  <span className="block relative">
-                    <span className="relative z-10 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                      es vivir mejor
+                </motion.div>
+
+                {/* Título principal */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+                  className="space-y-4"
+                >
+                  <h1 id="hero-heading" className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tighter">
+                    <span className="block text-white">
+                      Dormir bien,
                     </span>
-                    {shouldAnimate && (
-                      <motion.div
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
-                        className="absolute bottom-2 left-0 right-0 h-3 sm:h-4 bg-gradient-to-r from-violet-500/30 via-fuchsia-500/30 to-cyan-500/30 blur-xl"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </span>
-                </h1>
-              </motion.div>
+                    <span className="block relative">
+                      <span className="relative z-10 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+                        es vivir mejor
+                      </span>
+                      {shouldAnimate && (
+                        <motion.div
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          transition={{ delay: 1, duration: 1.2, ease: "easeInOut" }}
+                          className="absolute bottom-2 left-0 right-0 h-3 sm:h-4 bg-gradient-to-r from-violet-500/30 via-fuchsia-500/30 to-cyan-500/30 blur-xl"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                  </h1>
+                </motion.div>
 
-              {/* Subtítulo */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="space-y-4 sm:space-y-6"
+                {/* Subtítulo */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="space-y-4 sm:space-y-6"
+                >
+                  <p className="text-xl sm:text-2xl md:text-3xl text-zinc-300 leading-relaxed font-light">
+                    Tu cuerpo se adapta al colchón.<br />
+                    <span className="text-white font-medium">Nosotros lo hacemos al revés.</span>
+                  </p>
+
+                  {/* Precio */}
+                  <div className="flex items-center gap-4 sm:gap-6">
+                    <div className="flex items-baseline gap-2 sm:gap-3">
+                      <span className="text-5xl sm:text-6xl md:text-7xl font-black text-white tracking-tight">449€</span>
+                      <div className="flex flex-col">
+                        <span className="text-lg sm:text-xl text-zinc-500 line-through">799€</span>
+                        <span className="text-xs sm:text-sm font-bold text-amber-400">-44% HOY</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* CTA Buttons */}
+                <motion.nav
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="flex flex-col sm:flex-row gap-4 pt-4 sm:pt-6"
+                  aria-label="Acciones principales"
+                >
+                  <Link 
+                    href="/simulador"
+                    prefetch={true}
+                    className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] hover:bg-[position:100%_0] text-white px-8 sm:px-10 py-5 sm:py-6 rounded-2xl font-bold text-lg sm:text-xl shadow-2xl shadow-violet-500/50 transition-all duration-500 hover:scale-[1.02]"
+                    aria-label="Hacer test gratuito personalizado en 2 minutos"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-fuchsia-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                    <Brain className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" aria-hidden="true" />
+                    <span className="relative z-10">Test gratuito · 2 min</span>
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                  </Link>
+
+                  <Link
+                    href="/catalogo"
+                    prefetch={true}
+                    className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white px-8 sm:px-10 py-5 sm:py-6 rounded-2xl font-bold text-lg sm:text-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                    aria-label="Ver colección premium de colchones"
+                  >
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+                    Ver colección
+                  </Link>
+                </motion.nav>
+
+                {/* Indicadores de confianza */}
+                <motion.ul
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4 text-xs sm:text-sm text-zinc-400 border-t border-white/5"
+                  aria-label="Beneficios del producto"
+                >
+                  <li className="text-zinc-300">✓ Muelles Ensacados</li>
+                  <li className="text-zinc-300">✓ Envío gratis</li>
+                  <li className="text-zinc-300">✓ Hecho en España</li>
+                </motion.ul>
+              </article>
+
+              {/* Right Column - Product Carousel OPTIMIZADO MOBILE 2025 */}
+              <motion.figure
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 1 }}
+                className="relative order-1 lg:order-2 px-4 sm:px-0"
+                aria-label="Galería de imágenes del colchón Multisac®"
               >
-                <p className="text-xl sm:text-2xl md:text-3xl text-zinc-300 leading-relaxed font-light">
-                  Tu cuerpo se adapta al colchón.<br />
-                  <span className="text-white font-medium">Nosotros lo hacemos al revés.</span>
-                </p>
+                {/* Container principal del carousel */}
+                <div className="relative w-full">
+                  
+                  {/* Efectos de brillo - visible en mobile */}
+                  <div className="absolute -inset-4 sm:-inset-8 md:-inset-12 bg-gradient-to-r from-violet-600/20 via-fuchsia-600/20 to-cyan-600/20 sm:from-violet-600/30 sm:via-fuchsia-600/30 sm:to-cyan-600/30 rounded-[2rem] sm:rounded-[4rem] blur-[80px] sm:blur-[120px] opacity-50 sm:opacity-60 animate-pulse" aria-hidden="true" />
+                  
+                  {/* Contenedor glassmorphism - border en mobile también */}
+                  <div className="relative bg-gradient-to-br from-zinc-900/20 to-zinc-950/20 sm:from-zinc-900/40 sm:to-zinc-950/40 backdrop-blur-xl sm:backdrop-blur-2xl border border-white/5 sm:border-2 sm:border-white/10 rounded-2xl sm:rounded-[2.5rem] overflow-hidden p-2 sm:p-3 shadow-xl sm:shadow-2xl">
+                    
+                    {/* Gradient overlay interno */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-fuchsia-500/10 to-cyan-500/10 sm:from-violet-500/20 sm:via-fuchsia-500/20 sm:to-cyan-500/20 blur-2xl" aria-hidden="true" />
+                    
+                    {/* Carousel de producto - aspect ratio optimizado */}
+                    <div 
+                      ref={carouselRef}
+                      className="relative w-full aspect-[3/4] sm:aspect-[4/3] rounded-xl sm:rounded-[2rem] overflow-hidden bg-black shadow-2xl"
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                    >
+                      {/* Imágenes del carousel con transición premium */}
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={currentImage}
+                          initial={{ opacity: 0, scale: 1.05 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ 
+                            duration: 0.6, 
+                            ease: [0.43, 0.13, 0.23, 0.96],
+                          }}
+                          className="absolute inset-0"
+                        >
+                          <Image 
+                            src={CAROUSEL_IMAGES[currentImage].url}
+                            alt={CAROUSEL_IMAGES[currentImage].alt}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                            priority={currentImage === 0}
+                            loading={currentImage === 0 ? 'eager' : 'lazy'}
+                            quality={90}
+                            placeholder="blur"
+                            blurDataURL={CAROUSEL_IMAGES[currentImage].blurDataURL}
+                            onLoadingComplete={() => {
+                              setImagesLoaded(prev => {
+                                const newState = [...prev]
+                                newState[currentImage] = true
+                                return newState
+                              })
+                            }}
+                          />
+                        </motion.div>
+                      </AnimatePresence>
 
-                {/* Precio */}
-                <div className="flex items-center gap-4 sm:gap-6">
-                  <div className="flex items-baseline gap-2 sm:gap-3">
-                    <span className="text-5xl sm:text-6xl md:text-7xl font-black text-white tracking-tight">449€</span>
-                    <div className="flex flex-col">
-                      <span className="text-lg sm:text-xl text-zinc-500 line-through">799€</span>
-                      <span className="text-xs sm:text-sm font-bold text-amber-400">-44% HOY</span>
+                      {/* Overlays de gradiente profesionales */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+                      
+                      {/* Vignette effect */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.25)_100%)] pointer-events-none" />
+
+                      {/* Controles de navegación desktop */}
+                      <button
+                        onClick={goToPrev}
+                        className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 backdrop-blur-xl border border-white/20 hover:border-white/40 hover:scale-110 shadow-2xl z-30 group"
+                        aria-label="Imagen anterior del colchón"
+                      >
+                        <ChevronLeft className="w-7 h-7 group-hover:-translate-x-0.5 transition-transform" strokeWidth={2.5} />
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-300 backdrop-blur-xl border border-white/20 hover:border-white/40 hover:scale-110 shadow-2xl z-30 group"
+                        aria-label="Siguiente imagen del colchón"
+                      >
+                        <ChevronRight className="w-7 h-7 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+                      </button>
+
+                      {/* Progress Bar Moderna (estilo 2025) - Arriba */}
+                      <div className="absolute top-0 left-0 right-0 z-30 p-3 sm:p-6">
+                        <div className="space-y-2.5 sm:space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-white/90 text-[11px] sm:text-xs font-bold tracking-wider uppercase backdrop-blur-md bg-black/30 px-3 py-1.5 rounded-lg shadow-lg">
+                              {CAROUSEL_IMAGES[currentImage].label}
+                            </span>
+                            <span className="text-white/80 text-[11px] sm:text-xs font-semibold backdrop-blur-md bg-black/30 px-3 py-1.5 rounded-lg shadow-lg">
+                              {currentImage + 1} / {CAROUSEL_IMAGES.length}
+                            </span>
+                          </div>
+                          
+                          {/* Progress bar mejorada */}
+                          <div className="relative h-1 sm:h-1.5 bg-white/15 rounded-full overflow-hidden backdrop-blur-sm shadow-lg">
+                            <motion.div 
+                              className="absolute inset-y-0 left-0 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 rounded-full shadow-lg shadow-violet-500/50"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${carouselProgress}%` }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                            />
+                          </div>
+
+                          {/* Micro indicadores (puntos) */}
+                          <div className="flex gap-1.5 justify-center sm:justify-start">
+                            {CAROUSEL_IMAGES.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                className={`transition-all duration-300 ${
+                                  currentImage === index
+                                    ? 'w-6 sm:w-8 h-1 bg-white/95 rounded-full shadow-lg'
+                                    : 'w-1 h-1 bg-white/40 hover:bg-white/60 rounded-full'
+                                }`}
+                                aria-label={`Ver ${CAROUSEL_IMAGES[index].label}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Badges flotantes premium - Mejor posicionados */}
+                      <div className="absolute bottom-0 left-0 right-0 z-20 p-3 sm:p-6">
+                        <div className="flex items-end justify-between gap-2 sm:gap-3">
+                          
+                          {/* Badge izquierdo */}
+                          <FloatingBadge 
+                            delay={0.5}
+                            className="bg-gradient-to-br from-cyan-500/95 via-blue-500/95 to-cyan-600/95 backdrop-blur-xl px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-2xl border border-white/30"
+                          >
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full animate-pulse shadow-lg" />
+                              <span className="text-white text-[11px] sm:text-sm font-black whitespace-nowrap">💨 Transpirable</span>
+                            </div>
+                          </FloatingBadge>
+
+                          {/* Badge derecho */}
+                          <FloatingBadge 
+                            delay={0.8}
+                            className="bg-gradient-to-br from-violet-500/95 via-fuchsia-500/95 to-violet-600/95 backdrop-blur-xl px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-2xl border border-white/30"
+                          >
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <span className="text-white text-[11px] sm:text-sm font-black whitespace-nowrap">🌬️ Efecto nube</span>
+                              <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full animate-pulse shadow-lg" />
+                            </div>
+                          </FloatingBadge>
+                        </div>
+                      </div>
+
+                      {/* Badge de descuento - Esquina superior derecha */}
+                      <motion.div
+                        initial={{ scale: 0, rotate: -12 }}
+                        animate={{ scale: 1, rotate: -8 }}
+                        transition={{ delay: 1.2, type: "spring", bounce: 0.6 }}
+                        className="absolute top-3 right-3 sm:top-6 sm:right-6 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl shadow-2xl border-2 border-yellow-300/60 z-20"
+                        aria-label="Descuento del 44%"
+                      >
+                        <div className="text-center">
+                          <div className="text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider leading-none">Ahorra</div>
+                          <div className="text-white text-2xl sm:text-3xl font-black leading-none mt-0.5">44%</div>
+                        </div>
+                      </motion.div>
+
+                      {/* Swipe Indicator (solo mobile, primera vez) */}
+                      {isMobile && !isDragging && currentImage === 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: [0, 1, 0], x: [-20, 20, 60] }}
+                          transition={{ duration: 2, repeat: 2, repeatDelay: 1, delay: 1.5 }}
+                          className="absolute left-1/2 top-1/2 -translate-y-1/2 pointer-events-none z-40"
+                        >
+                          <div className="flex items-center gap-2 bg-black/80 backdrop-blur-xl px-4 py-2.5 rounded-full border border-white/30 shadow-2xl">
+                            <ChevronLeft className="w-4 h-4 text-white/70" />
+                            <span className="text-white text-xs font-bold">Desliza</span>
+                            <ChevronRight className="w-4 h-4 text-white" />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Grid de especificaciones técnicas */}
+                    <div className="grid grid-cols-4 gap-2 sm:gap-2 md:gap-3 mt-3 sm:mt-4 md:mt-6">
+                      {specBadges}
                     </div>
                   </div>
                 </div>
-              </motion.div>
-
-              {/* CTA Buttons */}
-              <motion.nav
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 pt-4 sm:pt-6"
-                aria-label="Acciones principales"
-              >
-                <Link 
-                  href="/simulador"
-                  prefetch={true}
-                  className="group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 bg-[length:200%_100%] hover:bg-[position:100%_0] text-white px-8 sm:px-10 py-5 sm:py-6 rounded-2xl font-bold text-lg sm:text-xl shadow-2xl shadow-violet-500/50 transition-all duration-500 hover:scale-[1.02]"
-                  aria-label="Hacer test gratuito personalizado en 2 minutos"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 via-violet-600 to-fuchsia-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
-                  <Brain className="w-5 h-5 sm:w-6 sm:h-6 relative z-10" aria-hidden="true" />
-                  <span className="relative z-10">Test gratuito · 2 min</span>
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 relative z-10 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
-                </Link>
-
-                <Link
-                  href="/catalogo"
-                  prefetch={true}
-                  className="group inline-flex items-center justify-center gap-3 bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white px-8 sm:px-10 py-5 sm:py-6 rounded-2xl font-bold text-lg sm:text-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
-                  aria-label="Ver colección premium de colchones"
-                >
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-                  Ver colección
-                </Link>
-              </motion.nav>
-
-              {/* Indicadores de confianza */}
-              <motion.ul
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="flex flex-wrap items-center gap-4 sm:gap-6 pt-4 text-xs sm:text-sm text-zinc-400 border-t border-white/5"
-                aria-label="Beneficios del producto"
-              >
-                <li className="text-zinc-300">✓ Muelles Ensacados</li>
-                <li className="text-zinc-300">✓ Envío gratis</li>
-                <li className="text-zinc-300">✓ Hecho en España</li>
-              </motion.ul>
-            </article>
-
-            {/* Right Column - Product Carousel optimizado */}
-            <motion.figure
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 1 }}
-              className="relative -mx-4 sm:mx-0"
-              aria-label="Galería de imágenes del colchón Multisac®"
-            >
-              <div className="relative">
-                {/* Efectos de brillo - reducidos en móvil */}
-                <div className="absolute -inset-2 sm:-inset-6 md:-inset-12 bg-gradient-to-r from-violet-600/15 sm:from-violet-600/40 via-fuchsia-600/15 sm:via-fuchsia-600/40 to-cyan-600/15 sm:to-cyan-600/40 rounded-xl sm:rounded-[3rem] md:rounded-[4rem] blur-[40px] sm:blur-[60px] md:blur-[100px] opacity-50 sm:opacity-70 animate-pulse" aria-hidden="true" />
-                
-                <div className="absolute -inset-1 sm:-inset-4 md:-inset-6 bg-gradient-to-br from-cyan-500/15 sm:from-cyan-500/30 via-violet-500/15 sm:via-violet-500/30 to-fuchsia-500/15 sm:to-fuchsia-500/30 rounded-lg sm:rounded-[2.5rem] md:rounded-[3.5rem] blur-xl sm:blur-2xl md:blur-3xl" aria-hidden="true" />
-                
-                <div className="relative bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 backdrop-blur-3xl border-2 border-white/20 rounded-none sm:rounded-[2rem] md:rounded-[3rem] p-0 sm:p-2 md:p-3 shadow-2xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-500/30 via-fuchsia-500/30 to-cyan-500/30 blur-xl animate-pulse" />
-                  
-                  {/* Carousel de producto con swipe */}
-                  <div 
-                    ref={carouselRef}
-                    className="relative aspect-[3/4] sm:aspect-[4/3] rounded-none sm:rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-black shadow-inner min-h-[520px] sm:min-h-0"
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                  >
-                    {/* Imágenes del carousel con lazy loading y zoom */}
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentImage}
-                        initial={{ opacity: 0, scale: 1.1 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.5, ease: [0.43, 0.13, 0.23, 0.96] }}
-                        className="absolute inset-0"
-                      >
-                        <Image 
-                          src={CAROUSEL_IMAGES[currentImage].url}
-                          alt={CAROUSEL_IMAGES[currentImage].alt}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                          priority={currentImage === 0}
-                          loading={currentImage === 0 ? 'eager' : 'lazy'}
-                          quality={85}
-                          placeholder="blur"
-                          blurDataURL={CAROUSEL_IMAGES[currentImage].blurDataURL}
-                          onLoadingComplete={() => {
-                            setImagesLoaded(prev => {
-                              const newState = [...prev]
-                              newState[currentImage] = true
-                              return newState
-                            })
-                          }}
-                        />
-                      </motion.div>
-                    </AnimatePresence>
-
-                    {/* Overlays de gradiente */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-violet-600/20 via-transparent to-cyan-600/20 mix-blend-overlay pointer-events-none" />
-
-                    {/* Controles de navegación - solo desktop */}
-                    <button
-                      onClick={goToPrev}
-                      className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
-                      aria-label="Imagen anterior del colchón"
-                    >
-                      <ChevronLeft className="w-7 h-7 group-hover:-translate-x-0.5 transition-transform" />
-                    </button>
-                    <button
-                      onClick={goToNext}
-                      className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
-                      aria-label="Siguiente imagen del colchón"
-                    >
-                      <ChevronRight className="w-7 h-7 group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-
-                    {/* Indicadores de navegación - más grandes en móvil */}
-                    <nav 
-                      className="absolute bottom-5 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 bg-black/50 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 z-20"
-                      aria-label="Indicadores de imagen"
-                    >
-                      {CAROUSEL_IMAGES.map((img, index) => (
-                        <button
-                          key={index}
-                          onClick={() => goToSlide(index)}
-                          className={`h-2.5 rounded-full transition-all duration-300 ${
-                            currentImage === index
-                              ? 'bg-white w-10 shadow-lg shadow-white/50'
-                              : 'bg-white/40 hover:bg-white/70 w-2.5'
-                          }`}
-                          aria-label={`Ver ${img.label}`}
-                          aria-current={currentImage === index ? 'true' : 'false'}
-                        />
-                      ))}
-                    </nav>
-
-                    {/* Badges flotantes con especificaciones - más grandes en móvil */}
-                    <FloatingBadge 
-                      className="absolute top-4 md:top-4 right-4 md:right-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 backdrop-blur-sm px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
-                    >
-                      <span className="text-white text-sm md:text-sm font-black">32cm · 7 capas</span>
-                    </FloatingBadge>
-
-                    <FloatingBadge 
-                      delay={1}
-                      className="absolute bottom-20 md:bottom-20 left-4 md:left-4 bg-gradient-to-r from-cyan-600 to-blue-600 backdrop-blur-sm px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
-                    >
-                      <span className="text-white text-sm md:text-sm font-black">275 m2 muelles</span>
-                    </FloatingBadge>
-
-                    {/* Badge de descuento - más grande */}
-                    <motion.div
-                      initial={{ scale: 0, rotate: -12 }}
-                      animate={{ scale: 1, rotate: -6 }}
-                      transition={{ delay: 1.2, type: "spring", bounce: 0.5 }}
-                      className="absolute top-4 md:top-4 left-4 md:left-4 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-yellow-300/50 z-10"
-                      aria-label="Descuento del 44%"
-                    >
-                      <div className="text-center">
-                        <div className="text-white text-xs md:text-xs font-black uppercase tracking-wider">Oferta</div>
-                        <div className="text-white text-2xl md:text-2xl font-black leading-none">-44%</div>
-                      </div>
-                    </motion.div>
-
-                    {/* Efecto de partículas - solo desktop */}
-                    {shouldAnimate && (
-                      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                        {[...Array(8)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ 
-                              opacity: [0, 0.6, 0],
-                              y: [20, -100],
-                              x: [0, Math.random() * 40 - 20]
-                            }}
-                            transition={{
-                              duration: 3 + Math.random() * 2,
-                              repeat: Infinity,
-                              delay: i * 0.8,
-                              ease: "easeOut"
-                            }}
-                            className="absolute bottom-0 left-1/2 w-1 h-1 bg-white/40 rounded-full blur-sm"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Grid de especificaciones técnicas */}
-                  <div className="mt-3 md:mt-6 grid grid-cols-4 gap-2 md:gap-3 px-2 sm:px-0">
-                    {specBadges}
-                  </div>
-                </div>
-              </div>
-            </motion.figure>
+              </motion.figure>
+            </div>
           </div>
         </div>
 
@@ -587,10 +634,9 @@ export function HeroSection() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ delay: 1.5, duration: 1 }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2"
+            transition={{ delay: 2, duration: 1 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden sm:block"
             aria-label="Desplázate para ver más contenido"
-            role="img"
           >
             <div className="flex flex-col items-center gap-2 text-white/40">
               <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1.5 bg-white/5 backdrop-blur-sm">

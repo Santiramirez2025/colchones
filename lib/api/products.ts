@@ -60,7 +60,7 @@ export type PaginatedResult<T> = {
  * Parsear un producto de Prisma a ProductWithParsedJson
  */
 function parseProduct<T extends Product>(product: T): ParsedProduct<T> {
-  return {
+  const parsed = {
     ...product,
     features: parseJsonField(product.features),
     techFeatures: parseJsonField(product.techFeatures),
@@ -71,6 +71,15 @@ function parseProduct<T extends Product>(product: T): ParsedProduct<T> {
     materials: parseJsonField(product.materials),
     layers: parseJsonField(product.layers),
   } as ParsedProduct<T>
+  
+  // 🔍 DEBUG: Verifica que las imágenes se parsean correctamente
+  console.log('🖼️ Images parsed:', {
+    original: product.images,
+    parsed: parsed.images,
+    isArray: Array.isArray(parsed.images)
+  })
+  
+  return parsed
 }
 
 /**
@@ -396,6 +405,49 @@ export const getFeaturedProducts = unstable_cache(
   ['featured-products'],
   { 
     revalidate: 3600,
+    tags: ['products']
+  }
+)
+
+/**
+ * Obtener productos populares para generateStaticParams - CON CACHÉ
+ * NUEVA FUNCIÓN AGREGADA
+ */
+export const getPopularProducts = unstable_cache(
+  async (limit: number = 50) => {
+    try {
+      const products = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          inStock: true,
+        },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          price: true,
+          rating: true,
+          salesCount: true,
+          isBestSeller: true,
+        },
+        orderBy: [
+          { isBestSeller: 'desc' },
+          { salesCount: 'desc' },
+          { rating: 'desc' },
+          { viewsCount: 'desc' }
+        ],
+        take: limit
+      })
+      
+      return products
+    } catch (error) {
+      console.error('Error fetching popular products:', error)
+      return []
+    }
+  },
+  ['popular-products'],
+  { 
+    revalidate: 3600, // 1 hora
     tags: ['products']
   }
 )

@@ -1,8 +1,9 @@
-// app/producto/[slug]/product-client.tsx - VERSIÓN CORREGIDA
+// app/producto/[slug]/product-client.tsx - VERSIÓN CORREGIDA CON IMÁGENES
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Star, Shield, Truck, Zap, Heart, Share2, ChevronRight, ChevronLeft,
@@ -36,7 +37,7 @@ export default function ProductClient({
   stockInfo,
   breadcrumbs = []
 }: ProductClientProps) {
-  // SAFE ARRAY PARSING
+  // SAFE ARRAY PARSING - Las imágenes ya vienen parseadas del API
   const images = Array.isArray(product.images) ? product.images : []
   const features = Array.isArray(product.features) ? product.features : []
   const techFeatures = Array.isArray(product.techFeatures) ? product.techFeatures : []
@@ -99,6 +100,9 @@ export default function ProductClient({
 
   const isOutOfStock = !product.inStock || (selectedVariant && selectedVariant.stock === 0)
 
+  // Imagen actual o fallback
+  const currentImage = images.length > 0 ? images[imageIndex] : product.image
+
   useEffect(() => {
     const handleScroll = () => {
       if (productRef.current) {
@@ -114,15 +118,22 @@ export default function ProductClient({
     if (isOutOfStock) return
   
     addItem({
-      id: selectedVariant?.id || product.id,
+      productId: product.id,  // ✅ Cambio 1: id → productId
+      slug: product.slug,     // ✅ Cambio 2: Agregar slug
       name: product.name,
       price: currentPrice,
       originalPrice: originalPrice || undefined,
       quantity: quantity,
-      image: images[0] || product.image,
+      image: currentImage || product.image || '/images/placeholder.jpg',
+      images: images.length > 0 ? images : (product.image ? [product.image] : []),
       size: selectedVariant?.size || 'Estándar',
       variant: selectedVariant?.dimensions || undefined,
-      sku: selectedVariant?.sku || product.sku || undefined
+      sku: selectedVariant?.sku || product.sku || undefined,
+      maxQuantity: 10,
+      inStock: product.inStock,
+      category: product.category?.name,
+      rating: product.rating,
+      isBestSeller: product.isBestSeller
     })
   }
 
@@ -214,8 +225,17 @@ export default function ProductClient({
             <div className="container mx-auto px-4 py-4">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0">
-                    <div className="w-full h-full flex items-center justify-center text-3xl">🛏️</div>
+                  <div className="w-16 h-16 rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0 relative">
+                    {currentImage ? (
+                      <Image
+                        src={currentImage}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-3xl">🛏️</div>
+                    )}
                   </div>
                   <div>
                     <h3 className="font-bold text-white line-clamp-1">{product.name}</h3>
@@ -308,10 +328,22 @@ export default function ProductClient({
                   key={imageIndex}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="absolute inset-0 flex items-center justify-center text-[15rem]"
+                  className="absolute inset-0"
                   onClick={() => setShowImageModal(true)}
                 >
-                  🛏️
+                  {currentImage ? (
+                    <Image
+                      src={currentImage}
+                      alt={`${product.name} - Imagen ${imageIndex + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={imageIndex === 0}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[15rem]">
+                      🛏️
+                    </div>
+                  )}
                 </motion.div>
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                   <ZoomIn className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -351,13 +383,18 @@ export default function ProductClient({
                     <button
                       key={index}
                       onClick={() => setImageIndex(index)}
-                      className={`aspect-square bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-xl overflow-hidden transition-all border-2 ${
+                      className={`aspect-square bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-xl overflow-hidden transition-all border-2 relative ${
                         imageIndex === index
                           ? 'border-violet-500 ring-2 ring-violet-500/30'
                           : 'border-white/10 hover:border-white/20'
                       }`}
                     >
-                      <div className="w-full h-full flex items-center justify-center text-4xl">🛏️</div>
+                      <Image
+                        src={img}
+                        alt={`Thumbnail ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
                     </button>
                   ))}
                 </div>
@@ -829,7 +866,7 @@ function DescriptionTab({ product }: { product: any }) {
         {product.story && (
           <div className="mt-6">
             <h4 className="text-xl font-bold text-white mb-3">Historia del producto</h4>
-            <p className="text-zinc-300 leading-relaxed">{product.story}</p>
+            <p className="text-zinc-300 leading-relaxed whitespace-pre-line">{product.story}</p>
           </div>
         )}
       </div>
@@ -1189,37 +1226,51 @@ function RelatedProducts({ products, title }: { products: any[]; title: string }
         {title}
       </h2>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <Link href={`/producto/${product.slug}`} key={product.id}>
-            <motion.div
-              whileHover={{ y: -8 }}
-              className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-white/10 overflow-hidden hover:border-violet-500/30 transition-all group"
-            >
-              <div className="aspect-square bg-zinc-800 flex items-center justify-center relative overflow-hidden">
-                <span className="text-7xl">🛏️</span>
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="p-5">
-                <h3 className="font-bold text-white mb-2 line-clamp-1 group-hover:text-violet-400 transition-colors">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-zinc-400 mb-4 line-clamp-2">{product.subtitle}</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-black text-white">{product.price}€</span>
-                    {product.originalPrice && (
-                      <span className="text-sm text-zinc-500 line-through ml-2">{product.originalPrice}€</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    <span className="text-sm font-bold text-white">{product.rating.toFixed(1)}</span>
+        {products.map((product) => {
+          const productImages = Array.isArray(product.images) ? product.images : []
+          const productImage = productImages.length > 0 ? productImages[0] : product.image
+          
+          return (
+            <Link href={`/producto/${product.slug}`} key={product.id}>
+              <motion.div
+                whileHover={{ y: -8 }}
+                className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-white/10 overflow-hidden hover:border-violet-500/30 transition-all group"
+              >
+                <div className="aspect-square bg-zinc-800 relative overflow-hidden">
+                  {productImage ? (
+                    <Image
+                      src={productImage}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-7xl">🛏️</div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-white mb-2 line-clamp-1 group-hover:text-violet-400 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-zinc-400 mb-4 line-clamp-2">{product.subtitle}</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-black text-white">{product.price}€</span>
+                      {product.originalPrice && (
+                        <span className="text-sm text-zinc-500 line-through ml-2">{product.originalPrice}€</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      <span className="text-sm font-bold text-white">{product.rating?.toFixed(1) || '4.8'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </Link>
-        ))}
+              </motion.div>
+            </Link>
+          )
+        })}
       </div>
     </div>
   )
@@ -1244,6 +1295,8 @@ function ImageModal({ isOpen, onClose, images, currentIndex, productName }: {
 
   if (!isOpen) return null
 
+  const currentImage = images.length > 0 ? images[index] : null
+
   return (
     <AnimatePresence>
       <motion.div
@@ -1255,14 +1308,23 @@ function ImageModal({ isOpen, onClose, images, currentIndex, productName }: {
       >
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors backdrop-blur-sm"
+          className="absolute top-6 right-6 w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors backdrop-blur-sm z-10"
         >
           <X className="w-7 h-7" />
         </button>
 
         <div className="max-w-5xl w-full" onClick={(e) => e.stopPropagation()}>
-          <div className="aspect-square bg-zinc-900 rounded-3xl flex items-center justify-center mb-6 overflow-hidden">
-            <span className="text-[25rem]">🛏️</span>
+          <div className="aspect-square bg-zinc-900 rounded-3xl flex items-center justify-center mb-6 overflow-hidden relative">
+            {currentImage ? (
+              <Image
+                src={currentImage}
+                alt={`${productName} - Imagen ${index + 1}`}
+                fill
+                className="object-contain"
+              />
+            ) : (
+              <span className="text-[25rem]">🛏️</span>
+            )}
           </div>
           
           {images.length > 1 && (

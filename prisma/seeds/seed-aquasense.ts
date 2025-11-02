@@ -78,8 +78,6 @@ Cada detalle, desde el tejido Stretch Blue Bubble termorregulador hasta su later
         '/images/products/aquasense/winter-side.jpg',
         '/images/products/aquasense/viscogel-detail.jpg',
         '/images/products/aquasense/wave-design.jpg',
-        '/images/products/aquasense/lifestyle.jpg',
-        '/images/products/aquasense/materials.jpg'
       ]),
       videoUrl: 'https://www.youtube.com/watch?v=example',
       gradient: 'from-blue-400 via-cyan-500 to-teal-400',

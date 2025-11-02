@@ -77,8 +77,6 @@ El BioHarmony es el equilibrio perfecto entre soporte firme, suavidad y transpir
         '/images/products/bioharmony/layers.jpg',
         '/images/products/bioharmony/springs-detail.jpg',
         '/images/products/bioharmony/diamond-side.jpg',
-        '/images/products/bioharmony/lifestyle.jpg',
-        '/images/products/bioharmony/materials.jpg'
       ]),
       videoUrl: 'https://www.youtube.com/watch?v=example',
       gradient: 'from-green-400 via-emerald-500 to-teal-500',
