@@ -19,7 +19,7 @@ const CAROUSEL_IMAGES = [
     label: 'Acabado Premium',
     description: 'Tela transpirable de alta calidad',
     category: 'detail',
-    blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRm knyJckliyjqTzSlT54b6bk+h0R//2Q=='
+    blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=='
   },
   {
     url: 'https://images.unsplash.com/photo-1578898886969-7b8b91ab9e3e?w=1200&q=80',
@@ -76,11 +76,11 @@ const SpecBadge = memo(({ spec, index }: { spec: any, index: number }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 1 + index * 0.05 }}
-    className="group relative flex flex-col items-center gap-1.5 md:gap-2 p-2 md:p-4 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 hover:from-violet-500/20 hover:to-fuchsia-500/20 hover:border-violet-400/50 transition-all duration-300 backdrop-blur-sm hover:scale-105"
+    className="group relative flex flex-col items-center gap-1.5 md:gap-2 p-3 md:p-4 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 hover:from-violet-500/20 hover:to-fuchsia-500/20 hover:border-violet-400/50 transition-all duration-300 backdrop-blur-sm hover:scale-105"
   >
     <div className="absolute inset-0 bg-gradient-to-br from-violet-600/0 to-fuchsia-600/0 group-hover:from-violet-600/10 group-hover:to-fuchsia-600/10 rounded-xl transition-all duration-300" />
-    <spec.icon className="w-4 h-4 md:w-6 md:h-6 text-violet-400 group-hover:text-violet-300 transition-all duration-300 group-hover:scale-110 relative z-10" aria-hidden="true" />
-    <span className="text-white font-bold text-[10px] md:text-xs text-center relative z-10">{spec.value}</span>
+    <spec.icon className="w-5 h-5 md:w-6 md:h-6 text-violet-400 group-hover:text-violet-300 transition-all duration-300 group-hover:scale-110 relative z-10" aria-hidden="true" />
+    <span className="text-white font-bold text-xs md:text-xs text-center relative z-10">{spec.value}</span>
   </motion.div>
 ))
 SpecBadge.displayName = 'SpecBadge'
@@ -107,11 +107,14 @@ FloatingBadge.displayName = 'FloatingBadge'
 
 export function HeroSection() {
   const heroRef = useRef(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
   const [showScrollIndicator, setShowScrollIndicator] = useState(true)
   const [currentImage, setCurrentImage] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false])
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
   
   const mousePosition = useMousePosition(!isMobile)
   const { scrollYProgress, prefersReducedMotion } = useScrollProgress()
@@ -129,13 +132,13 @@ export function HeroSection() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Auto-play optimizado: 3 segundos con transición más rápida
+  // Auto-play optimizado: 4 segundos con transición más suave
   useEffect(() => {
     if (!isAutoPlaying) return
 
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % CAROUSEL_IMAGES.length)
-    }, 3000)
+    }, 4000)
 
     return () => clearInterval(interval)
   }, [isAutoPlaying])
@@ -169,13 +172,39 @@ export function HeroSection() {
       })
     }
     
-    // Prefetch después de que la página esté idle
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(prefetchLinks)
     } else {
       setTimeout(prefetchLinks, 2000)
     }
   }, [])
+
+  // Manejo de swipe táctil
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      goToNext()
+    }
+    if (isRightSwipe) {
+      goToPrev()
+    }
+
+    setTouchStart(0)
+    setTouchEnd(0)
+  }
 
   const goToNext = () => {
     setCurrentImage((prev) => (prev + 1) % CAROUSEL_IMAGES.length)
@@ -278,10 +307,10 @@ export function HeroSection() {
         {/* Grid pattern - más sutil en móvil */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,.02)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(139,92,246,.02)_1.5px,transparent_1.5px)] sm:bg-[linear-gradient(rgba(139,92,246,.03)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(139,92,246,.03)_1.5px,transparent_1.5px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_60%,transparent_100%)]" />
 
-        <div className="relative z-10 container mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
+        <div className="relative z-10 container mx-auto px-0 sm:px-4 py-12 sm:py-20">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 lg:gap-16 items-center max-w-7xl mx-auto">
             {/* Left Column */}
-            <article className="text-left space-y-6 sm:space-y-8">
+            <article className="text-left space-y-6 sm:space-y-8 px-4 sm:px-0">
               
               {/* Badge de prueba social */}
               <motion.div
@@ -398,28 +427,34 @@ export function HeroSection() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4, duration: 1 }}
-              className="relative"
+              className="relative -mx-4 sm:mx-0"
               aria-label="Galería de imágenes del colchón Multisac®"
             >
               <div className="relative">
                 {/* Efectos de brillo - reducidos en móvil */}
-                <div className="absolute -inset-6 sm:-inset-12 bg-gradient-to-r from-violet-600/20 sm:from-violet-600/40 via-fuchsia-600/20 sm:via-fuchsia-600/40 to-cyan-600/20 sm:to-cyan-600/40 rounded-[3rem] sm:rounded-[4rem] blur-[60px] sm:blur-[100px] opacity-50 sm:opacity-70 animate-pulse" aria-hidden="true" />
+                <div className="absolute -inset-2 sm:-inset-6 md:-inset-12 bg-gradient-to-r from-violet-600/15 sm:from-violet-600/40 via-fuchsia-600/15 sm:via-fuchsia-600/40 to-cyan-600/15 sm:to-cyan-600/40 rounded-xl sm:rounded-[3rem] md:rounded-[4rem] blur-[40px] sm:blur-[60px] md:blur-[100px] opacity-50 sm:opacity-70 animate-pulse" aria-hidden="true" />
                 
-                <div className="absolute -inset-4 sm:-inset-6 bg-gradient-to-br from-cyan-500/20 sm:from-cyan-500/30 via-violet-500/20 sm:via-violet-500/30 to-fuchsia-500/20 sm:to-fuchsia-500/30 rounded-[2.5rem] sm:rounded-[3.5rem] blur-2xl sm:blur-3xl" aria-hidden="true" />
+                <div className="absolute -inset-1 sm:-inset-4 md:-inset-6 bg-gradient-to-br from-cyan-500/15 sm:from-cyan-500/30 via-violet-500/15 sm:via-violet-500/30 to-fuchsia-500/15 sm:to-fuchsia-500/30 rounded-lg sm:rounded-[2.5rem] md:rounded-[3.5rem] blur-xl sm:blur-2xl md:blur-3xl" aria-hidden="true" />
                 
-                <div className="relative bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 backdrop-blur-3xl border-2 border-white/20 rounded-[2rem] md:rounded-[3rem] p-2 md:p-3 shadow-2xl overflow-hidden">
+                <div className="relative bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 backdrop-blur-3xl border-2 border-white/20 rounded-none sm:rounded-[2rem] md:rounded-[3rem] p-0 sm:p-2 md:p-3 shadow-2xl overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-500/30 via-fuchsia-500/30 to-cyan-500/30 blur-xl animate-pulse" />
                   
-                  {/* Carousel de producto */}
-                  <div className="relative aspect-[4/3] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-black shadow-inner">
-                    {/* Imágenes del carousel con lazy loading */}
+                  {/* Carousel de producto con swipe */}
+                  <div 
+                    ref={carouselRef}
+                    className="relative aspect-[3/4] sm:aspect-[4/3] rounded-none sm:rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-black shadow-inner min-h-[520px] sm:min-h-0"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  >
+                    {/* Imágenes del carousel con lazy loading y zoom */}
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={currentImage}
-                        initial={{ opacity: 0, scale: 1.05 }}
+                        initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.98 }}
-                        transition={{ duration: 0.3, ease: "anticipate" }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.5, ease: [0.43, 0.13, 0.23, 0.96] }}
                         className="absolute inset-0"
                       >
                         <Image 
@@ -430,7 +465,7 @@ export function HeroSection() {
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
                           priority={currentImage === 0}
                           loading={currentImage === 0 ? 'eager' : 'lazy'}
-                          quality={80}
+                          quality={85}
                           placeholder="blur"
                           blurDataURL={CAROUSEL_IMAGES[currentImage].blurDataURL}
                           onLoadingComplete={() => {
@@ -451,32 +486,32 @@ export function HeroSection() {
                     {/* Controles de navegación - solo desktop */}
                     <button
                       onClick={goToPrev}
-                      className="hidden lg:flex absolute left-3 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
+                      className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
                       aria-label="Imagen anterior del colchón"
                     >
-                      <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+                      <ChevronLeft className="w-7 h-7 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
                     <button
                       onClick={goToNext}
-                      className="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
+                      className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-300 backdrop-blur-md border-2 border-white/20 hover:border-white/40 hover:scale-110 shadow-xl z-20 group"
                       aria-label="Siguiente imagen del colchón"
                     >
-                      <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+                      <ChevronRight className="w-7 h-7 group-hover:translate-x-0.5 transition-transform" />
                     </button>
 
-                    {/* Indicadores de navegación - rediseñados */}
+                    {/* Indicadores de navegación - más grandes en móvil */}
                     <nav 
-                      className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 z-20"
+                      className="absolute bottom-5 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 bg-black/50 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 z-20"
                       aria-label="Indicadores de imagen"
                     >
                       {CAROUSEL_IMAGES.map((img, index) => (
                         <button
                           key={index}
                           onClick={() => goToSlide(index)}
-                          className={`h-2 rounded-full transition-all duration-300 ${
+                          className={`h-2.5 rounded-full transition-all duration-300 ${
                             currentImage === index
-                              ? 'bg-white w-8 shadow-lg shadow-white/50'
-                              : 'bg-white/40 hover:bg-white/70 w-2'
+                              ? 'bg-white w-10 shadow-lg shadow-white/50'
+                              : 'bg-white/40 hover:bg-white/70 w-2.5'
                           }`}
                           aria-label={`Ver ${img.label}`}
                           aria-current={currentImage === index ? 'true' : 'false'}
@@ -484,31 +519,31 @@ export function HeroSection() {
                       ))}
                     </nav>
 
-                    {/* Badges flotantes con especificaciones */}
+                    {/* Badges flotantes con especificaciones - más grandes en móvil */}
                     <FloatingBadge 
-                      className="absolute top-3 md:top-4 right-3 md:right-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 backdrop-blur-sm px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
+                      className="absolute top-4 md:top-4 right-4 md:right-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 backdrop-blur-sm px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
                     >
-                      <span className="text-white text-xs md:text-sm font-black">32cm · 7 capas</span>
+                      <span className="text-white text-sm md:text-sm font-black">32cm · 7 capas</span>
                     </FloatingBadge>
 
                     <FloatingBadge 
                       delay={1}
-                      className="absolute bottom-16 md:bottom-20 left-3 md:left-4 bg-gradient-to-r from-cyan-600 to-blue-600 backdrop-blur-sm px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
+                      className="absolute bottom-20 md:bottom-20 left-4 md:left-4 bg-gradient-to-r from-cyan-600 to-blue-600 backdrop-blur-sm px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-white/20 z-10"
                     >
-                      <span className="text-white text-xs md:text-sm font-black">1.800 muelles</span>
+                      <span className="text-white text-sm md:text-sm font-black">1.800 muelles</span>
                     </FloatingBadge>
 
-                    {/* Badge de descuento */}
+                    {/* Badge de descuento - más grande */}
                     <motion.div
                       initial={{ scale: 0, rotate: -12 }}
                       animate={{ scale: 1, rotate: -6 }}
                       transition={{ delay: 1.2, type: "spring", bounce: 0.5 }}
-                      className="absolute top-3 md:top-4 left-3 md:left-4 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-yellow-300/50 z-10"
+                      className="absolute top-4 md:top-4 left-4 md:left-4 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl border-2 border-yellow-300/50 z-10"
                       aria-label="Descuento del 44%"
                     >
                       <div className="text-center">
-                        <div className="text-white text-[10px] md:text-xs font-black uppercase tracking-wider">Oferta</div>
-                        <div className="text-white text-lg md:text-2xl font-black leading-none">-44%</div>
+                        <div className="text-white text-xs md:text-xs font-black uppercase tracking-wider">Oferta</div>
+                        <div className="text-white text-2xl md:text-2xl font-black leading-none">-44%</div>
                       </div>
                     </motion.div>
 
@@ -538,7 +573,7 @@ export function HeroSection() {
                   </div>
 
                   {/* Grid de especificaciones técnicas */}
-                  <div className="mt-4 md:mt-6 grid grid-cols-4 gap-2 md:gap-3">
+                  <div className="mt-3 md:mt-6 grid grid-cols-4 gap-2 md:gap-3 px-2 sm:px-0">
                     {specBadges}
                   </div>
                 </div>
