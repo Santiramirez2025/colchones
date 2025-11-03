@@ -35,7 +35,6 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "clean": "rm -rf .next out node_modules/.cache",
     "clean:all": "rm -rf .next out node_modules node_modules/.cache package-lock.json && npm install",
-    "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -53,9 +52,6 @@
     "precommit": "npm run lint && npm run type-check",
     "prepush": "npm run check",
     "validate": "npm run check && npm run build"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",

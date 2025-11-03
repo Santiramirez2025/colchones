@@ -87,7 +87,7 @@ export default function GuiaCompraPage() {
       color: 'from-pink-500 to-rose-500',
       details: [
         'Envío gratis a península (consulta islas y Ceuta/Melilla)',
-        'Entrega en 48-72h laborables',
+        'Entrega De 3 a 6 días laborables',
         'Te llamamos antes para coordinar la entrega',
         'Opción de subida a domicilio disponible'
       ],

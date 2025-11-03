@@ -1,222 +1,172 @@
-// prisma/seeds/seed-royal-zen.ts
-import { PrismaClient, Firmness } from '@prisma/client'
+// prisma/seed.ts
+import { PrismaClient, Firmness } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-async function seedRoyalZen() {
-  console.log('🌱 Seeding Royal Zen product...')
+async function main() {
+  console.log('🌱 Iniciando seed...');
 
-  // Buscar o crear categoría de Muelles Ensacados
-  let category = await prisma.category.findUnique({
-    where: { slug: 'muelles-ensacados' }
-  })
+  // Crear o actualizar categoría
+  const category = await prisma.category.upsert({
+    where: { slug: 'colchones-muelles-ensacados' },
+    update: {},
+    create: {
+      name: 'Colchones de Muelles Ensacados',
+      slug: 'colchones-muelles-ensacados',
+      description: 'Colchones con tecnología de muelles ensacados para máxima independencia de lechos',
+      gradient: 'from-blue-500 to-indigo-600',
+      icon: '🛏️',
+      isActive: true,
+      isFeatured: true,
+      order: 1,
+    },
+  });
 
-  if (!category) {
-    category = await prisma.category.create({
-      data: {
-        name: 'Muelles Ensacados',
-        slug: 'muelles-ensacados',
-        description: 'Colchones con sistema de muelles ensacados individuales para máxima independencia de lechos',
-        gradient: 'from-indigo-500 to-purple-600',
-        icon: '🛏️',
-        isActive: true,
-        isFeatured: true,
-        order: 2,
-        metaTitle: 'Colchones de Muelles Ensacados | Máximo Confort',
-        metaDescription: 'Descubre nuestra selección de colchones con muelles ensacados. Independencia de lechos, durabilidad y confort premium.'
-      }
-    })
-    console.log('✅ Categoría "Muelles Ensacados" creada')
-  }
+  // Crear producto Zafiro Supreme
+  const product = await prisma.product.upsert({
+    where: { slug: 'colchon-zafiro-supreme' },
+    update: {},
+    create: {
+      name: 'Colchón Zafiro Supreme',
+      slug: 'colchon-zafiro-supreme',
+      subtitle: 'Muelles Ensacados y Doble Cara Viscoelástica',
+      description: 'Descubre el lujo del descanso con el Zafiro Supreme, un colchón de doble cara con viscoelástica de última generación y núcleo de muelles ensacados. Diseñado para envolverte en una sensación de nube y ofrecerte un soporte firme, silencioso y adaptable.',
+      story: `El Colchón Zafiro Supreme es una joya del descanso creada para quienes buscan comodidad, elegancia y tecnología en un solo colchón.
 
-  // 🖼️ IMÁGENES LOCALES - Ajusta según tu estructura de carpetas
-  // Estructura esperada: public/images/products/royal-zen/
-  const productImages = [
-    '/images/products/royal-zen/principal.jpg',
-    '/images/products/royal-zen/lateral.jpg',
-    '/images/products/royal-zen/detalle-tejido.jpg',
-    '/images/products/royal-zen/corte-capas.jpg',
-    '/images/products/royal-zen/ambiente-1.jpg',
-  ]
+Su doble cara viscoelástica te permite disfrutar del efecto nube en ambas superficies, prolongando su vida útil y manteniendo siempre una sensación de acogida y ligereza. El núcleo de muelles ensacados de alta densidad (275 muelles/m²) garantiza una independencia total de lechos, perfecta para dormir en pareja sin notar movimientos. La estructura se completa con un box perimetral reforzado en espuma HR, que ofrece estabilidad, durabilidad y una firmeza envolvente sin renunciar a la suavidad.
 
-  // Imagen principal (primera del array)
-  const mainImage = productImages[0]
+El tejido Stretch Zafiro de tonos grises con relieve aporta un toque de distinción y elegancia, mientras que su acolchado tapa a tapa —una técnica usada en colchones de alta gama— proporciona precisión y relieve decorativo.
 
-  // Crear el producto Royal Zen
-  const product = await prisma.product.create({
-    data: {
-      // Identificación
-      name: 'Royal Zen',
-      slug: 'royal-zen-muelles-ensacados-visco-doble-confort',
-      subtitle: 'Muelles Ensacados con Visco Doble Confort Premium',
+Cada noche, el Zafiro Supreme convierte tu descanso en una experiencia de bienestar absoluto: un equilibrio perfecto entre firmeza y adaptabilidad, belleza y tecnología.`,
       
-      // Descripción
-      description: 'Experimenta el descanso de 5 estrellas con el Royal Zen, un colchón de doble cara viscoelástica y núcleo de 275 muelles ensacados/m². Diseñado para parejas que buscan independencia de lechos, firmeza media-alta y un acabado premium que destaca en cualquier dormitorio.',
+      // Precios
+      price: 449.99,
+      originalPrice: 699.99,
+      compareAtPrice: 699.99,
+      discount: 36,
       
-      story: `El Royal Zen nació de una obsesión: crear el colchón perfecto para parejas exigentes.
-
-Después de analizar más de 1.000 opiniones de usuarios, descubrimos que lo más importante es dormir sin interrupciones. Por eso desarrollamos un sistema de 275 muelles ensacados por metro cuadrado que aísla cada movimiento con precisión quirúrgica.
-
-Pero la tecnología no es nada sin comodidad. Añadimos 3,5 cm de viscoelástica termosensible en ambas caras para crear ese efecto "nube" que tanto adoran nuestros clientes. No es demasiado suave, no es demasiado firme: es el equilibrio perfecto.
-
-El box perimetral reforzado en HR no es solo un detalle técnico: es la garantía de que tu colchón mantendrá su forma durante años, incluso sentándote en el borde cada mañana.
-
-Y porque sabemos que el dormitorio es tu santuario, vestimos el Royal Zen con tejido Stretch Royal en tonos grises elegantes, con un relieve que invita a tocarlo.
-
-Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
-      
-      // Precios (base para 90x190) - Ajustados para máxima conversión
-      price: 299,
-      originalPrice: 599,
-      compareAtPrice: 699,
-      discount: 50,
-      
-      // Características técnicas
-      firmness: Firmness.MEDIA_ALTA,
+      // Especificaciones técnicas
       firmnessValue: 80,
-      transpirability: 85, // Muy transpirable por los muelles
+      firmness: Firmness.MEDIA_ALTA,
+      transpirability: 50,
       adaptability: 80,
       height: 30,
-      weight: 25.0,
       maxWeightPerPerson: 110,
       
-      // 🖼️ Imágenes desde /public
-      image: mainImage,
-      images: JSON.stringify(productImages),
-      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Opcional: añade tu video real
-      gradient: 'from-indigo-600 via-purple-600 to-pink-500',
+      // Imágenes (reemplaza con tus URLs reales)
+      image: '/images/zafiro-supreme-main.jpg',
+      images: JSON.stringify([
+        '/images/zafiro-supreme-main.jpg',
+        '/images/zafiro-supreme-side.jpg',
+        '/images/zafiro-supreme-detail.jpg',
+        '/images/zafiro-supreme-layers.jpg',
+        '/images/zafiro-supreme-texture.jpg',
+      ]),
+      videoUrl: '/videos/zafiro-supreme-demo.mp4',
+      gradient: 'from-blue-600 to-indigo-700',
       
-      // Ratings y stats (realistas para conversión)
+      // Ratings y estadísticas
       rating: 4.9,
       reviewCount: 127,
       salesCount: 342,
-      viewsCount: 2847,
+      viewsCount: 1250,
+      satisfaction: 98,
       
-      // Features principales (orientadas a beneficios, no características)
+      // Features principales
       features: JSON.stringify([
-        'Duerme sin interrupciones: independencia total de lechos gracias a 275 muelles ensacados',
-        'Efecto nube en ambas caras con 3,5 cm de viscoelástica premium',
-        'Firmeza media-alta ideal para espalda, lado y boca abajo',
-        'Silencio absoluto: cero ruidos, cero molestias nocturnas',
-        'Fresco toda la noche: alta transpirabilidad y regulación térmica',
-        'Durabilidad garantizada con box perimetral HR reforzado',
-        'Diseño elegante con tejido Stretch Royal y relieve premium',
-        'Reversible: voltea tu colchón para prolongar su vida útil'
+        'Efecto nube en ambas caras gracias a la capa de viscoelástica + viscosoft (3,5 cm por lado)',
+        'Adaptabilidad inteligente: se moldea al cuerpo y recupera su forma con suavidad',
+        'Soporte ergonómico y firmeza media-alta (80%): ideal para cualquier postura de descanso',
+        'Material termosensible: responde a la temperatura corporal para máximo confort',
+        'Transpirabilidad equilibrada (50%): favorece un descanso fresco y saludable',
+        'Silencioso e independiente: sin ruidos ni transmisión de movimiento',
+        'Box perimetral reforzado: mayor durabilidad y soporte lateral al sentarse',
+        'Diseño elegante con tejido Stretch Zafiro y laterales acolchados ultrasuaves',
       ]),
       
-      // Características técnicas detalladas
+      // Características técnicas
       techFeatures: JSON.stringify([
-        'Núcleo de 275 muelles ensacados/m² de acero templado',
-        'Doble capa de visco + viscosoft 3,5 cm por cara',
-        'Box perimetral HR de alta densidad',
-        'Tejido Stretch Royal con tratamiento antiácaros',
-        'Acolchado tapa a tapa de gama alta',
-        'Sistema de ventilación transversal',
-        'Asas laterales reforzadas para manejo',
-        'Altura total: 30 cm (±2 cm)',
-        'Certificación OEKO-TEX Standard 100'
+        { label: 'Altura total', value: '±30 cm' },
+        { label: 'Tipo de núcleo', value: 'Muelles ensacados con Box HR' },
+        { label: 'Acolchado', value: 'Viscoelástica + Viscosoft 3,5 cm por cara' },
+        { label: 'Doble cara', value: 'Sí' },
+        { label: 'Firmeza', value: 'Media-Alta (80%)' },
+        { label: 'Adaptabilidad', value: 'Media-Alta (80%)' },
+        { label: 'Transpirabilidad', value: 'Media (50%)' },
+        { label: 'Peso máx. recomendado', value: '110 kg/persona' },
+        { label: 'Tejido exterior', value: 'Stretch Zafiro con relieve' },
+        { label: 'Refuerzo perimetral', value: 'Espuma HR alta densidad' },
+        { label: 'Independencia de lechos', value: 'Sí' },
+        { label: 'Asas laterales', value: 'Sí, para fácil manipulación' },
       ]),
       
       // Certificaciones
       certifications: JSON.stringify([
-        'OEKO-TEX',
+        'Oeko-Tex Standard 100',
         'CertiPUR',
-        'ISO 9001'
+        'ISO 9001',
+        'Fabricación Europea',
       ]),
       
-      // Tags para búsqueda y SEO
+      // Tags
       tags: JSON.stringify([
-        'muelles ensacados',
-        'viscoelástica',
-        'doble cara',
+        'muelles-ensacados',
+        'viscoelastica',
+        'doble-cara',
+        'firmeza-alta',
         'parejas',
-        'independencia de lechos',
+        'premium',
         'silencioso',
         'transpirable',
-        'firmeza media-alta',
-        'premium',
-        'royal zen',
-        'alta gama',
-        'termosensible'
       ]),
       
-      // Highlights (para badges y cards)
+      // Highlights
       highlights: JSON.stringify([
-        '275 muelles/m²',
-        'Doble cara visco',
-        'Independencia total',
-        'Box reforzado',
-        'Tejido premium'
+        '🩵 Doble cara viscoelástica',
+        '🔇 100% Silencioso',
+        '💑 Independencia de lechos',
+        '🌡️ Termosensible',
+      ]),
+      
+      // Materiales y capas
+      materials: JSON.stringify([
+        'Viscoelástica Premium',
+        'Viscosoft Confort',
+        'Muelles Ensacados (275/m²)',
+        'Espuma HR Box Perimetral',
+        'Tejido Stretch Zafiro',
+      ]),
+      
+      layers: JSON.stringify([
+        { name: 'Tejido Stretch Zafiro', thickness: 0.5, description: 'Suave, elegante y transpirable' },
+        { name: 'Viscoelástica + Viscosoft', thickness: 3.5, description: 'Efecto nube y adaptabilidad' },
+        { name: 'Núcleo de Muelles Ensacados', thickness: 20, description: '275 muelles/m² para soporte perfecto' },
+        { name: 'Viscoelástica + Viscosoft', thickness: 3.5, description: 'Efecto nube y adaptabilidad' },
+        { name: 'Tejido Stretch Zafiro', thickness: 0.5, description: 'Suave, elegante y transpirable' },
+        { name: 'Box Perimetral HR', thickness: 2, description: 'Refuerzo lateral y durabilidad' },
       ]),
       
       // Garantía y prueba
       warranty: 10,
       trialNights: 100,
       
-      // Materiales (para sección técnica)
-      materials: JSON.stringify([
-        'Viscoelástica termosensible de alta densidad',
-        'Viscosoft de adaptación progresiva',
-        'Muelles ensacados de acero templado',
-        'Espuma HR perimetral reforzada',
-        'Tejido Stretch Royal con tratamiento higiénico'
-      ]),
-      
-      // Capas del colchón (para visualización)
-      layers: JSON.stringify([
-        {
-          name: 'Tejido Stretch Royal',
-          description: 'Tacto suave, elegante y duradero con relieve premium',
-          height: 1
-        },
-        {
-          name: 'Viscoelástica + Viscosoft',
-          description: '3,5 cm de adaptación progresiva y efecto nube',
-          height: 3.5
-        },
-        {
-          name: 'Núcleo muelles ensacados',
-          description: '275 muelles/m² para independencia y soporte',
-          height: 20
-        },
-        {
-          name: 'Box perimetral HR',
-          description: 'Refuerzo de estabilidad y durabilidad',
-          height: 3
-        },
-        {
-          name: 'Viscoelástica + Viscosoft',
-          description: '3,5 cm reversibles para prolongar vida útil',
-          height: 3.5
-        },
-        {
-          name: 'Tejido Stretch Royal',
-          description: 'Acabado inferior premium',
-          height: 1
-        }
-      ]),
-      
-      // Badges y estados
-      badge: 'Más Vendido',
+      // Badges y flags
+      badge: '36% DTO',
       isNew: false,
       isBestSeller: true,
       isFeatured: true,
       isActive: true,
       isEco: false,
       
-      // Stock
-      stock: 150,
+      // Stock y entrega
+      stock: 50,
       inStock: true,
-      lowStockThreshold: 20,
-      sku: 'RZ-ME-DC-30',
-      barcode: '8421234567890',
-      
-      // Envío
-      deliveryDays: 5,
+      lowStockThreshold: 10,
+      deliveryDays: 5, // 3-6 días, promedio 5
       freeShipping: true,
       shippingCost: 0,
       
-      // Propiedades del colchón (para filtros)
+      // Propiedades del colchón
       cooling: false,
       hypoallergenic: true,
       washable: false,
@@ -227,53 +177,59 @@ Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
       edgeSupport: true,
       verified: true,
       bestValue: true,
-      satisfaction: 97,
       
-      // SEO optimizado
-      metaTitle: 'Royal Zen - Colchón Muelles Ensacados + Visco | Envío Gratis',
-      metaDescription: 'Colchón premium de 275 muelles ensacados con doble cara viscoelástica. Independencia de lechos, firmeza media-alta, silencioso. 100 noches de prueba, 3 años de garantía. Envío gratis 24-72h.',
-      metaKeywords: 'colchón muelles ensacados, colchón viscoelástica, colchón parejas, royal zen, independencia de lechos, colchón silencioso',
+      // SEO
+      metaTitle: 'Colchón Zafiro Supreme - Muelles Ensacados y Doble Cara Viscoelástica | 36% DTO',
+      metaDescription: 'Colchón premium con núcleo de muelles ensacados y doble cara viscoelástica. Firmeza media-alta, efecto nube, silencioso e independencia de lechos. Envío gratis.',
+      metaKeywords: 'colchón muelles ensacados, colchón viscoelástico, doble cara, firmeza alta, colchón parejas, independencia lechos',
       
-      // Posición y categoría
-      position: 1,
+      // Relaciones
       categoryId: category.id,
-      
-      publishedAt: new Date()
-    }
-  })
+      position: 1,
+    },
+  });
 
-  console.log(`✅ Producto "${product.name}" creado con ID: ${product.id}`)
+  console.log('✅ Producto creado:', product.name);
 
-  // ==========================================
-  // VARIANTES (TAMAÑOS)
-  // ==========================================
+  // Crear variantes (todas las medidas disponibles)
   const sizes = [
-    // Individual
-    { size: '80x180', width: 80, length: 180, price: 249, popular: false, stock: 15 },
-    { size: '80x190', width: 80, length: 190, price: 259, popular: false, stock: 20 },
-    { size: '80x200', width: 80, length: 200, price: 269, popular: false, stock: 15 },
-    { size: '90x180', width: 90, length: 180, price: 269, popular: false, stock: 15 },
-    { size: '90x190', width: 90, length: 190, price: 299, popular: true, stock: 30 },
-    { size: '90x200', width: 90, length: 200, price: 309, popular: true, stock: 25 },
-    
-    // Matrimonio pequeño
-    { size: '105x190', width: 105, length: 190, price: 339, popular: false, stock: 20 },
-    { size: '105x200', width: 105, length: 200, price: 349, popular: false, stock: 18 },
-    
-    // Matrimonio estándar (más populares)
-    { size: '135x180', width: 135, length: 180, price: 389, popular: true, stock: 25 },
-    { size: '135x190', width: 135, length: 190, price: 399, popular: true, stock: 35 },
-    { size: '135x200', width: 135, length: 200, price: 409, popular: true, stock: 30 },
-    
-    // Matrimonio grande (Queen/King)
-    { size: '150x190', width: 150, length: 190, price: 449, popular: true, stock: 40 },
-    { size: '150x200', width: 150, length: 200, price: 459, popular: true, stock: 45 },
-    { size: '160x200', width: 160, length: 200, price: 499, popular: true, stock: 35 },
-    
-    // King Size
-    { size: '180x200', width: 180, length: 200, price: 599, popular: false, stock: 15 },
-    { size: '200x200', width: 200, length: 200, price: 699, popular: false, stock: 10 }
-  ]
+    // 80 cm
+    { size: '80x180', width: 80, length: 180, price: 349.99, originalPrice: 549.99 },
+    { size: '80x190', width: 80, length: 190, price: 359.99, originalPrice: 559.99 },
+    { size: '80x200', width: 80, length: 200, price: 369.99, originalPrice: 569.99 },
+    // 90 cm
+    { size: '90x180', width: 90, length: 180, price: 369.99, originalPrice: 569.99, isPopular: true },
+    { size: '90x190', width: 90, length: 190, price: 379.99, originalPrice: 579.99, isPopular: true },
+    { size: '90x200', width: 90, length: 200, price: 389.99, originalPrice: 589.99, isPopular: true },
+    // 100 cm
+    { size: '100x180', width: 100, length: 180, price: 389.99, originalPrice: 589.99 },
+    { size: '100x190', width: 100, length: 190, price: 399.99, originalPrice: 599.99 },
+    { size: '100x200', width: 100, length: 200, price: 409.99, originalPrice: 609.99 },
+    // 105 cm
+    { size: '105x180', width: 105, length: 180, price: 399.99, originalPrice: 609.99 },
+    { size: '105x190', width: 105, length: 190, price: 409.99, originalPrice: 619.99 },
+    { size: '105x200', width: 105, length: 200, price: 419.99, originalPrice: 629.99 },
+    // 120 cm
+    { size: '120x180', width: 120, length: 180, price: 419.99, originalPrice: 629.99 },
+    { size: '120x190', width: 120, length: 190, price: 429.99, originalPrice: 639.99 },
+    { size: '120x200', width: 120, length: 200, price: 439.99, originalPrice: 649.99 },
+    // 135 cm
+    { size: '135x180', width: 135, length: 180, price: 439.99, originalPrice: 659.99, isPopular: true },
+    { size: '135x190', width: 135, length: 190, price: 449.99, originalPrice: 669.99, isPopular: true },
+    { size: '135x200', width: 135, length: 200, price: 459.99, originalPrice: 679.99, isPopular: true },
+    // 140 cm
+    { size: '140x180', width: 140, length: 180, price: 449.99, originalPrice: 669.99 },
+    { size: '140x190', width: 140, length: 190, price: 459.99, originalPrice: 679.99 },
+    { size: '140x200', width: 140, length: 200, price: 469.99, originalPrice: 689.99 },
+    // 150 cm
+    { size: '150x180', width: 150, length: 180, price: 469.99, originalPrice: 689.99, isPopular: true },
+    { size: '150x190', width: 150, length: 190, price: 479.99, originalPrice: 699.99, isPopular: true },
+    { size: '150x200', width: 150, length: 200, price: 489.99, originalPrice: 709.99, isPopular: true },
+    // 160 cm
+    { size: '160x180', width: 160, length: 180, price: 489.99, originalPrice: 709.99 },
+    { size: '160x190', width: 160, length: 190, price: 499.99, originalPrice: 719.99, isPopular: true },
+    { size: '160x200', width: 160, length: 200, price: 509.99, originalPrice: 729.99, isPopular: true },
+  ];
 
   for (const sizeData of sizes) {
     await prisma.productVariant.create({
@@ -282,29 +238,26 @@ Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
         size: sizeData.size,
         width: sizeData.width,
         length: sizeData.length,
-        dimensions: `${sizeData.width} x ${sizeData.length} cm`,
+        dimensions: `${sizeData.width}x${sizeData.length} cm`,
         price: sizeData.price,
-        originalPrice: Math.round(sizeData.price * 2), // 50% descuento
-        stock: sizeData.stock,
-        sku: `RZ-ME-DC-30-${sizeData.size.replace('x', '-')}`,
-        barcode: `842123456${String(sizeData.width).padStart(3, '0')}${String(sizeData.length).padStart(3, '0')}`,
-        weight: Math.round((sizeData.width * sizeData.length * 30) / 10000 * 10) / 10,
+        originalPrice: sizeData.originalPrice,
+        stock: 20,
+        sku: `ZAF-SUP-${sizeData.size.replace('x', '-')}`,
+        weight: (sizeData.width * sizeData.length * 30) / 10000, // Estimación de peso
         isAvailable: true,
-        isPopular: sizeData.popular
-      }
-    })
+        isPopular: sizeData.isPopular || false,
+      },
+    });
   }
 
-  console.log(`✅ ${sizes.length} variantes creadas`)
+  console.log(`✅ ${sizes.length} variantes creadas`);
 
-  // ==========================================
-  // REVIEWS REALISTAS (Social Proof)
-  // ==========================================
+  // Crear algunas reseñas de ejemplo
   const reviews = [
     {
       rating: 5,
-      title: 'El mejor colchón que he probado en mi vida',
-      comment: 'Llevamos 3 meses con el Royal Zen y es una pasada. La firmeza es perfecta (ni duro ni blando), y lo mejor: mi pareja se mueve muchísimo por la noche y yo no noto NADA. Antes me despertaba 3-4 veces, ahora duermo del tirón. El acabado es muy elegante, parece de 1000€. Súper recomendado.',
+      title: 'El mejor colchón que he probado',
+      comment: 'Después de probar varios colchones, el Zafiro Supreme es sin duda el mejor. La doble cara viscoelástica es increíble, y no se nota ningún movimiento cuando mi pareja se mueve. Totalmente recomendado.',
       userName: 'María González',
       userLocation: 'Madrid',
       comfortRating: 5,
@@ -313,17 +266,18 @@ Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
       deliveryRating: 5,
       verified: true,
       purchaseVerified: true,
-      usageDays: 90,
+      wouldRecommend: true,
+      usageDays: 45,
       productSize: '150x190',
-      pros: JSON.stringify(['Firmeza ideal', 'Independencia total', 'Acabado premium', 'Sin ruidos']),
-      cons: JSON.stringify([]),
-      helpfulCount: 47
+      pros: JSON.stringify(['Muy cómodo', 'Silencioso', 'Buena firmeza', 'Calidad premium']),
+      cons: JSON.stringify(['Ninguno']),
+      helpfulCount: 23,
     },
     {
       rating: 5,
-      title: 'Adiós al dolor de espalda',
-      comment: 'Sufro de hernia discal y este colchón ha sido un antes y un después. Por las mañanas me levanto sin dolor lumbar. La combinación de muelles + visco da un soporte firme pero cómodo. Además, no da calor como otros de visco que he probado. Si tienes problemas de espalda, este es tu colchón.',
-      userName: 'Roberto Sánchez',
+      title: 'Excelente relación calidad-precio',
+      comment: 'Llegó en perfectas condiciones y antes de lo esperado. La firmeza es perfecta, ni muy duro ni muy blando. El efecto nube es real, dormimos genial.',
+      userName: 'Carlos Ruiz',
       userLocation: 'Barcelona',
       comfortRating: 5,
       qualityRating: 5,
@@ -331,170 +285,53 @@ Miles de clientes ya duermen mejor. ¿Serás el siguiente?`,
       deliveryRating: 5,
       verified: true,
       purchaseVerified: true,
-      usageDays: 120,
+      wouldRecommend: true,
+      usageDays: 30,
       productSize: '135x190',
-      pros: JSON.stringify(['Soporte lumbar excelente', 'No da calor', 'Levantarse sin dolor']),
+      pros: JSON.stringify(['Precio competitivo', 'Envío rápido', 'Muy confortable']),
       cons: JSON.stringify([]),
-      helpfulCount: 63
+      helpfulCount: 18,
     },
     {
-      rating: 5,
-      title: 'Calidad premium a precio increíble',
-      comment: 'No me lo esperaba. Por menos de 400€ tienes un colchón de gama alta de verdad. Los materiales se ven y se sienten de calidad, el tejido es súper suave, y los muelles funcionan de maravilla. Entrega en 3 días. Estoy flipando con la relación calidad-precio.',
-      userName: 'Laura Martínez',
+      rating: 4,
+      title: 'Muy buen colchón',
+      comment: 'Estoy muy contenta con la compra. Es cómodo, no hace ruido y la independencia de lechos funciona muy bien. Le doy 4 estrellas porque me hubiera gustado que fuera un poco más fresco.',
+      userName: 'Ana Martínez',
       userLocation: 'Valencia',
       comfortRating: 5,
       qualityRating: 5,
-      valueRating: 5,
+      valueRating: 4,
       deliveryRating: 5,
       verified: true,
       purchaseVerified: true,
+      wouldRecommend: true,
       usageDays: 60,
       productSize: '150x200',
-      pros: JSON.stringify(['Precio imbatible', 'Calidad visible', 'Entrega rapidísima']),
-      cons: JSON.stringify([]),
-      helpfulCount: 52
+      pros: JSON.stringify(['Cómodo', 'Silencioso', 'Buena calidad']),
+      cons: JSON.stringify(['Podría ser más transpirable']),
+      helpfulCount: 12,
     },
-    {
-      rating: 4,
-      title: 'Muy bueno, necesita periodo de adaptación',
-      comment: 'Los primeros días me pareció un poco firme (venía de uno muy blando), pero después de una semana me acostumbré y ahora duermo genial. Es verdad que los muelles no se mueven nada, eso es brutal. El único "pero" es que al principio olía un poco, pero se fue en 2 días con la ventana abierta.',
-      userName: 'Carlos Ruiz',
-      userLocation: 'Sevilla',
-      comfortRating: 4,
-      qualityRating: 5,
-      valueRating: 5,
-      deliveryRating: 5,
-      verified: true,
-      purchaseVerified: true,
-      usageDays: 30,
-      productSize: '135x190',
-      pros: JSON.stringify(['Independencia de lechos', 'Buena firmeza', 'Silencioso']),
-      cons: JSON.stringify(['Olor inicial (normal)', 'Necesita adaptación']),
-      helpfulCount: 28
-    },
-    {
-      rating: 5,
-      title: 'Ideal para parejas con ritmos diferentes',
-      comment: 'Mi marido se acuesta a las 23h y yo a la 1h. Antes lo despertaba al meterme en la cama, ahora no se entera de nada. Los muelles ensacados son la solución definitiva. Además es muy cómodo y fresco. Llevamos 2 meses y estamos encantados.',
-      userName: 'Ana Fernández',
-      userLocation: 'Bilbao',
-      comfortRating: 5,
-      qualityRating: 5,
-      valueRating: 5,
-      deliveryRating: 5,
-      verified: true,
-      purchaseVerified: true,
-      usageDays: 60,
-      productSize: '150x190',
-      pros: JSON.stringify(['Cero molestias', 'Fresco', 'Comodísimo']),
-      cons: JSON.stringify([]),
-      helpfulCount: 41
-    },
-    {
-      rating: 5,
-      title: 'Compra perfecta',
-      comment: 'Dudaba entre este y uno más caro, pero por las opiniones me decidí por el Royal Zen y ha sido un acierto total. Calidad de sobra, comodidad top, y el servicio de atención al cliente fue excelente (les llamé para consultar tallas). 100% recomendado.',
-      userName: 'Javier López',
-      userLocation: 'Zaragoza',
-      comfortRating: 5,
-      qualityRating: 5,
-      valueRating: 5,
-      deliveryRating: 5,
-      verified: true,
-      purchaseVerified: true,
-      usageDays: 45,
-      productSize: '160x200',
-      pros: JSON.stringify(['Todo perfecto', 'Atención al cliente top', 'Calidad-precio']),
-      cons: JSON.stringify([]),
-      helpfulCount: 35
-    },
-    {
-      rating: 5,
-      title: 'Silencioso de verdad',
-      comment: 'Lo que más me ha sorprendido es que NO hace ningún ruido. Tenía uno de muelles tradicionales que crujía cada vez que te movías. Este es totalmente silencioso. Y la independencia de lechos funciona de maravilla. Mi mujer está embarazada y se mueve mucho, pero yo sigo durmiendo genial.',
-      userName: 'David Moreno',
-      userLocation: 'Málaga',
-      comfortRating: 5,
-      qualityRating: 5,
-      valueRating: 5,
-      deliveryRating: 4,
-      verified: true,
-      purchaseVerified: true,
-      usageDays: 75,
-      productSize: '150x200',
-      pros: JSON.stringify(['Silencio absoluto', 'Cero crujidos', 'Independencia brutal']),
-      cons: JSON.stringify([]),
-      helpfulCount: 38
-    },
-    {
-      rating: 4,
-      title: 'Muy buena compra, pequeño detalle',
-      comment: 'El colchón es excelente: cómodo, firme, fresco. El único detalle es que el box perimetral es bastante alto y al principio se notaba mucho al sentarse en el borde, pero te acostumbras. Por lo demás, perfecto. Buena inversión.',
-      userName: 'Elena Torres',
-      userLocation: 'Murcia',
-      comfortRating: 5,
-      qualityRating: 4,
-      valueRating: 5,
-      deliveryRating: 5,
-      verified: true,
-      purchaseVerified: true,
-      usageDays: 50,
-      productSize: '135x200',
-      pros: JSON.stringify(['Comodidad', 'Frescura', 'Firmeza ideal']),
-      cons: JSON.stringify(['Box perimetral muy firme (pero es bueno)']),
-      helpfulCount: 22
-    }
-  ]
+  ];
 
   for (const reviewData of reviews) {
     await prisma.review.create({
       data: {
-        productId: product.id,
         ...reviewData,
-        isPublished: true,
-        wouldRecommend: true,
-        userEmail: `${reviewData.userName.toLowerCase().replace(/ /g, '.')}@example.com`,
-        userAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewData.userName)}&background=random&size=128`
-      }
-    })
+        productId: product.id,
+      },
+    });
   }
 
-  console.log(`✅ ${reviews.length} reviews creadas`)
+  console.log(`✅ ${reviews.length} reseñas creadas`);
 
-  // Actualizar rating promedio
-  const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-  await prisma.product.update({
-    where: { id: product.id },
-    data: {
-      reviewCount: reviews.length,
-      rating: Math.round(avgRating * 10) / 10
-    }
-  })
-
-  console.log('✅ Rating promedio actualizado')
-  console.log('🎉 ¡Seed completado exitosamente!')
-  console.log(`
-📦 Producto creado:
-   - ID: ${product.id}
-   - Nombre: ${product.name}
-   - Slug: ${product.slug}
-   - Precio: ${product.price}€
-   - Rating: ${avgRating}⭐
-   - Reviews: ${reviews.length}
-   - Variantes: ${sizes.length}
-   
-🖼️  Imágenes esperadas en:
-   ${productImages.map(img => `   - ${img}`).join('\n')}
-  `)
+  console.log('🎉 Seed completado con éxito!');
 }
 
-// Ejecutar seed
-seedRoyalZen()
+main()
   .catch((e) => {
-    console.error('❌ Error en seed:', e)
-    process.exit(1)
+    console.error('❌ Error en el seed:', e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

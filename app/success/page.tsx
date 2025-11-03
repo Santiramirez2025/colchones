@@ -112,7 +112,7 @@ export default function SuccessPage() {
             <Package className="w-12 h-12 text-primary-600 mx-auto mb-4" />
             <h3 className="font-bold mb-2">Envío gratis</h3>
             <p className="text-sm text-gray-600">
-              Entrega en 24-48h sin coste adicional
+              Entrega De 3 a 6 días sin coste adicional
             </p>
           </motion.div>
 
