@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     default: 'Tienda Colchón | Colchones Viscoelásticos Premium con Envío Gratis',
     template: '%s | Tienda Colchón'
   },
-  description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 24-48h ✓ Tu descanso asegurado ✓ 3 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
+  description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 3 a 6 dias ✓ Tu descanso asegurado ✓ 3 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
   applicationName: 'Tienda Colchón',
   
   keywords: [
@@ -285,7 +285,7 @@ const jsonLd = {
       isPartOf: { '@id': 'https://tiendacolchon.es/#website' },
       about: { '@id': 'https://tiendacolchon.es/#organization' },
       primaryImageOfPage: { '@id': 'https://tiendacolchon.es/#logo' },
-      description: 'Compra colchones viscoelásticos premium en España. Envío gratis 24-48h, Tu descanso asegurado y 3 años de garantía.',
+      description: 'Compra colchones viscoelásticos premium en España. Envío gratis 3 a 6 dias, Tu descanso asegurado y 3 años de garantía.',
       inLanguage: 'es-ES',
     },
     {

@@ -11,7 +11,7 @@ export const SITE_CONFIG = {
 }
 
 export const TRUST_BAR_ITEMS = [
-  { icon: 'Truck', text: 'Envío gratis 24-48h' },
+  { icon: 'Truck', text: 'Envío gratis 3 a 6 dias' },
   { icon: 'Shield', text: 'Garantía 3 años' },
   { icon: 'Moon', text: 'Certificados de calidad europea' }
 ]

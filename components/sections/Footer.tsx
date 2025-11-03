@@ -87,7 +87,7 @@ export default function Footer() {
 
   const helpLinks = [
     { href: '/contacto', label: 'Contacto' },
-    { href: '/faq', label: 'Preguntas frecuentes' },
+    { href: '/preguntas-frecuentes', label: 'Preguntas frecuentes' },
     { href: '/guia-compra', label: 'Guía de compra' },
     { href: '/cuidado-colchon', label: 'Cuidado del colchón' },
   ]

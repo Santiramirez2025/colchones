@@ -25,7 +25,7 @@ interface TrustItem {
 const TRUST_ITEMS: TrustItem[] = [
   {
     icon: Truck,
-    text: 'Envío gratis 24-48h',
+    text: 'Envío gratis 3 a 6 dias',
     ariaLabel: 'Envío gratuito en 24 a 48 horas'
   },
   {

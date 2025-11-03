@@ -34,7 +34,7 @@ export const HERO_PRODUCT: HeroProduct = {
     { label: 'Garantía', value: '3 años', icon: Shield }
   ],
   trustIndicators: [
-    { icon: CheckCircle2, text: 'Envío gratis 24-48h', color: 'text-emerald-400' },
+    { icon: CheckCircle2, text: 'Envío gratis 3 a 6 dias', color: 'text-emerald-400' },
     { icon: CheckCircle2, text: 'Garantía de Satisfacción Total', color: 'text-cyan-400' },
     { icon: CheckCircle2, text: 'Garantía 3 años', color: 'text-violet-400' }
   ],
@@ -154,7 +154,7 @@ export const BENEFITS: Benefit[] = [
 ]
 
 export const TRUST_FOOTER: TrustItem[] = [
-  { icon: Truck, title: 'Envío Express', description: 'Gratis 24-48h' },
+  { icon: Truck, title: 'Envío Express', description: 'Gratis 3 a 6 dias' },
   { icon: Shield, title: 'Garantía', description: '3 años' },
   { icon: Lock, title: 'Pago Seguro', description: 'SSL' }
 ]
