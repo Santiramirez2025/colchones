@@ -66,7 +66,7 @@ const Icons = {
 const SITE_CONFIG = {
   phone: '+34981123456', // Cambiar por tu número real
   phoneDisplay: '981 12 34 56',
-  brandName: 'Descanso Premium',
+  brandName: 'Tienda Colchon',
   tagline: 'Calidad certificada',
 }
 
@@ -200,8 +200,8 @@ export default function Header() {
                 {/* Brand text */}
                 <div className="flex flex-col">
                   <div className="text-lg md:text-xl font-black leading-none tracking-tight">
-                    <span className="text-white">Descanso</span>
-                    <span className="text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-400 bg-clip-text">Premium</span>
+                    <span className="text-white">Tienda</span>
+                    <span className="text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-violet-400 bg-clip-text">Colchon</span>
                   </div>
                   <div className="text-[9px] md:text-[10px] text-zinc-500 font-semibold tracking-wider uppercase mt-0.5">
                     {SITE_CONFIG.tagline}
