@@ -77,30 +77,6 @@ export default function Footer() {
     }, 1000)
   }
 
-  // Garantías reales y honestas
-  const trustBadges = [
-    { 
-      icon: Icons.Return, 
-      title: 'Prueba 30 días',
-      subtitle: 'Devolución gratis'
-    },
-    { 
-      icon: Icons.Truck, 
-      title: 'Envío gratis',
-      subtitle: 'Península en 48-72h'
-    },
-    { 
-      icon: Icons.Shield, 
-      title: 'Garantía 3 años',
-      subtitle: 'En todos los colchones'
-    },
-    { 
-      icon: Icons.CreditCard, 
-      title: 'Pago seguro',
-      subtitle: 'Encriptación SSL'
-    },
-  ]
-
   const quickLinks = [
     { href: '/productos', label: 'Catálogo' },
     { href: '/como-comprar', label: 'Cómo comprar' },
@@ -128,29 +104,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 max-w-7xl">
         
         {/* ============================================================ */}
-        {/* 1. GARANTÍAS & CONFIANZA - Mobile First */}
-        {/* ============================================================ */}
-        <section className="py-8 md:py-12 border-b border-gray-800/40">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {trustBadges.map((badge) => (
-              <div
-                key={badge.title}
-                className="flex items-start gap-3 p-4 bg-gray-900/30 rounded-lg border border-gray-800/40 hover:border-gray-700/60 transition-colors"
-              >
-                <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400">
-                  <badge.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-gray-200 mb-0.5">{badge.title}</div>
-                  <div className="text-xs text-gray-500">{badge.subtitle}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ============================================================ */}
-        {/* 2. CONTACTO DIRECTO - Prioridad alta */}
+        {/* 1. CONTACTO DIRECTO - Prioridad alta */}
         {/* ============================================================ */}
         <section className="py-8 md:py-12 border-b border-gray-800/40">
           <div className="max-w-2xl mx-auto">
@@ -223,7 +177,7 @@ export default function Footer() {
         </section>
 
         {/* ============================================================ */}
-        {/* 3. ENLACES ÚTILES - Grid limpio */}
+        {/* 2. ENLACES ÚTILES - Grid limpio */}
         {/* ============================================================ */}
         <section className="py-8 md:py-12 border-b border-gray-800/40">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -285,7 +239,7 @@ export default function Footer() {
         </section>
 
         {/* ============================================================ */}
-        {/* 4. MARCA - Minimalista al final */}
+        {/* 3. MARCA - Minimalista al final */}
         {/* ============================================================ */}
         <section className="py-6 md:py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

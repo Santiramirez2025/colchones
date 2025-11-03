@@ -4,6 +4,7 @@ import Script from 'next/script'
 import './globals.css'
 import Header from '../components/sections/Header'
 import Footer from '../components/sections/Footer'
+import { AuthProvider } from '@/lib/context/AuthContext'
 
 // ✅ OPTIMIZACIÓN: Fuentes con subset específico español + latin-ext
 const inter = Inter({ 
@@ -11,10 +12,9 @@ const inter = Inter({
   display: 'swap',
   variable: '--font-inter',
   preload: true,
-  // ✅ MEJORA: Solo cargar pesos que realmente uses
   weight: ['400', '500', '600', '700'],
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Arial', 'sans-serif'],
-  adjustFontFallback: true, // Reduce CLS
+  adjustFontFallback: true,
 })
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -34,9 +34,9 @@ export const viewport: Viewport = {
   userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#18181b' } // Zinc-900
+    { media: '(prefers-color-scheme: dark)', color: '#18181b' }
   ],
-  colorScheme: 'light dark', // ✅ Soportar ambos
+  colorScheme: 'light dark',
 }
 
 export const metadata: Metadata = {
@@ -45,36 +45,25 @@ export const metadata: Metadata = {
     default: 'Tienda Colchón | Colchones Viscoelásticos Premium con Envío Gratis',
     template: '%s | Tienda Colchón'
   },
-  // ✅ MEJORA: Descripción optimizada con long-tail keywords y CTA
   description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 24-48h ✓ Tu descanso asegurado ✓ 3 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
   applicationName: 'Tienda Colchón',
   
-  // ✅ SEO CRÍTICO: Keywords estratégicas (búsquedas reales de usuarios)
   keywords: [
-    // Keywords principales (alto volumen)
     'colchones viscoelásticos',
     'comprar colchón online',
     'colchones baratos calidad',
     'mejor colchón 2025',
-    
-    // Long-tail (alta conversión)
     'colchón viscoelástico 150x190',
     'colchón matrimonio oferta',
     'colchón espalda dolor lumbar',
     'colchón ortopédico cervical',
-    
-    // Locales
     'colchones Madrid',
     'colchones Barcelona',
     'tienda colchones España',
-    
-    // Comparativas y decisión
     'opiniones colchones viscoelásticos',
     'comparativa colchones 2025',
     'qué colchón comprar',
     'colchón firme o blando',
-    
-    // Beneficios
     'envío gratis colchones',
     'tu descanso asegurado',
     'colchón garantía 3 años',
@@ -91,7 +80,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
   
-  // ✅ MEJORA: Open Graph optimizado con más detalles
   openGraph: {
     type: 'website',
     locale: 'es_ES',
@@ -117,7 +105,6 @@ export const metadata: Metadata = {
     ],
   },
   
-  // ✅ MEJORA: Twitter Card optimizada
   twitter: {
     card: 'summary_large_image',
     site: '@tiendacolchon',
@@ -130,7 +117,6 @@ export const metadata: Metadata = {
     },
   },
   
-  // ✅ CRÍTICO: Robots optimizados para mejor crawling
   robots: {
     index: true,
     follow: true,
@@ -145,13 +131,11 @@ export const metadata: Metadata = {
     },
   },
   
-  // ✅ IMPORTANTE: Añadir verification codes reales
   verification: {
-    google: 'google-site-verification-code-aqui', // Obtener de Search Console
-    // yandex: 'yandex-verification-code', // Solo si operas en Rusia
+    google: 'google-site-verification-code-aqui',
     other: {
-      'facebook-domain-verification': 'facebook-verification-code', // Para Facebook Pixel
-      'pinterest-site-verification': 'pinterest-code', // Si usas Pinterest
+      'facebook-domain-verification': 'facebook-verification-code',
+      'pinterest-site-verification': 'pinterest-code',
     },
   },
   
@@ -159,16 +143,13 @@ export const metadata: Metadata = {
     canonical: 'https://tiendacolchon.es',
     languages: {
       'es-ES': 'https://tiendacolchon.es',
-      // Añadir si tienes versiones en catalán, gallego, euskera
-      // 'ca-ES': 'https://tiendacolchon.es/ca',
     },
   },
   
-  // ✅ MEJORA: Iconos optimizados para todos los dispositivos
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/favicon.svg', type: 'image/svg+xml' }, // SVG escalable
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/icon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/icon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -181,7 +162,7 @@ export const metadata: Metadata = {
       {
         rel: 'mask-icon',
         url: '/safari-pinned-tab.svg',
-        color: '#4f46e5', // Color de tu marca
+        color: '#4f46e5',
       },
     ],
   },
@@ -189,7 +170,6 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   category: 'shopping',
   
-  // ✅ MEJORA: Metadatos adicionales para PWA y móviles
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
@@ -200,11 +180,10 @@ export const metadata: Metadata = {
   },
 }
 
-// ✅ MEJORA CRÍTICA: Schema.org más completo y optimizado
+// ✅ Schema.org JSON-LD
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    // Organization Schema
     {
       '@type': 'Organization',
       '@id': 'https://tiendacolchon.es/#organization',
@@ -222,8 +201,6 @@ const jsonLd = {
       },
       image: { '@id': 'https://tiendacolchon.es/#logo' },
       description: 'Tienda online de colchones viscoelásticos premium con envío gratis en 24-48h. Más de 50.000 clientes satisfechos en España.',
-      
-      // ✅ IMPORTANTE: Contacto y ubicación
       telephone: '+34-900-123-456',
       email: 'info@tiendacolchon.es',
       address: {
@@ -234,8 +211,6 @@ const jsonLd = {
         postalCode: '28001',
         addressCountry: 'ES'
       },
-      
-      // ✅ Redes sociales (actualizar con tus URLs reales)
       sameAs: [
         'https://www.facebook.com/tiendacolchon',
         'https://www.instagram.com/tiendacolchon',
@@ -244,8 +219,6 @@ const jsonLd = {
         'https://www.pinterest.es/tiendacolchon',
         'https://twitter.com/tiendacolchon'
       ],
-      
-      // ✅ Rating agregado (actualizar con datos reales)
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.9',
@@ -253,8 +226,6 @@ const jsonLd = {
         bestRating: '5',
         worstRating: '1'
       },
-      
-      // ✅ Ofertas y servicios clave
       makesOffer: [
         {
           '@type': 'Offer',
@@ -289,8 +260,6 @@ const jsonLd = {
         }
       ]
     },
-    
-    // Website Schema
     {
       '@type': 'WebSite',
       '@id': 'https://tiendacolchon.es/#website',
@@ -299,8 +268,6 @@ const jsonLd = {
       description: 'Compra colchones viscoelásticos premium online con envío gratis',
       publisher: { '@id': 'https://tiendacolchon.es/#organization' },
       inLanguage: 'es-ES',
-      
-      // ✅ SearchAction para barra de búsqueda en Google
       potentialAction: {
         '@type': 'SearchAction',
         target: {
@@ -310,8 +277,6 @@ const jsonLd = {
         'query-input': 'required name=search_term_string'
       },
     },
-    
-    // ✅ NUEVO: E-commerce WebPage Schema
     {
       '@type': 'WebPage',
       '@id': 'https://tiendacolchon.es/#webpage',
@@ -323,8 +288,6 @@ const jsonLd = {
       description: 'Compra colchones viscoelásticos premium en España. Envío gratis 24-48h, Tu descanso asegurado y 3 años de garantía.',
       inLanguage: 'es-ES',
     },
-    
-    // Local Business Schema
     {
       '@type': 'Store',
       '@id': 'https://tiendacolchon.es/#localbusiness',
@@ -333,7 +296,6 @@ const jsonLd = {
       priceRange: '€€-€€€',
       telephone: '+34-900-123-456',
       email: 'info@tiendacolchon.es',
-      
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Calle Ejemplo 123',
@@ -342,14 +304,11 @@ const jsonLd = {
         postalCode: '28001',
         addressCountry: 'ES'
       },
-      
       geo: {
         '@type': 'GeoCoordinates',
         latitude: 40.4168,
         longitude: -3.7038
       },
-      
-      // ✅ Horario de atención (online 24/7)
       openingHoursSpecification: [
         {
           '@type': 'OpeningHoursSpecification',
@@ -358,8 +317,6 @@ const jsonLd = {
           closes: '23:59'
         }
       ],
-      
-      // ✅ Rating agregado
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.9',
@@ -367,12 +324,8 @@ const jsonLd = {
         bestRating: '5',
         worstRating: '1'
       },
-      
-      // ✅ Métodos de pago
       paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer', 'Financing'],
       currenciesAccepted: 'EUR',
-      
-      // ✅ Servicios destacados
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
         name: 'Colchones Premium',
@@ -390,7 +343,6 @@ const jsonLd = {
   ]
 }
 
-// ✅ NUEVO: FAQPage Schema para preguntas frecuentes (añadir a homepage)
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -430,7 +382,6 @@ const faqJsonLd = {
   ]
 }
 
-// Breadcrumb JSON-LD
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -456,16 +407,16 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* ✅ OPTIMIZACIÓN: Preconnect y DNS Prefetch críticos */}
+        {/* Preconnect críticos */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* ✅ Analytics y CDNs */}
+        {/* DNS Prefetch */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         
-        {/* ✅ NUEVO: Preload crítico para LCP */}
+        {/* Preload crítico para LCP */}
         <link 
           rel="preload" 
           href="/images/hero-colchon.webp" 
@@ -474,7 +425,7 @@ export default function RootLayout({
           fetchPriority="high"
         />
         
-        {/* ✅ Structured Data - Todos los schemas */}
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -492,32 +443,35 @@ export default function RootLayout({
         />
       </head>
       
-      <body className={`${inter.className} font-sans antialiased bg-[#fafafa] text-gray-900 overflow-x-hidden`}>
-        {/* ✅ ACCESIBILIDAD: Skip to main content */}
+      <body className={`${inter.className} font-sans antialiased bg-zinc-950 text-white overflow-x-hidden`}>
+        {/* Skip to main content */}
         <a 
           href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-indigo-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-violet-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all"
         >
           Saltar al contenido principal
         </a>
 
-        {/* Header Component */}
-        <Header />
-        
-        {/* Main Content */}
-        <main 
-          id="main-content" 
-          className="min-h-screen"
-          role="main"
-          aria-label="Contenido principal"
-        >
-          {children}
-        </main>
-        
-        {/* Footer Component */}
-        <Footer />
+        {/* ✅ NUEVO: Auth Provider - Envuelve toda la app */}
+        <AuthProvider>
+          {/* Header Component */}
+          <Header />
+          
+          {/* Main Content */}
+          <main 
+            id="main-content" 
+            className="min-h-screen"
+            role="main"
+            aria-label="Contenido principal"
+          >
+            {children}
+          </main>
+          
+          {/* Footer Component */}
+          <Footer />
+        </AuthProvider>
 
-        {/* ✅ PERFORMANCE: Google Analytics - afterInteractive */}
+        {/* Google Analytics */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'}`}
           strategy="afterInteractive"
@@ -534,13 +488,12 @@ export default function RootLayout({
               page_path: window.location.pathname,
               anonymize_ip: true,
               cookie_flags: 'SameSite=None;Secure',
-              // ✅ Enhanced Ecommerce
               send_page_view: true,
             });
           `}
         </Script>
 
-        {/* ✅ NUEVO: Google Tag Manager (más versátil que solo Analytics) */}
+        {/* Google Tag Manager */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
           <>
             <Script
@@ -566,7 +519,7 @@ export default function RootLayout({
           </>
         )}
 
-        {/* Facebook Pixel - afterInteractive */}
+        {/* Facebook Pixel */}
         {process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
           <>
             <Script
@@ -598,7 +551,7 @@ export default function RootLayout({
           </>
         )}
 
-        {/* ✅ NUEVO: Microsoft Clarity (alternativa gratuita a Hotjar) */}
+        {/* Microsoft Clarity */}
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
           <Script
             id="microsoft-clarity"
@@ -614,7 +567,7 @@ export default function RootLayout({
           </Script>
         )}
 
-        {/* Hotjar - lazyOnload */}
+        {/* Hotjar */}
         {process.env.NEXT_PUBLIC_HOTJAR_ID && (
           <Script
             id="hotjar"
@@ -633,7 +586,7 @@ export default function RootLayout({
           </Script>
         )}
 
-        {/* ✅ MEJORA: Web Vitals Reporting completo */}
+        {/* Web Vitals Reporting */}
         <Script
           id="web-vitals"
           strategy="afterInteractive"
@@ -648,7 +601,6 @@ export default function RootLayout({
                 id: metric.id,
               });
               
-              // Enviar a GA4
               if (window.gtag) {
                 window.gtag('event', metric.name, {
                   value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
@@ -661,15 +613,12 @@ export default function RootLayout({
                 });
               }
               
-              // Enviar a tu API si tienes un endpoint
               if (navigator.sendBeacon) {
                 navigator.sendBeacon('/api/analytics', body);
               }
             }
             
-            // Report all available metrics whenever they're ready
             if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
-              // LCP - Largest Contentful Paint
               new PerformanceObserver((list) => {
                 const entries = list.getEntries();
                 const lastEntry = entries[entries.length - 1];
@@ -682,7 +631,6 @@ export default function RootLayout({
                 });
               }).observe({ type: 'largest-contentful-paint', buffered: true });
               
-              // FID - First Input Delay
               new PerformanceObserver((list) => {
                 list.getEntries().forEach((entry) => {
                   sendToAnalytics({
@@ -695,7 +643,6 @@ export default function RootLayout({
                 });
               }).observe({ type: 'first-input', buffered: true });
               
-              // CLS - Cumulative Layout Shift
               let clsValue = 0;
               let clsEntries = [];
               new PerformanceObserver((list) => {
@@ -707,7 +654,6 @@ export default function RootLayout({
                 });
               }).observe({ type: 'layout-shift', buffered: true });
               
-              // Enviar CLS al salir de la página
               addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'hidden' && clsValue > 0) {
                   sendToAnalytics({
@@ -723,23 +669,20 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* ✅ NUEVO: Cookie Consent Banner GDPR Compliant */}
+        {/* Cookie Consent Banner GDPR */}
         <Script 
           id="cookie-consent" 
           strategy="lazyOnload"
         >
           {`
             (function() {
-              // Check if user has already given consent
               const consent = localStorage.getItem('cookie-consent');
               const consentDate = localStorage.getItem('cookie-consent-date');
               
-              // Re-ask consent every 6 months
               const sixMonthsAgo = new Date();
               sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
               
               if (!consent || (consentDate && new Date(consentDate) < sixMonthsAgo)) {
-                // Show cookie banner
                 const banner = document.createElement('div');
                 banner.id = 'cookie-consent-banner';
                 banner.innerHTML = \`
@@ -748,14 +691,14 @@ export default function RootLayout({
                       <div style="flex: 1; min-width: 300px;">
                         <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">
                           🍪 Utilizamos cookies propias y de terceros para mejorar tu experiencia, analizar el tráfico y personalizar el contenido. 
-                          <a href="/politica-cookies" style="color: #60a5fa; text-decoration: underline;">Más información</a>
+                          <a href="/politica-cookies" style="color: #a78bfa; text-decoration: underline;">Más información</a>
                         </p>
                       </div>
                       <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                         <button id="cookie-reject" style="padding: 0.625rem 1.25rem; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 0.5rem; cursor: pointer; font-weight: 500; font-size: 0.875rem;">
                           Rechazar
                         </button>
-                        <button id="cookie-accept" style="padding: 0.625rem 1.25rem; background: #4f46e5; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">
+                        <button id="cookie-accept" style="padding: 0.625rem 1.25rem; background: linear-gradient(to right, #8b5cf6, #d946ef); color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">
                           Aceptar todas
                         </button>
                       </div>
@@ -765,13 +708,11 @@ export default function RootLayout({
                 
                 document.body.appendChild(banner);
                 
-                // Accept button
                 document.getElementById('cookie-accept').addEventListener('click', () => {
                   localStorage.setItem('cookie-consent', 'accepted');
                   localStorage.setItem('cookie-consent-date', new Date().toISOString());
                   banner.remove();
                   
-                  // Enable tracking
                   if (window.gtag) {
                     window.gtag('consent', 'update', {
                       'analytics_storage': 'granted',
@@ -783,13 +724,11 @@ export default function RootLayout({
                   }
                 });
                 
-                // Reject button
                 document.getElementById('cookie-reject').addEventListener('click', () => {
                   localStorage.setItem('cookie-consent', 'rejected');
                   localStorage.setItem('cookie-consent-date', new Date().toISOString());
                   banner.remove();
                   
-                  // Disable tracking
                   if (window.gtag) {
                     window.gtag('consent', 'update', {
                       'analytics_storage': 'denied',
@@ -798,7 +737,6 @@ export default function RootLayout({
                   }
                 });
               } else if (consent === 'accepted') {
-                // User already accepted, enable tracking
                 if (window.gtag) {
                   window.gtag('consent', 'update', {
                     'analytics_storage': 'granted',
@@ -810,24 +748,13 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* ✅ NUEVO: Trustpilot Widget (si lo usas) */}
+        {/* Trustpilot Widget */}
         {process.env.NEXT_PUBLIC_TRUSTPILOT_KEY && (
           <Script
             src={`https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js`}
             strategy="lazyOnload"
           />
         )}
-
-        {/* ✅ NUEVO: Schema.org para productos (si tienes ecommerce) */}
-        <Script
-          id="ecommerce-product-schema"
-          strategy="afterInteractive"
-        >
-          {`
-            // Puedes añadir más schemas dinámicamente según la página
-            // Este es un ejemplo para productos destacados
-          `}
-        </Script>
       </body>
     </html>
   )

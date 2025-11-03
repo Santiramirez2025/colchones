@@ -1,0 +1,28 @@
+mutation AddNewProduct($brand: String, $category: String!, $createdAt: Timestamp!, $description: String!, $firmness: String, $imageUrl: String, $name: String!, $price: Float!, $size: String) @auth(level: USER) {
+  product_insert(data: {brand: $brand, category: $category, createdAt: $createdAt, description: $description, firmness: $firmness, imageUrl: $imageUrl, name: $name, price: $price, size: $size})
+}
+
+query ListProductsByCategory($category: String!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  products(where: {category: {eq: $category}}) {
+    id
+    name
+    description
+    price
+    imageUrl
+  }
+}
+
+mutation AddReviewToProduct($productId: UUID!, $userId: UUID!, $comment: String!, $createdAt: Timestamp!, $rating: Int!, $title: String) @auth(level: USER) {
+  review_insert(data: {productId: $productId, userId: $userId, comment: $comment, createdAt: $createdAt, rating: $rating, title: $title})
+}
+
+query ListReviewsForProduct($productId: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  reviews(where: {productId: {eq: $productId}}) {
+    id
+    userId
+    comment
+    createdAt
+    rating
+    title
+  }
+}
