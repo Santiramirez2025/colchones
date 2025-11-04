@@ -1,12 +1,16 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
-import Script from 'next/script'
+import { Suspense } from 'react'
 import './globals.css'
 import Header from '../components/sections/Header'
 import Footer from '../components/sections/Footer'
 import { AuthProvider } from '@/lib/context/AuthContext'
+import { Analytics } from '@/components/analytics'
 
-// ✅ OPTIMIZACIÓN: Fuentes con subset específico español + latin-ext
+// ============================================================================
+// FONTS
+// ============================================================================
+
 const inter = Inter({ 
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
@@ -27,6 +31,10 @@ const plusJakarta = Plus_Jakarta_Sans({
   adjustFontFallback: true,
 })
 
+// ============================================================================
+// VIEWPORT
+// ============================================================================
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -38,6 +46,10 @@ export const viewport: Viewport = {
   ],
   colorScheme: 'light dark',
 }
+
+// ============================================================================
+// METADATA
+// ============================================================================
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://tiendacolchon.es'),
@@ -180,7 +192,10 @@ export const metadata: Metadata = {
   },
 }
 
-// ✅ Schema.org JSON-LD
+// ============================================================================
+// STRUCTURED DATA (Schema.org JSON-LD)
+// ============================================================================
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -395,6 +410,10 @@ const breadcrumbJsonLd = {
   ]
 }
 
+// ============================================================================
+// ROOT LAYOUT
+// ============================================================================
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -411,10 +430,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* DNS Prefetch */}
+        {/* DNS Prefetch para servicios de analytics */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://www.clarity.ms" />
         
         {/* Preload crítico para LCP */}
         <link 
@@ -425,7 +445,7 @@ export default function RootLayout({
           fetchPriority="high"
         />
         
-        {/* Structured Data */}
+        {/* Structured Data - Schema.org JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -444,7 +464,7 @@ export default function RootLayout({
       </head>
       
       <body className={`${inter.className} font-sans antialiased bg-zinc-950 text-white overflow-x-hidden`}>
-        {/* Skip to main content */}
+        {/* Skip to main content - Accesibilidad */}
         <a 
           href="#main-content" 
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-violet-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all"
@@ -452,7 +472,7 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
 
-        {/* ✅ NUEVO: Auth Provider - Envuelve toda la app */}
+        {/* Auth Provider - Envuelve toda la app */}
         <AuthProvider>
           {/* Header Component */}
           <Header />
@@ -471,290 +491,10 @@ export default function RootLayout({
           <Footer />
         </AuthProvider>
 
-        {/* Google Analytics */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'}`}
-          strategy="afterInteractive"
-        />
-        <Script 
-          id="google-analytics" 
-          strategy="afterInteractive"
-        >
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'}', {
-              page_path: window.location.pathname,
-              anonymize_ip: true,
-              cookie_flags: 'SameSite=None;Secure',
-              send_page_view: true,
-            });
-          `}
-        </Script>
-
-        {/* Google Tag Manager */}
-        {process.env.NEXT_PUBLIC_GTM_ID && (
-          <>
-            <Script
-              id="google-tag-manager"
-              strategy="afterInteractive"
-            >
-              {`
-                (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_ID}');
-              `}
-            </Script>
-            <noscript>
-              <iframe 
-                src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-                height="0" 
-                width="0" 
-                style={{ display: 'none', visibility: 'hidden' }}
-              />
-            </noscript>
-          </>
-        )}
-
-        {/* Facebook Pixel */}
-        {process.env.NEXT_PUBLIC_FB_PIXEL_ID && (
-          <>
-            <Script
-              id="facebook-pixel"
-              strategy="afterInteractive"
-            >
-              {`
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
-                fbq('track', 'PageView');
-              `}
-            </Script>
-            <noscript>
-              <img 
-                height="1" 
-                width="1" 
-                style={{ display: 'none' }}
-                src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FB_PIXEL_ID}&ev=PageView&noscript=1`}
-                alt=""
-              />
-            </noscript>
-          </>
-        )}
-
-        {/* Microsoft Clarity */}
-        {process.env.NEXT_PUBLIC_CLARITY_ID && (
-          <Script
-            id="microsoft-clarity"
-            strategy="afterInteractive"
-          >
-            {`
-              (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
-            `}
-          </Script>
-        )}
-
-        {/* Hotjar */}
-        {process.env.NEXT_PUBLIC_HOTJAR_ID && (
-          <Script
-            id="hotjar"
-            strategy="lazyOnload"
-          >
-            {`
-              (function(h,o,t,j,a,r){
-                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-                h._hjSettings={hjid:${process.env.NEXT_PUBLIC_HOTJAR_ID},hjsv:6};
-                a=o.getElementsByTagName('head')[0];
-                r=o.createElement('script');r.async=1;
-                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-                a.appendChild(r);
-              })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-            `}
-          </Script>
-        )}
-
-        {/* Web Vitals Reporting */}
-        <Script
-          id="web-vitals"
-          strategy="afterInteractive"
-        >
-          {`
-            function sendToAnalytics(metric) {
-              const body = JSON.stringify({
-                name: metric.name,
-                value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-                rating: metric.rating,
-                delta: metric.delta,
-                id: metric.id,
-              });
-              
-              if (window.gtag) {
-                window.gtag('event', metric.name, {
-                  value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-                  metric_id: metric.id,
-                  metric_value: metric.value,
-                  metric_delta: metric.delta,
-                  metric_rating: metric.rating,
-                  event_category: 'Web Vitals',
-                  non_interaction: true,
-                });
-              }
-              
-              if (navigator.sendBeacon) {
-                navigator.sendBeacon('/api/analytics', body);
-              }
-            }
-            
-            if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
-              new PerformanceObserver((list) => {
-                const entries = list.getEntries();
-                const lastEntry = entries[entries.length - 1];
-                sendToAnalytics({
-                  name: 'LCP',
-                  value: lastEntry.renderTime || lastEntry.loadTime,
-                  rating: lastEntry.renderTime < 2500 ? 'good' : lastEntry.renderTime < 4000 ? 'needs-improvement' : 'poor',
-                  delta: lastEntry.renderTime || lastEntry.loadTime,
-                  id: 'v3-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-                });
-              }).observe({ type: 'largest-contentful-paint', buffered: true });
-              
-              new PerformanceObserver((list) => {
-                list.getEntries().forEach((entry) => {
-                  sendToAnalytics({
-                    name: 'FID',
-                    value: entry.processingStart - entry.startTime,
-                    rating: entry.processingStart - entry.startTime < 100 ? 'good' : entry.processingStart - entry.startTime < 300 ? 'needs-improvement' : 'poor',
-                    delta: entry.processingStart - entry.startTime,
-                    id: 'v3-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-                  });
-                });
-              }).observe({ type: 'first-input', buffered: true });
-              
-              let clsValue = 0;
-              let clsEntries = [];
-              new PerformanceObserver((list) => {
-                list.getEntries().forEach((entry) => {
-                  if (!entry.hadRecentInput) {
-                    clsValue += entry.value;
-                    clsEntries.push(entry);
-                  }
-                });
-              }).observe({ type: 'layout-shift', buffered: true });
-              
-              addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden' && clsValue > 0) {
-                  sendToAnalytics({
-                    name: 'CLS',
-                    value: clsValue,
-                    rating: clsValue < 0.1 ? 'good' : clsValue < 0.25 ? 'needs-improvement' : 'poor',
-                    delta: clsValue,
-                    id: 'v3-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-                  });
-                }
-              });
-            }
-          `}
-        </Script>
-
-        {/* Cookie Consent Banner GDPR */}
-        <Script 
-          id="cookie-consent" 
-          strategy="lazyOnload"
-        >
-          {`
-            (function() {
-              const consent = localStorage.getItem('cookie-consent');
-              const consentDate = localStorage.getItem('cookie-consent-date');
-              
-              const sixMonthsAgo = new Date();
-              sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-              
-              if (!consent || (consentDate && new Date(consentDate) < sixMonthsAgo)) {
-                const banner = document.createElement('div');
-                banner.id = 'cookie-consent-banner';
-                banner.innerHTML = \`
-                  <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); color: white; padding: 1.5rem; z-index: 9999; backdrop-filter: blur(10px);">
-                    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                      <div style="flex: 1; min-width: 300px;">
-                        <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">
-                          🍪 Utilizamos cookies propias y de terceros para mejorar tu experiencia, analizar el tráfico y personalizar el contenido. 
-                          <a href="/politica-cookies" style="color: #a78bfa; text-decoration: underline;">Más información</a>
-                        </p>
-                      </div>
-                      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                        <button id="cookie-reject" style="padding: 0.625rem 1.25rem; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 0.5rem; cursor: pointer; font-weight: 500; font-size: 0.875rem;">
-                          Rechazar
-                        </button>
-                        <button id="cookie-accept" style="padding: 0.625rem 1.25rem; background: linear-gradient(to right, #8b5cf6, #d946ef); color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.875rem;">
-                          Aceptar todas
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                \`;
-                
-                document.body.appendChild(banner);
-                
-                document.getElementById('cookie-accept').addEventListener('click', () => {
-                  localStorage.setItem('cookie-consent', 'accepted');
-                  localStorage.setItem('cookie-consent-date', new Date().toISOString());
-                  banner.remove();
-                  
-                  if (window.gtag) {
-                    window.gtag('consent', 'update', {
-                      'analytics_storage': 'granted',
-                      'ad_storage': 'granted'
-                    });
-                  }
-                  if (window.fbq) {
-                    window.fbq('consent', 'grant');
-                  }
-                });
-                
-                document.getElementById('cookie-reject').addEventListener('click', () => {
-                  localStorage.setItem('cookie-consent', 'rejected');
-                  localStorage.setItem('cookie-consent-date', new Date().toISOString());
-                  banner.remove();
-                  
-                  if (window.gtag) {
-                    window.gtag('consent', 'update', {
-                      'analytics_storage': 'denied',
-                      'ad_storage': 'denied'
-                    });
-                  }
-                });
-              } else if (consent === 'accepted') {
-                if (window.gtag) {
-                  window.gtag('consent', 'update', {
-                    'analytics_storage': 'granted',
-                    'ad_storage': 'granted'
-                  });
-                }
-              }
-            })();
-          `}
-        </Script>
-
-        {/* Trustpilot Widget */}
-        {process.env.NEXT_PUBLIC_TRUSTPILOT_KEY && (
-          <Script
-            src={`https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js`}
-            strategy="lazyOnload"
-          />
-        )}
+        {/* ✅ ANALYTICS - Todos los servicios de tracking modulares */}
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   )
