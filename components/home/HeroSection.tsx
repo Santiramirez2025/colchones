@@ -19,7 +19,7 @@ const CAROUSEL_IMAGES = [
     label: 'Acabado Premium',
     description: 'Tela transpirable de alta calidad',
     category: 'detail',
-    blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
+    blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
     url: '/images/colchongpt1.jpg',
@@ -27,7 +27,7 @@ const CAROUSEL_IMAGES = [
     label: 'Muelles Ensacados',
     description: '275 muelles/m² independientes',
     category: 'technology',
-    blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
+    blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
     url: '/images/colchongpt4.jpg',
@@ -35,9 +35,36 @@ const CAROUSEL_IMAGES = [
     label: 'Confort Total',
     description: 'Diseñado para tu descanso',
     category: 'lifestyle',
-    blurDataURL: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k='
+    blurDataURL: 'data:image/jpeg;base64,...'
+  },
+
+  // ✅ Añadir tres nuevas imágenes
+  {
+    url: '/images/colchongpt5.jpg',
+    alt: 'Espuma viscoelástica de alta densidad que se adapta al contorno del cuerpo',
+    label: 'Viscoelástica HD',
+    description: 'Adaptación ergonómica total',
+    category: 'comfort',
+    blurDataURL: 'data:image/jpeg;base64,...'
+  },
+  {
+    url: '/images/colchongpt6.jpg',
+    alt: 'Capa superior suave con tratamiento antiácaros e hipoalergénico',
+    label: 'Hipoalergénico',
+    description: 'Protección antiácaros',
+    category: 'health',
+    blurDataURL: 'data:image/jpeg;base64,...'
+  },
+  {
+    url: '/images/colchongpt7.jpg',
+    alt: 'Refuerzo perimetral que mejora la estabilidad del colchón',
+    label: 'Refuerzo Perimetral',
+    description: 'Estabilidad en todo el borde',
+    category: 'stability',
+    blurDataURL: 'data:image/jpeg;base64,...'
   }
-]
+];
+
 
 // Datos estructurados JSON-LD para SEO
 const productStructuredData = {
@@ -52,7 +79,7 @@ const productStructuredData = {
   },
   "offers": {
     "@type": "Offer",
-    "url": "https://tudominio.com/producto/colchon-multisac",
+    "url": "https://tiendacolchon.es/producto/colchon-multisac",
     "priceCurrency": "EUR",
     "price": "449",
     "priceValidUntil": "2025-12-31",

@@ -1,9 +1,17 @@
 // components/cart/CartComponents.tsx
 'use client'
 
-import { motion } from 'framer-motion'
-import { Shield, Truck, Award, Star, ChevronRight, Lock, Package, Heart, BadgeCheck } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Shield, Truck, Award, Star, ChevronRight, Lock, Package, Heart, BadgeCheck, Plus, Check, Sparkles, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useCartStore } from '@/lib/store/cart-store'
+import type { Product, ProductVariant } from '@prisma/client'
+
+type ProductWithVariants = Product & {
+  variants: ProductVariant[]
+}
 
 // Progress Bar for Free Shipping
 interface ShippingProgressProps {
@@ -173,50 +181,259 @@ export function UrgencyBanner({ message, type = 'stock' }: UrgencyBannerProps) {
   )
 }
 
-// Upsell Component
+// NEW: Upsell Component - Dynamic Topper
 interface UpsellProps {
   onAdd?: () => void
 }
 
 export function Upsell({ onAdd }: UpsellProps) {
+  const [topper, setTopper] = useState<ProductWithVariants | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [addedToCart, setAddedToCart] = useState(false)
+  const [showVariants, setShowVariants] = useState(false)
+  
+  const { addItem, items } = useCartStore()
+
+  useEffect(() => {
+    const fetchTopper = async () => {
+      try {
+        const response = await fetch('/api/products/upsell/topper')
+        const data = await response.json()
+        
+        if (data.success && data.product) {
+          setTopper(data.product)
+          const popularVariant = data.product.variants.find((v: ProductVariant) => v.isPopular) 
+            || data.product.variants[0]
+          setSelectedVariant(popularVariant)
+        }
+      } catch (error) {
+        console.error('Error loading topper:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchTopper()
+  }, [])
+
+  const handleAddToCart = () => {
+    if (!topper || !selectedVariant) return
+
+    // Verificar si ya está en el carrito - buscar por productId y size
+    const isInCart = items.some(item => 
+      item.productId === topper.id && item.size === selectedVariant.size
+    )
+
+    if (isInCart) {
+      setAddedToCart(true)
+      setTimeout(() => setAddedToCart(false), 2000)
+      return
+    }
+
+    // No pasar 'id' - se genera automáticamente
+    addItem({
+      productId: topper.id,
+      name: topper.name,
+      size: selectedVariant.size,
+      price: selectedVariant.price,
+      originalPrice: selectedVariant.originalPrice || undefined,
+      quantity: 1,
+      image: topper.image,
+      slug: topper.slug,
+      variant: selectedVariant.size
+    })
+
+    setAddedToCart(true)
+    setTimeout(() => setAddedToCart(false), 2000)
+    onAdd?.()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="animate-pulse bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 rounded-xl p-4 border border-white/5">
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-20 bg-zinc-700/50 rounded-lg" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-zinc-700/50 rounded w-2/3" />
+            <div className="h-3 bg-zinc-700/50 rounded w-1/2" />
+          </div>
+          <div className="w-20 h-10 bg-zinc-700/50 rounded-lg" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!topper || !selectedVariant) return null
+
+  const hasDiscount = selectedVariant.originalPrice && selectedVariant.originalPrice > selectedVariant.price
+  const discountPercent = hasDiscount 
+    ? Math.round(((selectedVariant.originalPrice! - selectedVariant.price) / selectedVariant.originalPrice!) * 100)
+    : 0
+
+  // Verificar si ya está en el carrito
+  const isInCart = items.some(item => 
+    item.productId === topper.id && item.size === selectedVariant.size
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl p-4 mb-6"
+      className="relative bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-zinc-900/50 border border-amber-500/20 rounded-xl p-4 overflow-hidden"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <div className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">
-          -10%
+      <div className="absolute -top-1 -right-1">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl shadow-lg flex items-center gap-1">
+          <Sparkles className="w-3 h-3" />
+          RECOMENDADO
         </div>
-        <span className="text-sm font-bold text-gray-900">Completa tu descanso</span>
       </div>
-      
-      <div className="flex items-center gap-4">
-        <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-          <span className="text-2xl">🛏️</span>
-        </div>
-        
-        <div className="flex-1">
-          <h4 className="font-semibold text-gray-900 text-sm mb-1">
-            Almohada Premium Ergonómica
-          </h4>
-          <div className="flex items-center gap-2">
-            <span className="text-gray-400 line-through text-xs">89€</span>
-            <span className="text-indigo-600 font-bold text-sm">80€</span>
+
+      {hasDiscount && (
+        <div className="absolute top-3 left-3 z-10">
+          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-black px-2 py-1 rounded-lg shadow-lg">
+            -{discountPercent}%
           </div>
         </div>
-        
+      )}
+
+      <div className="flex items-center gap-4">
+        <div className="relative w-20 h-20 bg-zinc-800 rounded-lg flex-shrink-0 overflow-hidden border border-white/10">
+          <Image
+            src={topper.image || '/images/placeholder.jpg'}
+            alt={topper.name}
+            fill
+            className="object-cover"
+            sizes="80px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <h4 className="font-black text-white text-sm mb-1 flex items-center gap-2">
+            {topper.name}
+            {topper.rating && topper.rating >= 4.5 && (
+              <div className="flex items-center gap-0.5">
+                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                <span className="text-[10px] text-amber-400 font-bold">{topper.rating}</span>
+              </div>
+            )}
+          </h4>
+          
+          <div className="relative mb-2">
+            <button
+              onClick={() => setShowVariants(!showVariants)}
+              className="w-full text-left px-2 py-1 bg-zinc-800/80 border border-white/10 rounded-lg text-xs text-white font-semibold flex items-center justify-between hover:border-amber-500/30 transition-colors"
+            >
+              <span className="flex items-center gap-1.5">
+                <Package className="w-3 h-3 text-amber-400" />
+                {selectedVariant.size}
+              </span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${showVariants ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {showVariants && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute z-20 w-full mt-1 bg-zinc-900 border border-white/20 rounded-lg shadow-2xl max-h-48 overflow-y-auto"
+                >
+                  {topper.variants.map((variant) => {
+                    const variantDiscount = variant.originalPrice && variant.originalPrice > variant.price
+                    const isSelected = variant.id === selectedVariant.id
+                    
+                    return (
+                      <button
+                        key={variant.id}
+                        onClick={() => {
+                          setSelectedVariant(variant)
+                          setShowVariants(false)
+                        }}
+                        className={`w-full px-3 py-2 text-left hover:bg-amber-500/10 transition-colors flex items-center justify-between ${
+                          isSelected ? 'bg-amber-500/20' : ''
+                        }`}
+                      >
+                        <span className="text-xs font-semibold text-white flex items-center gap-2">
+                          {variant.size}
+                          {variant.isPopular && (
+                            <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded">
+                              Popular
+                            </span>
+                          )}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {variantDiscount && (
+                            <span className="text-[10px] text-zinc-500 line-through">
+                              {variant.originalPrice}€
+                            </span>
+                          )}
+                          <span className="text-xs font-black text-amber-400">
+                            {variant.price}€
+                          </span>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {hasDiscount && (
+              <span className="text-zinc-500 line-through text-xs">
+                {selectedVariant.originalPrice}€
+              </span>
+            )}
+            <span className="text-amber-400 font-black text-base">
+              {selectedVariant.price}€
+            </span>
+          </div>
+        </div>
+
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onAdd}
-          className="px-4 py-2 bg-white border-2 border-indigo-600 text-indigo-600 rounded-lg font-semibold text-sm hover:bg-indigo-50 transition-colors"
+          onClick={handleAddToCart}
+          disabled={addedToCart || isInCart}
+          className={`px-4 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center gap-2 flex-shrink-0 ${
+            addedToCart || isInCart
+              ? 'bg-emerald-500 text-white'
+              : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600'
+          }`}
         >
-          Añadir
+          {addedToCart || isInCart ? (
+            <>
+              <Check className="w-4 h-4" />
+              <span className="hidden sm:inline">Añadido</span>
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Añadir</span>
+            </>
+          )}
         </motion.button>
       </div>
+
+      {topper.highlights && (
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <div className="flex flex-wrap gap-1.5">
+            {JSON.parse(topper.highlights as string).slice(0, 3).map((feature: string, index: number) => (
+              <span
+                key={index}
+                className="text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-300 rounded-full font-semibold"
+              >
+                {feature}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }

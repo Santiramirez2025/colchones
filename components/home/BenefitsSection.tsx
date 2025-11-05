@@ -73,12 +73,12 @@ export function BenefitsSection() {
                 </p>
                 
                 <h3 className="text-4xl md:text-5xl font-black text-white mb-8 leading-tight">
-                  Para mi colchón?
+                Beneficios de nuestros colchones
                 </h3>
 
                 <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
                   <Image
-                    src="/familia-cama.jpg"
+                    src="/capas.jpg"
                     alt="Familia disfrutando en la cama con su colchón"
                     width={600}
                     height={400}
@@ -87,7 +87,7 @@ export function BenefitsSection() {
                 </div>
 
                 <p className="text-zinc-300 text-lg leading-relaxed">
-                  Los detalles importan…Para cuidar de tu colchón puedes <span className="text-white font-bold">utilizar cualquier tipo de cama</span>, excepto las articuladas y somieres de muelles, ya que puede dañarlo.
+                Cada muelle se adapta y amolda a la perfección a cada uno de los puntos de presión generados por el cuerpo. Mejora la posición de tu columna y favorece la circulación sanguínea, previniendo los habituales dolores de espalda.
                 </p>
               </div>
             </div>
