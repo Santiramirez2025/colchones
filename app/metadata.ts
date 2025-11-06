@@ -1,7 +1,7 @@
-// app/metadata.ts - SEO Optimizado e Integrado (Fixed para Next.js 15)
+// lib/metadata.ts - SEO Optimizado e Integrado con Prisma
 import { Metadata } from 'next'
+import { prisma } from '@/lib/prisma'
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants'
-import { HERO_PRODUCT, SOCIAL_PROOF } from '@/lib/product-data'
 
 // ============================================
 // METADATA PRINCIPAL PARA HOME
@@ -12,11 +12,10 @@ export const homeMetadata: Metadata = {
   
   title: {
     default: SEO_DEFAULTS.title,
-    template: `%s | ${SITE_CONFIG.name}` // Para otras páginas
+    template: `%s | ${SITE_CONFIG.name}`
   },
   
   description: SEO_DEFAULTS.description,
-  
   keywords: SEO_DEFAULTS.keywords,
   
   authors: [{ 
@@ -27,7 +26,6 @@ export const homeMetadata: Metadata = {
   creator: SITE_CONFIG.name,
   publisher: SITE_CONFIG.name,
   
-  // Open Graph optimizado
   openGraph: {
     type: 'website',
     locale: 'es_ES',
@@ -46,7 +44,6 @@ export const homeMetadata: Metadata = {
     ],
   },
   
-  // Twitter Card
   twitter: {
     card: 'summary_large_image',
     site: '@tiendacolchon',
@@ -59,7 +56,6 @@ export const homeMetadata: Metadata = {
     },
   },
   
-  // Robots
   robots: {
     index: true,
     follow: true,
@@ -74,16 +70,12 @@ export const homeMetadata: Metadata = {
     },
   },
   
-  // Verification (actualizar con tus códigos reales)
+  // TODO: Actualizar con tus códigos reales de Search Console
   verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    other: {
-      'facebook-domain-verification': 'your-facebook-verification',
-    },
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    // yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
   },
   
-  // Alternates
   alternates: {
     canonical: SITE_CONFIG.url,
     languages: {
@@ -91,17 +83,11 @@ export const homeMetadata: Metadata = {
     },
   },
   
-  // Información adicional
   category: 'Hogar y Descanso',
   classification: 'E-commerce de Colchones',
-  
-  // Manifest
   manifest: '/manifest.json',
-  
-  // App-specific
   applicationName: SITE_CONFIG.name,
   
-  // Icons
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -110,7 +96,6 @@ export const homeMetadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   
-  // Other
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
@@ -119,14 +104,69 @@ export const homeMetadata: Metadata = {
 }
 
 // ============================================
-// STRUCTURED DATA (JSON-LD)
+// STRUCTURED DATA DINÁMICO
 // ============================================
 
-export const structuredData = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    // Organization
-    {
+/**
+ * Obtiene todos los schemas structured data para la home
+ */
+export async function getAllStructuredData() {
+  try {
+    // Fetch datos necesarios en paralelo
+    const [featuredProduct, stats, topReview] = await Promise.all([
+      // Producto destacado para el hero
+      prisma.product.findFirst({
+        where: { 
+          isActive: true,
+          isFeatured: true 
+        },
+        orderBy: { salesCount: 'desc' },
+        select: {
+          name: true,
+          description: true,
+          price: true,
+          originalPrice: true,
+          image: true,
+          slug: true,
+          rating: true,
+          reviewCount: true,
+          warranty: true,
+        }
+      }),
+      
+      // Estadísticas agregadas
+      prisma.product.aggregate({
+        where: { isActive: true },
+        _avg: { rating: true },
+        _sum: { reviewCount: true }
+      }),
+      
+      // Mejor review para mostrar
+      prisma.review.findFirst({
+        where: { 
+          isPublished: true,
+          verified: true,
+          rating: 5
+        },
+        orderBy: { helpfulCount: 'desc' },
+        select: {
+          userName: true,
+          rating: true,
+          comment: true,
+          createdAt: true
+        }
+      })
+    ])
+
+    const avgRating = stats._avg.rating || 4.8
+    const totalReviews = stats._sum.reviewCount || 0
+
+    // Array de schemas
+    const schemas = []
+
+    // 1. Organization Schema
+    schemas.push({
+      '@context': 'https://schema.org',
       '@type': 'Organization',
       '@id': `${SITE_CONFIG.url}/#organization`,
       name: SITE_CONFIG.name,
@@ -142,37 +182,43 @@ export const structuredData = {
       email: `info@${SITE_CONFIG.domain}`,
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Madrid',
+        addressLocality: 'Madrid', // TODO: Actualizar con dirección real
         addressRegion: 'Comunidad de Madrid',
         postalCode: '28001',
-        streetAddress: 'Calle del Descanso 123',
+        streetAddress: 'Calle Ejemplo 123', // TODO: Actualizar
         addressCountry: 'ES',
       },
-      contactPoint: [
-        {
-          '@type': 'ContactPoint',
-          telephone: SITE_CONFIG.phone.number,
-          contactType: 'Atención al Cliente',
-          areaServed: 'ES',
-          availableLanguage: ['Spanish'],
-        },
-      ],
-      aggregateRating: {
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: SITE_CONFIG.phone.number,
+        contactType: 'Atención al Cliente',
+        areaServed: 'ES',
+        availableLanguage: 'Spanish',
+        hoursAvailable: {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '18:00'
+        }
+      },
+      aggregateRating: totalReviews > 0 ? {
         '@type': 'AggregateRating',
-        ratingValue: SOCIAL_PROOF.rating.value.toString(),
-        reviewCount: SOCIAL_PROOF.rating.count.toString(),
+        ratingValue: avgRating.toFixed(1),
+        reviewCount: totalReviews.toString(),
         bestRating: '5',
         worstRating: '1',
-      },
+      } : undefined,
       sameAs: [
-        `https://facebook.com/${SITE_CONFIG.domain.split('.')[0]}`,
-        `https://instagram.com/${SITE_CONFIG.domain.split('.')[0]}`,
-        `https://twitter.com/${SITE_CONFIG.domain.split('.')[0]}`,
-      ],
-    },
-    
-    // Website
-    {
+        // TODO: Añadir tus URLs reales de redes sociales
+        // 'https://facebook.com/tiendacolchon',
+        // 'https://instagram.com/tiendacolchon',
+        // 'https://twitter.com/tiendacolchon',
+      ].filter(Boolean),
+    })
+
+    // 2. WebSite Schema
+    schemas.push({
+      '@context': 'https://schema.org',
       '@type': 'WebSite',
       '@id': `${SITE_CONFIG.url}/#website`,
       url: SITE_CONFIG.url,
@@ -185,88 +231,154 @@ export const structuredData = {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: `${SITE_CONFIG.url}/buscar?q={search_term_string}`,
+          urlTemplate: `${SITE_CONFIG.url}/catalogo?q={search_term_string}`,
         },
         'query-input': 'required name=search_term_string',
       },
-    },
-    
-    // Product (Hero Product)
-    {
-      '@type': 'Product',
-      '@id': `${SITE_CONFIG.url}/#product`,
-      name: HERO_PRODUCT.name,
-      description: HERO_PRODUCT.description,
-      image: `${SITE_CONFIG.url}${HERO_PRODUCT.images.hero}`,
-      brand: {
-        '@type': 'Brand',
-        name: SITE_CONFIG.name,
+    })
+
+    // 3. LocalBusiness Schema (para Google Maps)
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      '@id': `${SITE_CONFIG.url}/#localbusiness`,
+      name: SITE_CONFIG.name,
+      image: `${SITE_CONFIG.url}/logo.png`,
+      url: SITE_CONFIG.url,
+      telephone: SITE_CONFIG.phone.number,
+      priceRange: '€€',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Calle Ejemplo 123', // TODO: Actualizar
+        addressLocality: 'Madrid',
+        postalCode: '28001',
+        addressCountry: 'ES'
       },
-      offers: {
-        '@type': 'Offer',
-        url: SITE_CONFIG.url,
-        priceCurrency: 'EUR',
-        price: HERO_PRODUCT.price.current.toString(),
-        priceValidUntil: '2025-12-31',
-        availability: 'https://schema.org/InStock',
-        itemCondition: 'https://schema.org/NewCondition',
-        seller: {
-          '@id': `${SITE_CONFIG.url}/#organization`,
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '18:00'
+      }
+    })
+
+    // 4. Product Schema (Featured Product)
+    if (featuredProduct) {
+      const nextYear = new Date()
+      nextYear.setFullYear(nextYear.getFullYear() + 1)
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        '@id': `${SITE_CONFIG.url}/producto/${featuredProduct.slug}`,
+        name: featuredProduct.name,
+        description: featuredProduct.description,
+        image: featuredProduct.image.startsWith('http') 
+          ? featuredProduct.image 
+          : `${SITE_CONFIG.url}${featuredProduct.image}`,
+        brand: {
+          '@type': 'Brand',
+          name: SITE_CONFIG.name,
         },
-        shippingDetails: {
-          '@type': 'OfferShippingDetails',
-          shippingRate: {
-            '@type': 'MonetaryAmount',
-            value: '0',
-            currency: 'EUR',
+        offers: {
+          '@type': 'Offer',
+          url: `${SITE_CONFIG.url}/producto/${featuredProduct.slug}`,
+          priceCurrency: 'EUR',
+          price: featuredProduct.price.toFixed(2),
+          priceValidUntil: nextYear.toISOString().split('T')[0],
+          availability: 'https://schema.org/InStock',
+          itemCondition: 'https://schema.org/NewCondition',
+          seller: {
+            '@id': `${SITE_CONFIG.url}/#organization`,
           },
-          deliveryTime: {
-            '@type': 'ShippingDeliveryTime',
-            handlingTime: {
-              '@type': 'QuantitativeValue',
-              minValue: 1,
-              maxValue: 2,
-              unitCode: 'DAY',
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingRate: {
+              '@type': 'MonetaryAmount',
+              value: '0',
+              currency: 'EUR',
+            },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: {
+                '@type': 'QuantitativeValue',
+                minValue: 1,
+                maxValue: 2,
+                unitCode: 'DAY',
+              },
             },
           },
         },
-      },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: SOCIAL_PROOF.rating.value.toString(),
-        reviewCount: SOCIAL_PROOF.rating.count.toString(),
-        bestRating: '5',
-        worstRating: '1',
-      },
-      review: SOCIAL_PROOF.reviews.slice(0, 3).map((review) => ({
-        '@type': 'Review',
-        author: {
-          '@type': 'Person',
-          name: review.name,
-        },
-        datePublished: new Date().toISOString(),
-        reviewBody: review.text,
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: review.rating.toString(),
+        aggregateRating: featuredProduct.reviewCount > 0 ? {
+          '@type': 'AggregateRating',
+          ratingValue: featuredProduct.rating.toFixed(1),
+          reviewCount: featuredProduct.reviewCount.toString(),
           bestRating: '5',
           worstRating: '1',
+        } : undefined,
+        warranty: {
+          '@type': 'WarrantyPromise',
+          durationOfWarranty: {
+            '@type': 'QuantitativeValue',
+            value: featuredProduct.warranty.toString(),
+            unitCode: 'ANN',
+          },
         },
-      })),
-      warranty: {
-        '@type': 'WarrantyPromise',
-        durationOfWarranty: {
-          '@type': 'QuantitativeValue',
-          value: '10',
-          unitCode: 'ANN',
+      })
+    }
+
+    // 5. FAQPage Schema
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Cuánto tiempo tarda el envío?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Realizamos envíos gratuitos en 24-48 horas a toda España peninsular. Para Baleares, Canarias, Ceuta y Melilla el plazo es de 3-5 días laborables.',
+          },
         },
-      },
-    },
-    
-    // Breadcrumb
-    {
+        {
+          '@type': 'Question',
+          name: '¿Qué garantía tienen los colchones?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Todos nuestros colchones incluyen garantía del fabricante de hasta 10 años contra defectos de fabricación. Además, ofrecemos 100 noches de prueba con devolución gratuita si no estás satisfecho.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿Puedo probar el colchón antes de quedármelo?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sí, todos nuestros colchones incluyen 100 noches de prueba. Si no estás satisfecho, recogemos el colchón gratis y te devolvemos el 100% de tu dinero.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué formas de pago aceptan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Aceptamos tarjetas de crédito/débito (Visa, Mastercard, American Express), PayPal, transferencia bancaria y financiación hasta 12 meses sin intereses.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo funciona la devolución?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Si durante las 100 noches de prueba no estás satisfecho, contacta con nosotros y coordinamos la recogida gratuita. Una vez recibido el colchón, procesamos el reembolso completo en 3-5 días laborables.',
+          },
+        },
+      ],
+    })
+
+    // 6. BreadcrumbList Schema
+    schemas.push({
+      '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
-      '@id': `${SITE_CONFIG.url}/#breadcrumb`,
       itemListElement: [
         {
           '@type': 'ListItem',
@@ -275,56 +387,29 @@ export const structuredData = {
           item: SITE_CONFIG.url,
         },
       ],
-    },
+    })
+
+    return schemas
+
+  } catch (error) {
+    console.error('Error generando structured data:', error)
     
-    // FAQ
-    {
-      '@type': 'FAQPage',
-      '@id': `${SITE_CONFIG.url}/#faq`,
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: '¿Cuánto tiempo tarda el envío?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Realizamos envíos gratuitos en 24-48 horas a toda España peninsular. Para Baleares, Canarias, Ceuta y Melilla consultar plazos.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Qué garantía tienen los colchones?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Todos nuestros colchones incluyen 3 años de garantía del fabricante contra defectos de fabricación y hundimientos superiores a 2cm.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Por qué confiar en la calidad de nuestros colchones?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Cómo funciona el test personalizado?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Nuestro test con inteligencia artificial analiza tus preferencias de sueño en 2 minutos y te recomienda los colchones más adecuados según tu peso, postura al dormir, firmeza preferida y necesidades específicas.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: '¿Qué formas de pago aceptan?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Aceptamos tarjetas de crédito/débito (Visa, Mastercard, Amex), PayPal, transferencia bancaria y financiación hasta 12 meses sin intereses.',
-          },
-        },
-      ],
-    },
-  ],
+    // Fallback: schemas mínimos sin datos de BD
+    return [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE_CONFIG.name,
+        url: SITE_CONFIG.url,
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE_CONFIG.name,
+        url: SITE_CONFIG.url,
+      }
+    ]
+  }
 }
 
 // ============================================
@@ -333,38 +418,36 @@ export const structuredData = {
 
 /**
  * Genera metadata para páginas de productos
- * FIXED: Cambiado type de 'product' a 'website' (Next.js 15 no acepta 'product')
  */
 export function generateProductMetadata(product: {
   name: string
   description: string
   price: number
   image: string
-  slug?: string
+  slug: string
 }): Metadata {
-  const url = product.slug 
-    ? `${SITE_CONFIG.url}/producto/${product.slug}`
-    : SITE_CONFIG.url
+  const url = `${SITE_CONFIG.url}/producto/${product.slug}`
 
   return {
     title: `${product.name} - Comprar Online`,
-    description: `${product.description} Precio: ${product.price}€. Envío gratis. Garantía 3 años. Certificados de calidad europea.`,
+    description: `${product.description} Precio: ${product.price}€. Envío gratis en 24-48h. 100 noches de prueba. Hasta 10 años de garantía.`,
     openGraph: {
       title: product.name,
       description: product.description,
       images: [{ 
-        url: product.image, 
+        url: product.image.startsWith('http') ? product.image : `${SITE_CONFIG.url}${product.image}`,
         width: 1200, 
         height: 630,
         alt: product.name
       }],
-      type: 'website', // ✅ FIXED: Cambiado de 'product' a 'website'
+      type: 'website',
       url,
     },
     twitter: {
       card: 'summary_large_image',
       title: product.name,
       description: product.description,
+      images: product.image.startsWith('http') ? product.image : `${SITE_CONFIG.url}${product.image}`,
     },
     alternates: {
       canonical: url,
@@ -378,15 +461,13 @@ export function generateProductMetadata(product: {
 export function generateCategoryMetadata(category: {
   name: string
   description: string
-  slug?: string
+  slug: string
 }): Metadata {
-  const url = category.slug
-    ? `${SITE_CONFIG.url}/categoria/${category.slug}`
-    : SITE_CONFIG.url
+  const url = `${SITE_CONFIG.url}/categoria/${category.slug}`
 
   return {
-    title: `${category.name} - Comprar Online`,
-    description: category.description,
+    title: `${category.name} - Comprar Online con Envío Gratis`,
+    description: `${category.description} Envío gratis en 24-48h. 100 noches de prueba. Hasta 10 años de garantía.`,
     openGraph: {
       title: category.name,
       description: category.description,
@@ -410,14 +491,12 @@ export function generateCategoryMetadata(category: {
 export function generateBlogMetadata(article: {
   title: string
   excerpt: string
-  image: string
+  coverImage?: string
   author: string
-  date: string
-  slug?: string
+  publishedAt: Date
+  slug: string
 }): Metadata {
-  const url = article.slug
-    ? `${SITE_CONFIG.url}/blog/${article.slug}`
-    : SITE_CONFIG.url
+  const url = `${SITE_CONFIG.url}/blog/${article.slug}`
 
   return {
     title: article.title,
@@ -426,14 +505,16 @@ export function generateBlogMetadata(article: {
     openGraph: {
       title: article.title,
       description: article.excerpt,
-      images: [{ 
-        url: article.image, 
-        width: 1200, 
+      images: article.coverImage ? [{
+        url: article.coverImage.startsWith('http') 
+          ? article.coverImage 
+          : `${SITE_CONFIG.url}${article.coverImage}`,
+        width: 1200,
         height: 630,
         alt: article.title
-      }],
+      }] : [],
       type: 'article',
-      publishedTime: article.date,
+      publishedTime: article.publishedAt.toISOString(),
       authors: [article.author],
       url,
     },
@@ -441,9 +522,58 @@ export function generateBlogMetadata(article: {
       card: 'summary_large_image',
       title: article.title,
       description: article.excerpt,
+      images: article.coverImage,
     },
     alternates: {
       canonical: url,
     },
+  }
+}
+
+/**
+ * Genera structured data para un producto específico
+ */
+export function generateProductStructuredData(product: {
+  name: string
+  description: string
+  price: number
+  originalPrice?: number
+  image: string
+  slug: string
+  rating: number
+  reviewCount: number
+  warranty: number
+  sku?: string
+}) {
+  const nextYear = new Date()
+  nextYear.setFullYear(nextYear.getFullYear() + 1)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.image.startsWith('http') ? product.image : `${SITE_CONFIG.url}${product.image}`,
+    sku: product.sku,
+    brand: {
+      '@type': 'Brand',
+      name: SITE_CONFIG.name,
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `${SITE_CONFIG.url}/producto/${product.slug}`,
+      priceCurrency: 'EUR',
+      price: product.price.toFixed(2),
+      priceValidUntil: nextYear.toISOString().split('T')[0],
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+    },
+    aggregateRating: product.reviewCount > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating.toFixed(1),
+      reviewCount: product.reviewCount.toString(),
+      bestRating: '5',
+      worstRating: '1',
+    } : undefined,
   }
 }

@@ -78,7 +78,7 @@ export function BenefitsSection() {
 
                 <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
                   <Image
-                    src="/capas.jpg"
+                    src="/capas4.jpg"
                     alt="Familia disfrutando en la cama con su colchón"
                     width={600}
                     height={400}

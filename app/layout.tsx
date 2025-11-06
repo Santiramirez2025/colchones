@@ -220,7 +220,7 @@ const jsonLd = {
       email: 'info@tiendacolchon.es',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Calle Ejemplo 123',
+        streetAddress: 'Calle de Alcalá',
         addressLocality: 'Madrid',
         addressRegion: 'Comunidad de Madrid',
         postalCode: '28001',
@@ -262,15 +262,22 @@ const jsonLd = {
               value: '0',
               currency: 'EUR'
             },
-            deliveryTime: {
-              '@type': 'ShippingDeliveryTime',
-              handlingTime: {
-                '@type': 'QuantitativeValue',
-                minValue: '24',
-                maxValue: '48',
-                unitCode: 'HUR'
-              }
-            }
+"deliveryTime": {
+  "@type": "ShippingDeliveryTime",
+  "handlingTime": {
+    "@type": "QuantitativeValue",
+    "minValue": 0,
+    "maxValue": 1,
+    "unitCode": "DAY"
+  },
+  "transitTime": {
+    "@type": "QuantitativeValue",
+    "minValue": 3,
+    "maxValue": 10,
+    "unitCode": "DAY"
+  }
+}
+
           }
         }
       ]
@@ -463,24 +470,31 @@ export default function RootLayout({
         />
       </head>
       
-      <body className={`${inter.className} font-sans antialiased bg-zinc-950 text-white overflow-x-hidden`}>
-        {/* Skip to main content - Accesibilidad */}
+      <body 
+        className={`${inter.className} font-sans antialiased bg-zinc-950 text-white min-h-screen flex flex-col`}
+        style={{ 
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+          textRendering: 'optimizeLegibility'
+        }}
+      >
+        {/* Skip to main content - Accesibilidad Mejorado */}
         <a 
           href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-violet-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-violet-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-violet-500/50 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-all duration-200"
         >
           Saltar al contenido principal
         </a>
 
         {/* Auth Provider - Envuelve toda la app */}
         <AuthProvider>
-          {/* Header Component */}
+          {/* Header Component - Sticky con shadow */}
           <Header />
           
-          {/* Main Content */}
+          {/* Main Content - Flex-1 para empujar footer al fondo */}
           <main 
             id="main-content" 
-            className="min-h-screen"
+            className="flex-1 w-full scroll-mt-20"
             role="main"
             aria-label="Contenido principal"
           >

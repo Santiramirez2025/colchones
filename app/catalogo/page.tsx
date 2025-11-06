@@ -14,32 +14,50 @@ export const revalidate = 3600
 
 function CatalogoLoading() {
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <div className="container mx-auto px-4 pt-32 pb-16">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 px-6 py-3 rounded-full mb-8">
-            <Sparkles className="w-5 h-5 text-violet-400 animate-pulse" />
-            <span className="text-sm font-bold text-white">
+    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden scroll-smooth antialiased">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 md:pt-32 pb-16 md:pb-24">
+        {/* Header Section */}
+        <div className="text-center mb-12 md:mb-16">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 px-4 md:px-6 py-2 md:py-3 rounded-full mb-6 md:mb-8 animate-pulse">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-violet-400" />
+            <span className="text-xs md:text-sm font-bold text-white">
               Cargando catálogo premium...
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-black text-white mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
             Nuestros <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Colchones</span>
           </h1>
         </div>
 
         {/* Skeleton Grid Premium */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-3xl overflow-hidden">
-                <div className="h-80 bg-zinc-800/50" />
-                <div className="p-6 space-y-4">
-                  <div className="h-6 bg-zinc-800 rounded w-3/4" />
-                  <div className="h-4 bg-zinc-800 rounded w-1/2" />
-                  <div className="h-10 bg-zinc-800 rounded w-1/3" />
-                  <div className="h-14 bg-zinc-800 rounded" />
+              <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden">
+                {/* Image Skeleton */}
+                <div className="aspect-square bg-zinc-800/50 relative">
+                  <div className="absolute top-3 left-3 right-3 flex justify-between">
+                    <div className="h-6 w-20 bg-zinc-700/50 rounded-lg" />
+                    <div className="h-6 w-6 bg-zinc-700/50 rounded-lg" />
+                  </div>
+                </div>
+                
+                {/* Content Skeleton */}
+                <div className="p-4 md:p-6 space-y-3 md:space-y-4">
+                  <div className="space-y-2">
+                    <div className="h-5 md:h-6 bg-zinc-800/70 rounded-lg w-3/4" />
+                    <div className="h-3 md:h-4 bg-zinc-800/50 rounded w-1/2" />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 md:h-10 bg-zinc-800/70 rounded-lg w-24" />
+                    <div className="h-6 md:h-8 bg-zinc-800/50 rounded w-16" />
+                  </div>
+                  
+                  <div className="pt-2">
+                    <div className="h-12 md:h-14 bg-zinc-800/70 rounded-xl w-full" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -56,22 +74,27 @@ export default async function CatalogoPage() {
 
   if (!products || products.length === 0) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 mb-8">
-            <Zap className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-            Catálogo en construcción
-          </h1>
-          <p className="text-zinc-400 text-lg mb-8 max-w-md mx-auto">
-            Estamos preparando nuestra colección premium. Vuelve pronto.
-          </p>
-          <div className="inline-block bg-zinc-900 border border-white/10 rounded-2xl p-6">
-            <p className="text-zinc-400 text-sm mb-3">💡 Desarrolladores: Ejecuta el seed</p>
-            <code className="text-violet-400 font-mono text-sm">
-              npx prisma db seed
-            </code>
+      <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden scroll-smooth antialiased flex items-center justify-center">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 mb-6 md:mb-8 shadow-xl shadow-violet-500/30">
+              <Zap className="w-8 h-8 md:w-10 md:h-10 text-white" />
+            </div>
+            
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 md:mb-4 leading-tight">
+              Catálogo en construcción
+            </h1>
+            
+            <p className="text-zinc-400 text-base md:text-lg mb-6 md:mb-8 max-w-md mx-auto">
+              Estamos preparando nuestra colección premium. Vuelve pronto.
+            </p>
+            
+            <div className="inline-block bg-zinc-900 border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6">
+              <p className="text-zinc-400 text-xs md:text-sm mb-2 md:mb-3">💡 Desarrolladores: Ejecuta el seed</p>
+              <code className="text-violet-400 font-mono text-xs md:text-sm break-all">
+                npx prisma db seed
+              </code>
+            </div>
           </div>
         </div>
       </div>
@@ -106,8 +129,10 @@ export default async function CatalogoPage() {
   })
 
   return (
-    <Suspense fallback={<CatalogoLoading />}>
-      <CatalogoClient initialProducts={normalizedProducts} />
-    </Suspense>
+    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden scroll-smooth antialiased">
+      <Suspense fallback={<CatalogoLoading />}>
+        <CatalogoClient initialProducts={normalizedProducts} />
+      </Suspense>
+    </div>
   )
 }

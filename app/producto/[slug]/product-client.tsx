@@ -1,4 +1,3 @@
-// app/producto/[slug]/product-client.tsx - VERSIÓN OPTIMIZADA
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -65,7 +64,6 @@ export default function ProductClient({
   // COMPUTED
   const currentPrice = selectedVariant?.price || product.price
   const originalPrice = selectedVariant?.originalPrice || product.originalPrice
-  const monthlyPayment = Math.round(currentPrice / 12)
   const savings = originalPrice ? originalPrice - currentPrice : 0
   const discountPercent = originalPrice 
     ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
@@ -108,14 +106,9 @@ export default function ProductClient({
       isBestSeller: product.isBestSeller
     })
 
-    // Mostrar toast de confirmación
     setShowAddedToast(true)
     setTimeout(() => setShowAddedToast(false), 3000)
-
-    // Navegar al carrito después de 1 segundo
-    setTimeout(() => {
-      router.push('/carrito')
-    }, 1000)
+    setTimeout(() => router.push('/carrito'), 1000)
   }
 
   const handleShare = async (platform?: string) => {
@@ -149,10 +142,10 @@ export default function ProductClient({
     }
   }
 
-  const faqs = generateFaqs(product, monthlyPayment)
+  const faqs = generateFaqs(product)
   
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden scroll-smooth antialiased">
       {/* Toast de confirmación */}
       <AnimatePresence>
         {showAddedToast && (
@@ -174,7 +167,7 @@ export default function ProductClient({
       {/* Breadcrumbs */}
       <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-      {/* Sticky Bar - Simplificado para móvil */}
+      {/* Sticky Bar */}
       <StickyBar 
         show={showStickyBar}
         product={product}
@@ -187,8 +180,8 @@ export default function ProductClient({
         currentImage={currentImage}
       />
 
-      <div className="container mx-auto px-4 py-8 md:py-12" ref={productRef}>
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12 md:mb-16">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12" ref={productRef}>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-16 md:mb-24">
           {/* Image Gallery */}
           <ImageGallery
             images={images}
@@ -209,7 +202,6 @@ export default function ProductClient({
             currentPrice={currentPrice}
             originalPrice={originalPrice}
             savings={savings}
-            monthlyPayment={monthlyPayment}
             stockInfo={stockInfo}
             variants={variants}
             selectedVariant={selectedVariant}
@@ -227,32 +219,38 @@ export default function ProductClient({
           />
         </div>
 
-        {/* Tabs Section - Simplificado para móvil */}
-        <TabsSection
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          product={product}
-          reviews={reviews}
-          averageRatings={averageRatings}
-          faqs={faqs}
-          expandedFaq={expandedFaq}
-          setExpandedFaq={setExpandedFaq}
-        />
+        {/* Tabs Section */}
+        <section className="border-t border-white/10 py-16 md:py-24">
+          <TabsSection
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            product={product}
+            reviews={reviews}
+            averageRatings={averageRatings}
+            faqs={faqs}
+            expandedFaq={expandedFaq}
+            setExpandedFaq={setExpandedFaq}
+          />
+        </section>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <RelatedProducts 
-            products={relatedProducts}
-            title="También te puede interesar"
-          />
+          <section className="border-t border-white/10 py-16 md:py-24">
+            <RelatedProducts 
+              products={relatedProducts}
+              title="También te puede interesar"
+            />
+          </section>
         )}
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (
-          <RelatedProducts 
-            products={similarProducts}
-            title="Colchones con firmeza similar"
-          />
+          <section className="border-t border-white/10 py-16 md:py-24">
+            <RelatedProducts 
+              products={similarProducts}
+              title="Colchones con firmeza similar"
+            />
+          </section>
         )}
       </div>
 
@@ -303,7 +301,7 @@ function calculateRatings(reviews: any[], productRating?: number) {
   }
 }
 
-function generateFaqs(product: any, monthlyPayment: number) {
+function generateFaqs(product: any) {
   return [
     {
       q: '¿Cuánto tarda en llegar el colchón?',
@@ -320,10 +318,6 @@ function generateFaqs(product: any, monthlyPayment: number) {
     {
       q: '¿El colchón viene comprimido?',
       a: 'Sí, viene enrollado en caja para facilitar el transporte. Se expande en 24-48h tras desembalarlo.'
-    },
-    {
-      q: '¿Puedo financiar la compra?',
-      a: `Sí, ofrecemos financiación en 12 meses sin intereses. Pagarías ${monthlyPayment}€/mes.`
     }
   ]
 }
@@ -335,7 +329,7 @@ function generateFaqs(product: any, monthlyPayment: number) {
 function Breadcrumbs({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
   return (
     <div className="border-b border-white/10 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-40">
-      <div className="container mx-auto px-4 py-3 md:py-4">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center gap-2 text-xs md:text-sm text-zinc-400 overflow-x-auto">
           {breadcrumbs.map((crumb: Breadcrumb, index: number) => (
             <div key={crumb.href} className="flex items-center gap-2 flex-shrink-0">
@@ -375,9 +369,9 @@ function StickyBar({
           exit={{ y: -100 }}
           className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-zinc-900 to-zinc-950 border-b border-white/10 backdrop-blur-xl shadow-2xl"
         >
-          <div className="container mx-auto px-4 py-3">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between gap-3">
-              {/* Producto info - Más compacto en móvil */}
+              {/* Producto info */}
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-zinc-800 overflow-hidden flex-shrink-0 relative">
                   {currentImage ? (
@@ -402,9 +396,8 @@ function StickyBar({
                 </div>
               </div>
 
-              {/* Controles - Simplificados para móvil */}
+              {/* Controles */}
               <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-                {/* Cantidad solo en desktop */}
                 <div className="hidden md:flex items-center border border-white/10 rounded-xl overflow-hidden">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -421,7 +414,6 @@ function StickyBar({
                   </button>
                 </div>
 
-                {/* Botón de añadir al carrito */}
                 <button
                   onClick={handleAddToCart}
                   disabled={isOutOfStock}
@@ -593,7 +585,6 @@ function ProductInfo({
   currentPrice, 
   originalPrice, 
   savings,
-  monthlyPayment,
   stockInfo,
   variants,
   selectedVariant,
@@ -650,9 +641,9 @@ function ProductInfo({
         </div>
       </div>
 
-      {/* Precio */}
+      {/* Precio - SIN financiación */}
       <div className="mb-6 md:mb-8 p-4 md:p-6 bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl md:rounded-3xl border border-white/10">
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between">
           <div>
             <div className="flex items-baseline gap-3 md:gap-4 mb-2">
               <span className="text-4xl md:text-6xl font-black text-white">{currentPrice}€</span>
@@ -677,19 +668,6 @@ function ProductInfo({
               </div>
             </div>
           )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 md:gap-4">
-          <div className="p-3 md:p-4 bg-white/5 rounded-xl border border-white/10">
-            <p className="text-zinc-400 text-xs md:text-sm mb-1">Financiación 0%</p>
-            <p className="text-xl md:text-2xl font-black text-white">{monthlyPayment}€<span className="text-sm md:text-lg font-normal text-zinc-400">/mes</span></p>
-            <p className="text-[10px] md:text-xs text-zinc-500 mt-1">12 meses sin intereses</p>
-          </div>
-          <div className="p-3 md:p-4 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl">
-            <p className="text-zinc-400 text-xs md:text-sm mb-1">Por solo</p>
-            <p className="text-xl md:text-2xl font-black text-white">{Math.round(currentPrice / 365)}€<span className="text-sm md:text-lg font-normal text-zinc-400">/día</span></p>
-            <p className="text-[10px] md:text-xs text-zinc-500 mt-1">Durante 1 año</p>
-          </div>
         </div>
       </div>
 
@@ -851,7 +829,7 @@ function ProductInfo({
         </div>
       </div>
 
-      {/* Key Features - Simplificado */}
+      {/* Key Features */}
       <div className="mb-6 md:mb-8 p-4 md:p-6 bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 rounded-xl md:rounded-2xl border border-white/10">
         <h3 className="font-black text-white mb-3 md:mb-4 flex items-center gap-2 text-sm md:text-base">
           <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-violet-400" />
@@ -896,10 +874,10 @@ function TabsSection({ activeTab, setActiveTab, product, reviews, averageRatings
   const highlights = Array.isArray(product.highlights) ? product.highlights : []
 
   return (
-    <div className="mb-12 md:mb-16">
+    <div>
       {/* Tabs - Scrollable en móvil */}
-      <div className="border-b border-white/10 mb-6 md:mb-8 overflow-x-auto">
-        <div className="flex gap-4 md:gap-8 min-w-max px-4 md:px-0">
+      <div className="border-b border-white/10 mb-8 md:mb-12 overflow-x-auto">
+        <div className="flex gap-4 md:gap-8 min-w-max">
           {[
             { id: 'description', label: 'Descripción', icon: Info },
             { id: 'specs', label: 'Especificaciones', icon: Package },
@@ -951,7 +929,7 @@ function TabsSection({ activeTab, setActiveTab, product, reviews, averageRatings
 }
 
 // ============================================================================
-// TAB COMPONENTS - Simplificados
+// TAB COMPONENTS
 // ============================================================================
 
 function DescriptionTab({ product }: { product: any }) {
@@ -1239,7 +1217,7 @@ function FaqTab({ faqs, expandedFaq, setExpandedFaq }: {
 
 function RelatedProducts({ products, title }: { products: any[]; title: string }) {
   return (
-    <div className="mb-12 md:mb-16">
+    <div>
       <h2 className="text-2xl md:text-4xl font-black text-white mb-6 md:mb-8 flex items-center gap-2 md:gap-3">
         <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-violet-400" />
         {title}
@@ -1376,7 +1354,6 @@ const styles = `
   }
 `
 
-// Inyectar estilos
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement('style')
   styleSheet.textContent = styles

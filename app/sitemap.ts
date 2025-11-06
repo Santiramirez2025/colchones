@@ -1,175 +1,236 @@
-// app/sitemap.ts - Sitemap optimizado profesional
+// app/sitemap.ts - Optimizado con Prisma
 import { MetadataRoute } from 'next'
-
-const BASE_URL = 'https://www.tiendacolchon.es'
-const NOW = new Date()
-
-// ============================================
-// CONFIGURACIÓN DE PRIORIDADES SEO
-// ============================================
-const PRIORITIES = {
-  HOME: 1.0,
-  PRODUCTS_LIST: 0.9,
-  PRODUCT_PAGE: 0.9,
-  CATEGORIES: 0.8,
-  BLOG: 0.7,
-  BLOG_POST: 0.6,
-  INFO_PAGES: 0.6,
-  LEGAL: 0.3
-} as const
-
-const FREQUENCIES = {
-  DAILY: 'daily',
-  WEEKLY: 'weekly',
-  MONTHLY: 'monthly',
-  YEARLY: 'yearly'
-} as const
-
-// ============================================
-// HELPER FUNCTION
-// ============================================
-const createUrl = (
-  path: string, 
-  priority: number, 
-  changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
-  lastModified: Date = NOW
-): MetadataRoute.Sitemap[number] => ({
-  url: `${BASE_URL}${path}`,
-  lastModified,
-  changeFrequency,
-  priority
-})
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // ============================================
-  // PÁGINAS PRINCIPALES
-  // ============================================
-  const mainPages: MetadataRoute.Sitemap = [
-    createUrl('/', PRIORITIES.HOME, FREQUENCIES.DAILY),
-    createUrl('/productos', PRIORITIES.PRODUCTS_LIST, FREQUENCIES.DAILY),
-    createUrl('/blog', PRIORITIES.BLOG, FREQUENCIES.WEEKLY),
-  ]
-
-  // ============================================
-  // CATEGORÍAS DE PRODUCTOS
-  // ============================================
-  const categories = [
-    'colchones-viscoelasticos',
-    'colchones-muelles-ensacados',
-    'colchones-hibridos',
-    'colchones-latex',
-    'almohadas',
-    'bases-somieres'
-  ]
-
-  const categoryPages: MetadataRoute.Sitemap = categories.map(slug =>
-    createUrl(`/categoria/${slug}`, PRIORITIES.CATEGORIES, FREQUENCIES.WEEKLY)
-  )
-
-  // ============================================
-  // PRODUCTOS DESTACADOS
-  // ============================================
-  const products = [
-    'colchon-multisac-premium',
-    'colchon-viscoelastico-adaptable',
-    'colchon-hibrido-comfort',
-    'colchon-latex-natural',
-    'almohada-viscoelastica'
-  ]
-
-  const productPages: MetadataRoute.Sitemap = products.map(slug =>
-    createUrl(`/producto/${slug}`, PRIORITIES.PRODUCT_PAGE, FREQUENCIES.WEEKLY)
-  )
-
-  // ============================================
-  // BLOG POSTS
-  // ============================================
-  const blogPosts = [
-    'como-elegir-colchon-perfecto',
-    'guia-firmeza-colchones',
-    'mejor-colchon-dolor-espalda',
-    'diferencias-colchon-viscoelastico-muelles'
-  ]
-
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map(slug =>
-    createUrl(`/blog/${slug}`, PRIORITIES.BLOG_POST, FREQUENCIES.MONTHLY)
-  )
-
-  // ============================================
-  // PÁGINAS INFORMATIVAS
-  // ============================================
-  const infoPages = [
-    { path: '/sobre-nosotros', freq: FREQUENCIES.MONTHLY },
-    { path: '/contacto', freq: FREQUENCIES.MONTHLY },
-    { path: '/preguntas-frecuentes', freq: FREQUENCIES.MONTHLY },
-    { path: '/garantia', freq: FREQUENCIES.MONTHLY },
-    { path: '/envios', freq: FREQUENCIES.MONTHLY },
-    { path: '/devoluciones', freq: FREQUENCIES.MONTHLY }
-  ]
-
-  const infoSitemap: MetadataRoute.Sitemap = infoPages.map(page =>
-    createUrl(page.path, PRIORITIES.INFO_PAGES, page.freq)
-  )
-
-  // ============================================
-  // PÁGINAS LEGALES
-  // ============================================
-  const legalPages: MetadataRoute.Sitemap = [
-    '/politica-privacidad',
-    '/terminos-condiciones',
-    '/politica-cookies'
-  ].map(path => createUrl(path, PRIORITIES.LEGAL, FREQUENCIES.YEARLY))
-
-  // ============================================
-  // COMBINAR TODO
-  // ============================================
-  return [
-    ...mainPages,
-    ...categoryPages,
-    ...productPages,
-    ...blogPages,
-    ...infoSitemap,
-    ...legalPages
-  ]
-}
-
-// ============================================
-// NOTA: INTEGRACIÓN CON BASE DE DATOS
-// ============================================
-/*
-Para sitios con muchos productos, usa tu base de datos:
-
 import { prisma } from '@/lib/prisma'
 
-// Dentro de sitemap():
-const dbProducts = await prisma.product.findMany({
-  where: { published: true },
-  select: { slug: true, updatedAt: true }
-})
+const BASE_URL = 'https://www.tiendacolchon.es'
+export const revalidate = 3600 // Regenerar cada hora
 
-const productPages = dbProducts.map(product =>
-  createUrl(
-    `/producto/${product.slug}`,
-    PRIORITIES.PRODUCT_PAGE,
-    FREQUENCIES.WEEKLY,
-    product.updatedAt
-  )
-)
-*/
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  try {
+    // Fetch paralelo de toda la data
+    const [products, categories, blogPosts] = await Promise.all([
+      prisma.product.findMany({
+        where: { isActive: true },
+        select: { 
+          slug: true, 
+          updatedAt: true,
+          isBestSeller: true,
+          isFeatured: true 
+        },
+        orderBy: { updatedAt: 'desc' }
+      }),
+      prisma.category.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+        orderBy: { order: 'asc' }
+      }),
+      prisma.blogPost.findMany({
+        where: { isPublished: true },
+        select: { slug: true, publishedAt: true, updatedAt: true },
+        orderBy: { publishedAt: 'desc' }
+      })
+    ])
 
-// ============================================
-// VERIFICACIÓN
-// ============================================
-/*
-1. Verifica tu sitemap en:
-   https://www.tiendacolchon.es/sitemap.xml
+    const now = new Date()
 
-2. Envía a Google Search Console:
-   - https://search.google.com/search-console
+    return [
+      // 1. HOME - Máxima prioridad
+      {
+        url: BASE_URL,
+        lastModified: now,
+        changeFrequency: 'daily',
+        priority: 1.0
+      },
 
-3. Valida con:
-   - https://www.xml-sitemaps.com/validate-xml-sitemap.html
+      // 2. PÁGINAS PRINCIPALES
+      {
+        url: `${BASE_URL}/catalogo`,
+        lastModified: now,
+        changeFrequency: 'daily',
+        priority: 0.9
+      },
+      {
+        url: `${BASE_URL}/comparador`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.85
+      },
+      {
+        url: `${BASE_URL}/guia-compra`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.8
+      },
+      {
+        url: `${BASE_URL}/simulador`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.75
+      },
 
-4. Robots.txt debe incluir:
-   Sitemap: https://www.tiendacolchon.es/sitemap.xml
-*/
+      // 3. CATEGORÍAS - Alta prioridad
+      ...categories.map(cat => ({
+        url: `${BASE_URL}/categoria/${cat.slug}`,
+        lastModified: cat.updatedAt,
+        changeFrequency: 'weekly' as const,
+        priority: 0.85
+      })),
+
+      // 4. PRODUCTOS - Prioridad diferenciada
+      ...products.map(prod => ({
+        url: `${BASE_URL}/producto/${prod.slug}`,
+        lastModified: prod.updatedAt,
+        changeFrequency: 'weekly' as const,
+        priority: prod.isBestSeller || prod.isFeatured ? 0.9 : 0.8
+      })),
+
+      // 5. BLOG
+      {
+        url: `${BASE_URL}/blog`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7
+      },
+      ...blogPosts.map(post => ({
+        url: `${BASE_URL}/blog/${post.slug}`,
+        lastModified: post.publishedAt || post.updatedAt,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6
+      })),
+
+      // 6. GUÍAS Y CONTENIDO
+      {
+        url: `${BASE_URL}/cuidado-colchon`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
+      },
+      {
+        url: `${BASE_URL}/higiene-sueno`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
+      },
+      {
+        url: `${BASE_URL}/dormir-rapido`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
+      },
+      {
+        url: `${BASE_URL}/dormitorio-perfecto`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
+      },
+
+      // 7. PÁGINAS INSTITUCIONALES
+      {
+        url: `${BASE_URL}/nosotros`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.6
+      },
+      {
+        url: `${BASE_URL}/profesional`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.55
+      },
+      {
+        url: `${BASE_URL}/opiniones`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7
+      },
+
+      // 8. SERVICIO AL CLIENTE
+      {
+        url: `${BASE_URL}/contacto`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.5
+      },
+      {
+        url: `${BASE_URL}/preguntas-frecuentes`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.6
+      },
+      {
+        url: `${BASE_URL}/envios`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.5
+      },
+      {
+        url: `${BASE_URL}/devoluciones`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.5
+      },
+      {
+        url: `${BASE_URL}/garantia`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.5
+      },
+
+      // 9. PÁGINAS LEGALES - Baja prioridad
+      {
+        url: `${BASE_URL}/privacidad`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3
+      },
+      {
+        url: `${BASE_URL}/terminos`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3
+      },
+      {
+        url: `${BASE_URL}/condiciones-compra`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3
+      },
+      {
+        url: `${BASE_URL}/cookies`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3
+      },
+      {
+        url: `${BASE_URL}/aviso-legal`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3
+      }
+    ]
+  } catch (error) {
+    console.error('Error generando sitemap:', error)
+    
+    // Fallback: devolver solo páginas principales
+    return [
+      {
+        url: BASE_URL,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 1.0
+      },
+      {
+        url: `${BASE_URL}/catalogo`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.9
+      },
+      {
+        url: `${BASE_URL}/contacto`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.5
+      }
+    ]
+  }
+}

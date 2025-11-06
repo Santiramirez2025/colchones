@@ -126,7 +126,7 @@ export async function getProducts(options?: {
 }): Promise<PaginatedResult<ProductWithCategory>> {
   try {
     const page = options?.page || 1
-    const limit = options?.limit || 20
+    const limit = options?.limit || 100
     const skip = (page - 1) * limit
 
     const where: Prisma.ProductWhereInput = { isActive: true }
