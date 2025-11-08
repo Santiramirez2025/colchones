@@ -38,7 +38,7 @@ export function BenefitsSection() {
 
                 <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
                   <Image
-                    src="/colchon-enrollado.jpg"
+                    src="/entregasegura.jpg"
                     alt="Colchón enrollado para transporte seguro"
                     width={600}
                     height={400}
@@ -78,7 +78,7 @@ export function BenefitsSection() {
 
                 <div className="mb-8 rounded-2xl overflow-hidden shadow-xl">
                   <Image
-                    src="/capas4.jpg"
+                    src="/resortespocket2.jpg"
                     alt="Familia disfrutando en la cama con su colchón"
                     width={600}
                     height={400}

@@ -14,7 +14,7 @@ import { useScrollProgress } from '@/lib/hooks/useScrollProgress'
 // Imágenes del carousel optimizadas
 const CAROUSEL_IMAGES = [
   {
-    url: '/images/colchongpt.jpg',
+    url: '/images/astralnature1.jpg',
     alt: 'Colchón Multisac® Premium - Vista detallada del acabado de alta calidad con tela transpirable',
     label: 'Acabado Premium',
     description: 'Tela transpirable de alta calidad',
@@ -22,15 +22,15 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
-    url: '/images/colchongpt1.jpg',
-    alt: 'Tecnología de muelles ensacados independientes del colchón Multisac® - 275 muelles por metro cuadrado',
-    label: 'Muelles Ensacados',
-    description: '275 muelles/m² independientes',
+    url: '/images/astralnature2.jpg',
+    alt: 'Tecnología de Resortes Pocket independientes del colchón Multisac® - 275 resortes por metro cuadrado',
+    label: 'Resortes Pocket',
+    description: '275 resortes/m² independientes',
     category: 'technology',
     blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
-    url: '/images/colchongpt4.jpg',
+    url: '/images/astralnature3.jpg',
     alt: 'Colchón Multisac® en dormitorio moderno - Confort total diseñado para tu mejor descanso',
     label: 'Confort Total',
     description: 'Diseñado para tu descanso',
@@ -40,7 +40,7 @@ const CAROUSEL_IMAGES = [
 
   // ✅ Añadir tres nuevas imágenes
   {
-    url: '/images/colchongpt5.jpg',
+    url: '/images/astralnature4.jpg',
     alt: 'Espuma viscoelástica de alta densidad que se adapta al contorno del cuerpo',
     label: 'Viscoelástica HD',
     description: 'Adaptación ergonómica total',
@@ -48,7 +48,7 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
-    url: '/images/colchongpt6.jpg',
+    url: '/images/astralnature5.jpg',
     alt: 'Capa superior suave con tratamiento antiácaros e hipoalergénico',
     label: 'Hipoalergénico',
     description: 'Protección antiácaros',
@@ -56,7 +56,7 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,...'
   },
   {
-    url: '/images/colchongpt7.jpg',
+    url: '/images/astralnature6.jpg',
     alt: 'Refuerzo perimetral que mejora la estabilidad del colchón',
     label: 'Refuerzo Perimetral',
     description: 'Estabilidad en todo el borde',
@@ -64,7 +64,6 @@ const CAROUSEL_IMAGES = [
     blurDataURL: 'data:image/jpeg;base64,...'
   }
 ];
-
 
 // Datos estructurados JSON-LD para SEO
 const productStructuredData = {
