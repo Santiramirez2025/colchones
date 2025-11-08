@@ -60,7 +60,7 @@ export type PaginatedResult<T> = {
  * Parsear un producto de Prisma a ProductWithParsedJson
  */
 function parseProduct<T extends Product>(product: T): ParsedProduct<T> {
-  const parsed = {
+  return {
     ...product,
     features: parseJsonField(product.features),
     techFeatures: parseJsonField(product.techFeatures),
@@ -71,15 +71,6 @@ function parseProduct<T extends Product>(product: T): ParsedProduct<T> {
     materials: parseJsonField(product.materials),
     layers: parseJsonField(product.layers),
   } as ParsedProduct<T>
-  
-  // 🔍 DEBUG: Verifica que las imágenes se parsean correctamente
-  console.log('🖼️ Images parsed:', {
-    original: product.images,
-    parsed: parsed.images,
-    isArray: Array.isArray(parsed.images)
-  })
-  
-  return parsed
 }
 
 /**
@@ -200,7 +191,7 @@ export const getAllProductsSlugs = unstable_cache(
   },
   ['all-products-slugs'],
   { 
-    revalidate: 3600, // 1 hora
+    revalidate: 3600,
     tags: ['products']
   }
 )
@@ -250,7 +241,7 @@ export const getProductBySlug = unstable_cache(
   },
   ['product-by-slug'],
   { 
-    revalidate: 1800, // 30 minutos
+    revalidate: 1800,
     tags: ['products', 'reviews']
   }
 )
@@ -411,7 +402,6 @@ export const getFeaturedProducts = unstable_cache(
 
 /**
  * Obtener productos populares para generateStaticParams - CON CACHÉ
- * NUEVA FUNCIÓN AGREGADA
  */
 export const getPopularProducts = unstable_cache(
   async (limit: number = 50) => {
@@ -447,13 +437,14 @@ export const getPopularProducts = unstable_cache(
   },
   ['popular-products'],
   { 
-    revalidate: 3600, // 1 hora
+    revalidate: 3600,
     tags: ['products']
   }
 )
 
 /**
- * Buscar productos - OPTIMIZADO para SQLite (sin mode: insensitive)
+ * Buscar productos - CASE-INSENSITIVE para SQLite
+ * 🔥 VERSIÓN CORREGIDA - Filtra en memoria para búsqueda case-insensitive
  */
 export async function searchProducts(
   query: string,
@@ -467,24 +458,15 @@ export async function searchProducts(
       return []
     }
 
-    const searchTerm = query.trim()
+    const searchTerm = query.trim().toLowerCase()
     const limit = options?.limit || 50
 
-    const where: Prisma.ProductWhereInput = {
-      isActive: true,
-      OR: [
-        { name: { contains: searchTerm } },
-        { subtitle: { contains: searchTerm } },
-        { description: { contains: searchTerm } },
-      ]
-    }
-
-    if (options?.categoryId) {
-      where.categoryId = options.categoryId
-    }
-    
-    const products = await prisma.product.findMany({
-      where,
+    // Obtener todos los productos activos
+    const allProducts = await prisma.product.findMany({
+      where: {
+        isActive: true,
+        ...(options?.categoryId && { categoryId: options.categoryId })
+      },
       include: {
         category: true
       },
@@ -492,11 +474,19 @@ export async function searchProducts(
         { isBestSeller: 'desc' },
         { rating: 'desc' },
         { reviewCount: 'desc' }
-      ],
-      take: limit
+      ]
     })
+
+    // Filtrar en memoria (case-insensitive)
+    const filtered = allProducts.filter(p => 
+      p.name.toLowerCase().includes(searchTerm) ||
+      p.subtitle?.toLowerCase().includes(searchTerm) ||
+      p.description?.toLowerCase().includes(searchTerm)
+    ).slice(0, limit)
+
+    console.log(`🔍 Search "${searchTerm}": ${filtered.length} products found`)
     
-    return products.map(parseProductWithCategory)
+    return filtered.map(parseProductWithCategory)
   } catch (error) {
     console.error('Error searching products:', error)
     return []
@@ -514,12 +504,10 @@ export async function filterProducts(
       isActive: true
     }
 
-    // Filtro de firmeza
     if (options.firmness && options.firmness !== 'Todas') {
       where.firmness = options.firmness as any
     }
 
-    // Filtro de precio
     if (options.minPrice !== undefined || options.maxPrice !== undefined) {
       where.price = {}
       if (options.minPrice !== undefined) {
@@ -530,24 +518,20 @@ export async function filterProducts(
       }
     }
 
-    // Filtro de rating
     if (options.minRating !== undefined) {
       where.rating = {
         gte: options.minRating
       }
     }
 
-    // Filtro de categoría
     if (options.categoryId) {
       where.categoryId = options.categoryId
     }
 
-    // Filtro de stock
     if (options.inStock !== undefined) {
       where.inStock = options.inStock
     }
 
-    // Filtros booleanos adicionales
     if (options.isEco) {
       where.isEco = true
     }
@@ -558,7 +542,6 @@ export async function filterProducts(
       where.hypoallergenic = true
     }
 
-    // Configurar ordenamiento
     let orderBy: Prisma.ProductOrderByWithRelationInput[] = [
       { position: 'asc' },
       { isBestSeller: 'desc' },
@@ -717,7 +700,7 @@ export const getCategories = unstable_cache(
   },
   ['categories-list'],
   { 
-    revalidate: 7200, // 2 horas
+    revalidate: 7200,
     tags: ['categories']
   }
 )
@@ -727,7 +710,6 @@ export const getCategories = unstable_cache(
  */
 export async function getProductRatings(productId: string) {
   try {
-    // Usar aggregate para cálculos eficientes
     const [avgResult, distribution] = await Promise.all([
       prisma.review.aggregate({
         where: {
@@ -757,7 +739,6 @@ export async function getProductRatings(productId: string) {
       })
     ])
 
-    // Construir distribución
     const dist: Record<number, number> = {
       5: 0, 4: 0, 3: 0, 2: 0, 1: 0
     }
@@ -793,7 +774,6 @@ export async function getProductRatings(productId: string) {
  * Incrementar contador de vistas - Fire and forget
  */
 export function incrementProductViews(productId: string): void {
-  // Fire and forget - no bloquea la respuesta
   prisma.product.update({
     where: { id: productId },
     data: {

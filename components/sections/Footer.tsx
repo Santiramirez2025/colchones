@@ -115,8 +115,8 @@ export default function Footer() {
   }
 
   const quickLinks = [
-    { href: '/productos', label: 'Catálogo' },
-    { href: '/como-comprar', label: 'Cómo comprar' },
+    { href: '/catalogo', label: 'Catálogo' },
+    { href: '/guia-compra', label: 'Cómo comprar' },
     { href: '/envios', label: 'Envíos y entregas' },
     { href: '/garantia', label: 'Garantía' },
     { href: '/opiniones', label: 'Opiniones' },
@@ -323,7 +323,7 @@ export default function Footer() {
               <h3 className="text-xs font-bold text-violet-400 mb-4 uppercase tracking-wider">Empresa</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/sobre-nosotros" className="text-sm hover:text-white transition-colors inline-flex items-center group">
+                  <Link href="/nosotros" className="text-sm hover:text-white transition-colors inline-flex items-center group">
                     <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-gray-700 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all" />
                     Sobre nosotros
                   </Link>
