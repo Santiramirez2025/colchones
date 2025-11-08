@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Sparkles, Check, Heart, TrendingUp } from 'lucide-react'
-import ProductCard from '../../components/ui/ProductCard'
+import ProductCard from '../ui/ProductCard'
 
 interface SimulatorResultsProps {
   answers: Record<string, any>

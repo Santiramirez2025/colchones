@@ -1,7 +1,6 @@
 // lib/types/product.ts - VERSIÓN OPTIMIZADA
 
 import { Product, Category, Review, ProductVariant } from '@prisma/client'
-
 // ============================================================================
 // PRODUCT TYPES CON JSON PARSEADO
 // ============================================================================
