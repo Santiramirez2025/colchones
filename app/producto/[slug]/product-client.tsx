@@ -17,7 +17,6 @@ import ProductInfo from './components/ProductInfo'
 import TabsSection from './components/TabsSection'
 import RelatedProducts from './components/RelatedProducts'
 import ImageModal from './components/ImageModal'
-import TrustBadges from './components/TrustBadges'
 import UrgencyTimer from './components/UrgencyTimer'
 import SocialProof from './components/SocialProof'
 
@@ -590,17 +589,6 @@ const handleTabChange = useCallback((tab: string) => {
           />
         </div>
 
-        {/* Trust Badges Section */}
-        <TrustBadges 
-          hasCertifications={hasCertifications}
-          hasFreeShipping={hasFreeShipping}
-          hasReviews={hasReviews}
-          isHighRated={isHighRated}
-          warranty={product.warranty}
-          reviewCount={reviews.length}
-          rating={product.rating}
-        />
-
         {/* Tabs Section */}
         <section className="border-t border-white/10 py-16 md:py-24">
           <TabsSection
@@ -624,16 +612,6 @@ const handleTabChange = useCallback((tab: string) => {
             <RelatedProducts 
               products={relatedProducts}
               title="También te puede interesar"
-            />
-          </section>
-        )}
-
-        {/* Similar Products */}
-        {similarProducts.length > 0 && (
-          <section className="border-t border-white/10 py-16 md:py-24">
-            <RelatedProducts 
-              products={similarProducts}
-              title="Colchones con firmeza similar"
             />
           </section>
         )}

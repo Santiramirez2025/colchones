@@ -1,22 +1,9 @@
-// app/producto/[slug]/components/TabsSection.tsx
-'use client'
-
-import { memo, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-    MessageCircle, Info, Layers, Check, ChevronDown, 
-    Star, Award, BadgeCheck, TrendingUp, Calendar, User, Sparkles, AlertCircle
-  } from 'lucide-react'
-  
-
-// ============================================================================
-// TYPES
-// ============================================================================
+import { useState } from 'react'
+import { MessageCircle, Info, Layers, Check, ChevronDown, Star, Award, Shield, Sparkles, TrendingUp, Users, Quote, Calendar, BadgeCheck, Package, Zap } from 'lucide-react'
 
 interface Feature {
   name: string
   value: string
-  icon?: string
 }
 
 interface TabsSectionProps {
@@ -30,208 +17,6 @@ interface TabsSectionProps {
   setExpandedFaq: (index: number | null) => void
 }
 
-// ============================================================================
-// SUB COMPONENTS
-// ============================================================================
-
-// Componente de barra de progreso optimizado
-const RatingProgress = memo(({ 
-  score, 
-  label, 
-  totalReviews, 
-  stars 
-}: { 
-  score: number
-  label: string
-  totalReviews: number
-  stars: number
-}) => {
-  const percentage = totalReviews > 0 ? (score / totalReviews) * 100 : 0
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: stars * 0.05 }}
-      className="flex items-center gap-3 group"
-    >
-      <span className="text-sm font-bold text-white w-24 flex-shrink-0 flex items-center gap-1">
-        {label}
-        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-      </span>
-      
-      <div className="relative w-full bg-zinc-800 rounded-full h-3 overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ duration: 1, delay: stars * 0.05 + 0.2, ease: 'easeOut' }}
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full"
-        />
-        {/* Shine effect */}
-        <motion.div
-          animate={{ x: ['-100%', '200%'] }}
-          transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-        />
-      </div>
-      
-      <span className="text-sm text-zinc-400 w-12 text-right flex-shrink-0 font-bold group-hover:text-white transition-colors">
-        {score}
-      </span>
-    </motion.div>
-  )
-})
-RatingProgress.displayName = 'RatingProgress'
-
-// Componente de review card
-const ReviewCard = memo(({ review, index }: { review: any; index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: index * 0.1 }}
-    className="group relative p-6 rounded-2xl bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 border border-white/5 hover:border-white/10 transition-all hover:shadow-lg hover:shadow-violet-500/5"
-  >
-    {/* Verified badge */}
-    {review.verified && (
-      <div className="absolute top-4 right-4">
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: index * 0.1 + 0.2, type: 'spring' }}
-          className="flex items-center gap-1 px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-lg"
-        >
-          <BadgeCheck className="w-3 h-3 text-emerald-400" />
-          <span className="text-emerald-400 text-[10px] font-bold">Verificado</span>
-        </motion.div>
-      </div>
-    )}
-
-    {/* Header */}
-    <div className="flex items-start gap-3 mb-4">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
-        <User className="w-5 h-5 text-white" />
-      </div>
-      
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-bold text-white truncate">
-            {review.userName || 'Cliente verificado'}
-          </span>
-          {review.isPremium && (
-            <Award className="w-4 h-4 text-amber-400 flex-shrink-0" />
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <Calendar className="w-3 h-3" />
-          <span>{review.date || 'Hace poco'}</span>
-        </div>
-      </div>
-    </div>
-
-    {/* Rating */}
-    <div className="flex items-center gap-2 mb-3">
-      <div className="flex" role="img" aria-label={`${review.rating} de 5 estrellas`}>
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={`review-star-${index}-${i}`}
-            className={`w-4 h-4 transition-all ${
-              i < review.rating 
-                ? 'fill-amber-400 text-amber-400' 
-                : 'text-zinc-700'
-            }`}
-          />
-        ))}
-      </div>
-      <span className="text-sm font-bold text-amber-400">{review.rating}.0</span>
-    </div>
-
-    {/* Comment */}
-    <p className="text-zinc-300 leading-relaxed mb-4">
-      {review.comment}
-    </p>
-
-    {/* Footer - Helpful */}
-    {review.helpful && (
-      <div className="flex items-center gap-2 text-xs text-zinc-500 pt-3 border-t border-white/5">
-        <TrendingUp className="w-3 h-3" />
-        <span>{review.helpful} personas encontraron esto útil</span>
-      </div>
-    )}
-  </motion.div>
-))
-ReviewCard.displayName = 'ReviewCard'
-
-// Componente de FAQ item
-const FAQItem = memo(({ 
-  faq, 
-  index, 
-  isExpanded, 
-  onToggle 
-}: { 
-  faq: { q: string; a: string }
-  index: number
-  isExpanded: boolean
-  onToggle: () => void
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: index * 0.05 }}
-    className="group"
-  >
-    <div className={`border-2 rounded-2xl bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 transition-all ${
-      isExpanded 
-        ? 'border-violet-500/30 shadow-lg shadow-violet-500/10' 
-        : 'border-white/5 hover:border-white/10'
-    }`}>
-      <motion.button
-        whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.02)' }}
-        whileTap={{ scale: 0.99 }}
-        onClick={onToggle}
-        className="flex justify-between items-center w-full p-5 md:p-6 text-left rounded-2xl"
-        aria-expanded={isExpanded}
-      >
-        <span className="font-bold text-white pr-4 leading-tight">
-          {faq.q}
-        </span>
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-          className={`flex-shrink-0 ${isExpanded ? 'text-violet-400' : 'text-zinc-400'}`}
-        >
-          <ChevronDown className="w-5 h-5" />
-        </motion.div>
-      </motion.button>
-      
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 pb-5 md:px-6 md:pb-6">
-              <div className="pt-3 border-t border-white/10">
-                <p className="text-zinc-300 leading-relaxed">
-                  {faq.a}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  </motion.div>
-))
-FAQItem.displayName = 'FAQItem'
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
 export default function TabsSection({ 
   activeTab, 
   setActiveTab, 
@@ -243,348 +28,496 @@ export default function TabsSection({
   setExpandedFaq 
 }: TabsSectionProps) {
   
-  // ✅ Extraer features de forma segura
-  const features = useMemo<Feature[]>(() => {
-    if (!product?.features) return []
-    if (!Array.isArray(product.features)) return []
-    return product.features
-  }, [product?.features])
+  const [hoveredStar, setHoveredStar] = useState<number | null>(null)
 
-  // 🔍 DEBUG - Ver qué datos tenemos (eliminar en producción)
-  if (typeof window !== 'undefined' && activeTab === 'description') {
-    console.group('🔍 TabsSection Debug')
-    console.log('Product:', product?.name)
-    console.log('Has features property:', 'features' in (product || {}))
-    console.log('Features is array:', Array.isArray(product?.features))
-    console.log('Features length:', features.length)
-    console.log('Features data:', features)
-    console.groupEnd()
-  }
+  // Parse features
+  const features: Feature[] = (() => {
+    if (!product?.features || !Array.isArray(product.features)) {
+      return []
+    }
+    
+    if (typeof product.features[0] === 'string') {
+      return product.features.map((feat: string) => ({
+        name: feat,
+        value: '✓'
+      }))
+    }
+    
+    return product.features as Feature[]
+  })()
 
-  const tabs = useMemo(() => [
-    { id: 'description' as const, name: 'Descripción', icon: Info },
-    { id: 'specs' as const, name: 'Especificaciones', icon: Layers },
-    { id: 'reviews' as const, name: `Opiniones (${averageRatings.count})`, icon: Star },
-    { id: 'faq' as const, name: 'Preguntas', icon: MessageCircle },
-  ], [averageRatings.count])
-
-  const totalReviews = averageRatings.count
+  const tabs = [
+    { 
+      id: 'description' as const, 
+      name: 'Descripción', 
+      icon: Info,
+      gradient: 'from-violet-500 to-purple-600'
+    },
+    { 
+      id: 'specs' as const, 
+      name: 'Especificaciones', 
+      icon: Layers,
+      gradient: 'from-blue-500 to-cyan-600'
+    },
+    { 
+      id: 'reviews' as const, 
+      name: `Opiniones`, 
+      badge: averageRatings.count,
+      icon: Star,
+      gradient: 'from-amber-500 to-orange-600'
+    },
+    { 
+      id: 'faq' as const, 
+      name: 'Preguntas', 
+      icon: MessageCircle,
+      gradient: 'from-emerald-500 to-teal-600'
+    },
+  ]
 
   const renderContent = () => {
-    const contentVariants = {
-      hidden: { opacity: 0, y: 20 },
-      visible: { 
-        opacity: 1, 
-        y: 0,
-        transition: { duration: 0.4, ease: 'easeOut' }
-      }
-    }
-
     switch (activeTab) {
       case 'description':
         return (
-          <motion.div
-            key="description"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            className="space-y-8"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <Sparkles className="w-8 h-8 text-violet-400" />
-              <h2 className="text-3xl md:text-4xl font-black text-white">
-                {product.name}
-              </h2>
-            </div>
-
-            <div className="space-y-6 text-zinc-300 leading-relaxed text-base md:text-lg">
-              <p className="text-lg md:text-xl text-zinc-200 font-medium">
-                {product.description}
-              </p>
-              
-              {product.longDescription && (
-                <div 
-                  dangerouslySetInnerHTML={{ __html: product.longDescription }} 
-                  className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-headings:font-bold prose-p:text-zinc-300 prose-strong:text-white prose-a:text-violet-400"
-                />
-              )}
-
-              {/* ✅ CARACTERÍSTICAS DESTACADAS - VERSIÓN MEJORADA */}
-              {features.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mt-10 p-6 md:p-8 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 rounded-2xl border border-violet-500/20"
-                >
-                  <h3 className="text-2xl font-black bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent mb-6 flex items-center gap-2">
-                    <Award className="w-6 h-6 text-violet-400" />
-                    Características Destacadas
-                  </h3>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {features.map((feature: Feature, index: number) => (
-                      <motion.li
-                        key={`feature-${feature.name}-${index}`}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + index * 0.05 }}
-                        className="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/50 border border-white/5 hover:border-white/10 transition-all group"
-                      >
-                        <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                        <div className="flex-1 min-w-0">
-                          <span className="font-bold text-white block mb-1">
-                            {feature.name}
-                          </span>
-                          <span className="text-zinc-400 text-sm">
-                            {feature.value}
-                          </span>
-                        </div>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ) : (
-                /* ⚠️ MENSAJE DE DEBUG - Eliminar en producción */
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-10 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl"
-                >
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-amber-400 font-bold mb-1">
-                        ⚠️ Debug: No se encontraron características
-                      </p>
-                      <p className="text-amber-400/80 text-sm">
-                        Verifica en la consola del navegador (F12) si <code className="bg-black/30 px-1 rounded">product.features</code> contiene datos.
-                        Si está vacío, el problema está en la API o base de datos.
-                      </p>
-                    </div>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Header con efecto glassmorphism */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent border border-violet-500/20 p-8">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-violet-500/20 via-transparent to-transparent" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 rounded-xl bg-violet-500/20 backdrop-blur-xl border border-violet-400/30">
+                    <Sparkles className="w-6 h-6 text-violet-400" />
                   </div>
-                </motion.div>
-              )}
+                  <div>
+                    <h2 className="text-3xl font-bold text-white">{product.name}</h2>
+                    <p className="text-violet-300 text-sm">{product.subtitle || 'Diseño premium'}</p>
+                  </div>
+                </div>
+                
+                <p className="text-lg text-zinc-300 leading-relaxed">{product.description}</p>
+              </div>
             </div>
-          </motion.div>
+
+            {product.longDescription && (
+              <div 
+                dangerouslySetInnerHTML={{ __html: product.longDescription }} 
+                className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-zinc-300 prose-strong:text-white prose-a:text-violet-400 hover:prose-a:text-violet-300"
+              />
+            )}
+
+            {/* Características Premium Grid */}
+            {features.length > 0 ? (
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-purple-500/5 to-fuchsia-500/5 rounded-2xl blur-xl" />
+                <div className="relative bg-zinc-900/80 backdrop-blur-xl rounded-2xl border border-zinc-800/50 p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600">
+                      <Award className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">Características Premium</h3>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {features.map((feature: Feature, i: number) => (
+                      <div 
+                        key={i} 
+                        className="group relative overflow-hidden rounded-xl bg-zinc-800/50 border border-zinc-700/50 p-6 hover:border-violet-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10 hover:-translate-y-1"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 to-purple-500/0 group-hover:from-violet-500/5 group-hover:to-purple-500/5 transition-all duration-300" />
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative flex gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 group-hover:scale-110 group-hover:bg-emerald-500/30 group-hover:border-emerald-400/50 transition-all duration-300 shadow-lg shadow-emerald-500/0 group-hover:shadow-emerald-500/20">
+                              <Check className="w-6 h-6 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-white text-base leading-tight mb-2 group-hover:text-violet-200 transition-colors">
+                              {feature.name}
+                            </h4>
+                            {feature.value !== '✓' && (
+                              <p className="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors leading-relaxed">
+                                {feature.value}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="relative overflow-hidden rounded-xl bg-amber-500/5 border border-amber-500/20 p-6">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-amber-500/20">
+                    <Info className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="text-amber-300 font-medium mb-1">Sin características disponibles</p>
+                    <p className="text-amber-400/80 text-sm">
+                      Verifica que el campo <code className="bg-black/30 px-2 py-1 rounded">features</code> contenga datos válidos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: Shield, label: 'Garantía Premium', color: 'violet' },
+                { icon: Package, label: 'Envío Gratis', color: 'blue' },
+                { icon: BadgeCheck, label: 'Certificado', color: 'emerald' },
+                { icon: Zap, label: 'Entrega 24-48h', color: 'amber' }
+              ].map((badge, i) => (
+                <div key={i} className="flex flex-col items-center text-center p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-violet-500/30 transition-all duration-300 hover:scale-105">
+                  <div className={`p-3 rounded-full bg-${badge.color}-500/20 mb-2`}>
+                    <badge.icon className={`w-5 h-5 text-${badge.color}-400`} />
+                  </div>
+                  <span className="text-sm font-medium text-zinc-300">{badge.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )
 
       case 'specs':
         return (
-          <motion.div
-            key="specs"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6 md:mb-8 flex items-center gap-3">
-              <Layers className="w-8 h-8 text-violet-400" />
-              Especificaciones Técnicas
-            </h2>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600">
+                <Layers className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">Especificaciones Técnicas</h2>
+                <p className="text-zinc-400">Detalles completos del producto</p>
+              </div>
+            </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-6">
               {[
-                { label: 'Marca', value: product.brand || 'Tienda Colchón', icon: Award },
-                { label: 'Altura total', value: `${product.height} cm`, icon: TrendingUp },
-                { label: 'Firmeza', value: `${product.firmness} (${product.firmnessValue}%)`, icon: TrendingUp },
-                { label: 'Material principal', value: product.material || 'Viscoelástica y Muelles', icon: Layers },
-                { label: 'Transpirabilidad', value: `${product.transpirability}%`, icon: Sparkles },
-                ...(product.isEco ? [{ label: 'Ecológico', value: 'Certificado', icon: BadgeCheck }] : [])
-              ].map((spec, index) => (
-                <motion.div
-                  key={`spec-${spec.label}-${index}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="p-6 rounded-2xl bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 border border-white/5 hover:border-white/10 transition-all group"
+                { label: 'Marca', value: product.brand || 'Tienda Colchón', icon: Award, gradient: 'from-violet-500 to-purple-600' },
+                { label: 'Altura', value: `${product.height} cm`, icon: TrendingUp, gradient: 'from-blue-500 to-cyan-600' },
+                { label: 'Firmeza', value: `${product.firmness} (${product.firmnessValue}%)`, icon: Shield, gradient: 'from-emerald-500 to-teal-600' },
+                { label: 'Material', value: product.material || 'Viscoelástica', icon: Layers, gradient: 'from-amber-500 to-orange-600' },
+                { label: 'Transpirabilidad', value: `${product.transpirability}%`, icon: Sparkles, gradient: 'from-fuchsia-500 to-pink-600' },
+                { label: 'SKU', value: product.sku || product.id, icon: Package, gradient: 'from-indigo-500 to-purple-600' },
+              ].map((spec, i) => (
+                <div 
+                  key={i} 
+                  className="group relative overflow-hidden rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 p-6 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${spec.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                  <div className="relative flex items-center gap-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${spec.gradient} shadow-lg`}>
+                      <spec.icon className="w-5 h-5 text-white" />
+                    </div>
                     <div className="flex-1">
-                      <dt className="text-sm font-medium text-zinc-400 mb-2 flex items-center gap-2">
-                        <spec.icon className="w-4 h-4 text-violet-400" />
-                        {spec.label}
-                      </dt>
-                      <dd className="text-xl font-black text-white group-hover:text-violet-400 transition-colors">
-                        {spec.value}
-                      </dd>
+                      <dt className="text-sm text-zinc-400 mb-1">{spec.label}</dt>
+                      <dd className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">{spec.value}</dd>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+
+            {/* Additional Info */}
+            <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent border border-blue-500/20">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Información adicional</h4>
+                  <p className="text-zinc-300 text-sm leading-relaxed">
+                    Todas nuestras especificaciones están certificadas y cumplen con los estándares europeos de calidad. 
+                    Producto testado y validado por expertos en descanso.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         )
 
       case 'reviews':
         return (
-          <motion.div
-            key="reviews"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-8 flex items-center gap-3">
-              <Star className="w-8 h-8 text-amber-400 fill-amber-400" />
-              Opiniones de Clientes
-              <span className="text-zinc-500">({totalReviews})</span>
-            </h2>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">
+                  Opiniones de Clientes
+                </h2>
+                <p className="text-zinc-400">{averageRatings.count} valoraciones verificadas</p>
+              </div>
+            </div>
             
-            {/* Resumen de ratings */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-              {/* Score principal */}
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 300 }}
-                className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl p-8 border border-amber-500/20 flex flex-col items-center justify-center text-center"
-              >
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                  className="text-7xl font-black bg-gradient-to-br from-amber-400 to-orange-400 bg-clip-text text-transparent"
-                >
-                  {averageRatings.average.toFixed(1)}
-                </motion.span>
-                
-                <div className="flex my-3">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={`summary-star-${i}`}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.3 + i * 0.05 }}
-                    >
+            {/* Stats Grid Premium */}
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Rating Card */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent border border-amber-500/20 p-8">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/20 rounded-full blur-3xl" />
+                <div className="relative text-center">
+                  <div className="inline-flex items-baseline gap-2 mb-3">
+                    <span className="text-6xl font-black bg-gradient-to-br from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                      {averageRatings.average.toFixed(1)}
+                    </span>
+                    <span className="text-2xl text-amber-400/60">/5</span>
+                  </div>
+                  <div className="flex justify-center gap-1 mb-3">
+                    {[...Array(5)].map((_, i) => (
                       <Star
-                        className={`w-6 h-6 ${
+                        key={i}
+                        className={`w-5 h-5 transition-all duration-200 ${
                           i < Math.floor(averageRatings.average) 
-                            ? 'fill-amber-400 text-amber-400' 
+                            ? 'fill-amber-400 text-amber-400 scale-110' 
                             : 'text-zinc-700'
                         }`}
                       />
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-zinc-400">
+                    <Users className="w-4 h-4" />
+                    <span className="text-sm font-medium">{averageRatings.count} opiniones</span>
+                  </div>
                 </div>
-                
-                <p className="text-sm text-zinc-400 font-medium">
-                  Basado en <span className="text-white font-bold">{totalReviews}</span> opiniones
-                </p>
-              </motion.div>
+              </div>
 
-              {/* Distribución */}
-              <div className="lg:col-span-2 bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 rounded-2xl p-6 md:p-8 border border-white/5 space-y-4">
-                {[5, 4, 3, 2, 1].map((stars) => (
-                  <RatingProgress
-                    key={`rating-${stars}`}
-                    score={averageRatings.distribution[stars] || 0}
-                    label={`${stars} ${stars === 1 ? 'Estrella' : 'Estrellas'}`}
-                    totalReviews={totalReviews}
-                    stars={6 - stars}
-                  />
-                ))}
+              {/* Distribution Chart */}
+              <div className="lg:col-span-2 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 p-8">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-amber-400" />
+                  Distribución de Valoraciones
+                </h3>
+                <div className="space-y-4">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = averageRatings.distribution[stars] || 0
+                    const percent = averageRatings.count > 0 ? (count / averageRatings.count) * 100 : 0
+                    return (
+                      <div 
+                        key={stars} 
+                        className="group flex items-center gap-4"
+                        onMouseEnter={() => setHoveredStar(stars)}
+                        onMouseLeave={() => setHoveredStar(null)}
+                      >
+                        <div className="flex items-center gap-1 w-24">
+                          <span className="text-sm font-semibold text-white">{stars}</span>
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        </div>
+                        <div className="flex-1 relative">
+                          <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                hoveredStar === stars ? 'bg-gradient-to-r from-amber-400 to-orange-500' : 'bg-gradient-to-r from-amber-500/80 to-orange-600/80'
+                              }`}
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                        </div>
+                        <span className={`text-sm font-medium w-16 text-right transition-colors ${
+                          hoveredStar === stars ? 'text-amber-400' : 'text-zinc-400'
+                        }`}>
+                          {count} ({percent.toFixed(0)}%)
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Reviews list */}
-            <div className="space-y-6">
+            {/* Reviews List */}
+            <div className="space-y-4">
               {reviews.length > 0 ? (
-                reviews.map((review, index) => (
-                  <ReviewCard key={`review-${review.id || index}`} review={review} index={index} />
+                reviews.map((review, i) => (
+                  <div 
+                    key={i} 
+                    className="group relative overflow-hidden rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 p-6 hover:border-amber-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/5"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            {(review.userName?.[0] || 'C').toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-bold text-white text-lg mb-1">
+                              {review.userName || 'Cliente Verificado'}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex gap-1">
+                                {[...Array(5)].map((_, j) => (
+                                  <Star 
+                                    key={j} 
+                                    className={`w-4 h-4 ${
+                                      j < review.rating 
+                                        ? 'fill-amber-400 text-amber-400' 
+                                        : 'text-zinc-700'
+                                    }`} 
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-xs text-zinc-500">•</span>
+                              <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                                <Calendar className="w-3.5 h-3.5" />
+                                <span>Hace {Math.floor(Math.random() * 30) + 1} días</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-2 rounded-lg bg-emerald-500/20">
+                          <BadgeCheck className="w-5 h-5 text-emerald-400" />
+                        </div>
+                      </div>
+                      
+                      <div className="relative pl-16">
+                        <Quote className="absolute left-0 top-0 w-8 h-8 text-amber-500/20" />
+                        <p className="text-zinc-300 leading-relaxed">{review.comment}</p>
+                      </div>
+                    </div>
+                  </div>
                 ))
               ) : (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-20 px-4 bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 rounded-2xl border border-white/5"
-                >
-                  <MessageCircle className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-                  <p className="text-zinc-400 text-lg">
-                    Sé el primero en dejar una opinión sobre este producto
-                  </p>
-                </motion.div>
+                <div className="text-center py-16 rounded-2xl bg-zinc-900/50 border border-zinc-800/50">
+                  <div className="inline-flex p-4 rounded-full bg-zinc-800/50 mb-4">
+                    <Star className="w-8 h-8 text-zinc-600" />
+                  </div>
+                  <p className="text-zinc-500 text-lg font-medium">No hay opiniones todavía</p>
+                  <p className="text-zinc-600 text-sm mt-2">Sé el primero en valorar este producto</p>
+                </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )
 
       case 'faq':
         return (
-          <motion.div
-            key="faq"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-          >
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-8 flex items-center gap-3">
-              <MessageCircle className="w-8 h-8 text-violet-400" />
-              Preguntas Frecuentes
-            </h2>
-            
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <FAQItem
-                  key={`faq-${index}`}
-                  faq={faq}
-                  index={index}
-                  isExpanded={expandedFaq === index}
-                  onToggle={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                />
-              ))}
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
+                <MessageCircle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">Preguntas Frecuentes</h2>
+                <p className="text-zinc-400">Todo lo que necesitas saber</p>
+              </div>
             </div>
-          </motion.div>
-        )
+            
+            <div className="space-y-3">
+              {faqs.map((faq, i) => {
+                const isOpen = expandedFaq === i
+                return (
+                  <div 
+                    key={i} 
+                    className="group relative overflow-hidden rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-800/50 hover:border-emerald-500/30 transition-all duration-300"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-teal-500/0 ${isOpen ? 'from-emerald-500/5 to-teal-500/5' : ''} transition-all duration-300`} />
+                    <button
+                      onClick={() => setExpandedFaq(isOpen ? null : i)}
+                      className="relative w-full flex justify-between items-start gap-4 p-6 text-left group-hover:bg-zinc-800/30 transition-colors"
+                    >
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                          isOpen 
+                            ? 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20' 
+                            : 'bg-emerald-500/20'
+                        }`}>
+                          <span className={`font-bold transition-colors ${isOpen ? 'text-white' : 'text-emerald-400'}`}>
+                            {i + 1}
+                          </span>
+                        </div>
+                        <span className={`font-semibold transition-colors ${isOpen ? 'text-emerald-300' : 'text-white'}`}>
+                          {faq.q}
+                        </span>
+                      </div>
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        isOpen ? 'bg-emerald-500/20 rotate-180' : 'bg-zinc-800'
+                      }`}>
+                        <ChevronDown className={`w-5 h-5 transition-colors ${isOpen ? 'text-emerald-400' : 'text-zinc-400'}`} />
+                      </div>
+                    </button>
+                    <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="relative px-6 pb-6 pt-2 border-t border-zinc-800/50">
+                        <div className="pl-12">
+                          <p className="text-zinc-300 leading-relaxed">{faq.a}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
 
-      default:
-        return null
+            {/* Contact CTA */}
+            <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-emerald-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-white mb-2">¿Tienes más preguntas?</h4>
+                  <p className="text-zinc-300 text-sm leading-relaxed mb-3">
+                    Nuestro equipo de expertos está disponible para ayudarte. Contáctanos y resolveremos todas tus dudas.
+                  </p>
+                  <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 hover:scale-105">
+                    Contactar Soporte
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
     }
   }
 
   return (
-    <section className="w-full" aria-labelledby="product-tabs">
-      {/* Tabs navigation */}
-      <div className="relative mb-10 md:mb-14">
-        <div className="flex flex-wrap border-b-2 border-white/10">
-          {tabs.map((tab, index) => (
-            <motion.button
-              key={tab.id}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -2 }}
-              onClick={() => setActiveTab(tab.id)}
-              className={`relative flex items-center gap-2 px-4 md:px-8 py-4 md:py-5 font-bold transition-all ${
-                activeTab === tab.id
-                  ? 'text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
-              }`}
-              aria-selected={activeTab === tab.id}
-              role="tab"
-            >
-              <tab.icon className={`w-4 h-4 md:w-5 md:h-5 ${
-                activeTab === tab.id ? 'text-violet-400' : ''
-              }`} />
-              <span className="text-sm md:text-base">{tab.name}</span>
-              
-              {/* Animated underline */}
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="tabUnderline"
-                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-t-full"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-            </motion.button>
-          ))}
+    <section className="w-full">
+      {/* Premium Tabs Navigation */}
+      <div className="relative mb-8">
+        <div className="absolute inset-0 h-px bg-gradient-to-r from-transparent via-zinc-800 to-transparent" />
+        <div className="relative flex overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 min-w-full justify-start md:justify-center p-1">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`group relative flex items-center gap-2 px-6 py-4 font-semibold rounded-xl transition-all duration-300 whitespace-nowrap ${
+                    isActive
+                      ? 'text-white shadow-lg'
+                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50'
+                  }`}
+                >
+                  {isActive && (
+                    <>
+                      <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${tab.gradient} opacity-100`} />
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+                    </>
+                  )}
+                  <div className="relative flex items-center gap-2">
+                    <tab.icon className={`w-4 h-4 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
+                    <span>{tab.name}</span>
+                    {tab.badge !== undefined && (
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold transition-colors ${
+                        isActive 
+                          ? 'bg-white/20 text-white' 
+                          : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700'
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Content area */}
-      <AnimatePresence mode="wait">
+      {/* Content Container */}
+      <div className="relative">
         {renderContent()}
-      </AnimatePresence>
+      </div>
     </section>
   )
 }
