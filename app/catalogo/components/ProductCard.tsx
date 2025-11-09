@@ -25,6 +25,7 @@ interface ProductCardProps {
     mainColor?: string // Para AI-glow dinámico
   }
   index?: number
+  isFavorite?: boolean // ✅ Añadido para compatibilidad
   onToggleFavorite?: (id: string) => void
   avgPrice?: number
 }
