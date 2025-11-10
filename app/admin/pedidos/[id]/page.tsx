@@ -1,16 +1,20 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import { OrderStatusUpdater } from '@/components/admin/OrderStatusUpdater'
+import { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
-export default async function OrderDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const order = await prisma.order.findUnique({
-    where: { id: params.id },
+// Definimos el tipo de props completo para Next.js App Router (esencial para la tipificación)
+type OrderDetailPageProps = {
+    params: Promise<{ id: string }>
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  
+  export default async function OrderDetailPage({
+    params,
+  }: OrderDetailPageProps) {
+    const { id } = await params
+    const order = await prisma.order.findUnique({
+      where: { id },
     include: { user: true },
   })
 
@@ -18,6 +22,7 @@ export default async function OrderDetailPage({
     notFound()
   }
 
+  // Se asume que order.items es un string JSON que se puede parsear
   const items = JSON.parse(order.items)
 
   const statusLabels: Record<string, string> = {
