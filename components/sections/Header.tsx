@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDebounce } from '@/lib/hooks/use-debounce'
 import type { ProductWithCategory } from '@/lib/api/products'
-import { usePathname } from 'next/navigation' // <<-- Necesario para la condición
+import { usePathname } from 'next/navigation'
 
 // ✅ Iconos inline SVG optimizados
 const Icons = {
@@ -92,7 +92,6 @@ const Icons = {
   ),
 }
 
-// ✅ CONFIGURACIÓN CYBER MONDAY
 const SITE_CONFIG = {
   phone: '+34981123456',
   phoneDisplay: '981 12 34 56',
@@ -106,11 +105,7 @@ const POPULAR_SEARCHES = ['Cyber Monday', 'Ofertas -50%', 'Viscoelástico', 'Mue
 export default function Header() {
   const pathname = usePathname()
   
-  // 🚫 No renderizar Header en rutas de admin
-  if (pathname?.startsWith('/admin')) {
-    return null
-  }
-
+  // ✅ TODOS los hooks PRIMERO (antes del return condicional)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cartCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -124,7 +119,6 @@ export default function Header() {
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-  // Countdown para Cyber Monday
   useEffect(() => {
     const calculateCountdown = () => {
       const now = new Date()
@@ -278,11 +272,16 @@ export default function Header() {
     return badges
   }
 
+  // 🚫 Return condicional AL FINAL (después de TODOS los hooks)
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
+
+  // ✅ Renderizar Header normal
   return (
     <>
       {/* TOP BAR CYBER MONDAY */}
       <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 overflow-hidden">
-        {/* Animated background effects */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.1),transparent_50%)]" />
@@ -290,7 +289,6 @@ export default function Header() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center justify-between py-2">
-            {/* Countdown */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
                 <Icons.Fire className="w-4 h-4 text-yellow-300 animate-pulse" />
@@ -308,7 +306,6 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Info rápida */}
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-white">
                 <Icons.Zap className="w-4 h-4 text-yellow-300" />
@@ -338,7 +335,6 @@ export default function Header() {
 
         <nav className="container mx-auto px-4 relative z-10">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* LOGO CYBER */}
             <Link href="/" className="group relative flex-shrink-0 z-50">
               <div className="flex items-center gap-2.5 md:gap-3 transition-transform group-hover:scale-[1.02]">
                 <div className="relative">
@@ -391,7 +387,6 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* Dropdown de resultados */}
                 {isSearchOpen && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/98 backdrop-blur-xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-black/50 max-h-[500px] overflow-y-auto animate-slide-down">
                     {searchQuery.trim().length === 0 ? (
@@ -739,7 +734,6 @@ export default function Header() {
             className="fixed inset-0 lg:hidden flex flex-col animate-slide-up"
             style={{ zIndex: 9999 }}
           >
-            {/* Header del menú */}
             <div className="flex-shrink-0 bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 relative overflow-hidden">
               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
               <div className="container mx-auto px-4 relative z-10">
@@ -764,10 +758,8 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Contenido del menú */}
             <div className="flex-1 overflow-y-auto bg-gradient-to-b from-zinc-950 to-zinc-900">
               <div className="container mx-auto px-4 py-6 pb-safe">
-                {/* CTAs principales */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   <Link 
                     href="/catalogo" 
@@ -796,7 +788,6 @@ export default function Header() {
                   </a>
                 </div>
 
-                {/* Banner de código */}
                 <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 rounded-2xl border-2 border-yellow-500/30 relative overflow-hidden">
                   <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
                   <div className="relative flex items-center justify-between">
@@ -809,7 +800,6 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Beneficios */}
                 <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-cyan-950/30 to-blue-950/30 rounded-2xl border border-cyan-500/20">
                   <div className="flex flex-col items-center text-center">
                     <Icons.Zap className="w-5 h-5 text-yellow-400 mb-2" />
@@ -828,7 +818,6 @@ export default function Header() {
                   </div>
                 </div>
 
-                {/* Navegación */}
                 <nav className="mb-6">
                   <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3 px-1">Navegación</div>
                   <ul className="space-y-2">
@@ -862,7 +851,6 @@ export default function Header() {
                   </ul>
                 </nav>
 
-                {/* Mi cuenta */}
                 <div className="border-t border-cyan-500/20 pt-6">
                   <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3 px-1">Mi cuenta</div>
                   <Link 

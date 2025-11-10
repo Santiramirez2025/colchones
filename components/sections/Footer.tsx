@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 // ============================================================================
 // ICONS - Optimizados con strokeWidth consistente
@@ -72,7 +73,6 @@ const Icons = {
       <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z" />
     </svg>
   ),
-  // Redes sociales
   Instagram: ({ className = "w-5 h-5" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -96,7 +96,7 @@ const Icons = {
 }
 
 // ============================================================================
-// CONFIG - Actualizado con tema Cyber Monday
+// CONFIG
 // ============================================================================
 const SITE_CONFIG = {
   phone: '+34981123456',
@@ -116,6 +116,9 @@ const SITE_CONFIG = {
 // MAIN COMPONENT
 // ============================================================================
 export default function FooterCyber() {
+  const pathname = usePathname()
+  
+  // ✅ TODOS los hooks PRIMERO (antes del return condicional)
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -184,6 +187,12 @@ export default function FooterCyber() {
     }
   ]
 
+  // 🚫 Return condicional AL FINAL (después de TODOS los hooks)
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
+
+  // ✅ Renderizar Footer normal
   return (
     <footer className="relative bg-zinc-950 text-zinc-400 border-t border-cyan-500/20 overflow-hidden">
       {/* Efectos de fondo */}
@@ -193,12 +202,9 @@ export default function FooterCyber() {
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
-        {/* ============================================================ */}
-        {/* 1. CYBER MONDAY BANNER - NUEVO */}
-        {/* ============================================================ */}
+        {/* CYBER MONDAY BANNER */}
         <section className="py-8 md:py-10 border-b border-cyan-500/10">
           <div className="relative overflow-hidden bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 rounded-2xl p-6 md:p-8 border border-cyan-500/30">
-            {/* Animated background */}
             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
             
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -228,9 +234,7 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* 2. BADGES DE CONFIANZA - Rediseñado con tema Cyber */}
-        {/* ============================================================ */}
+        {/* BADGES DE CONFIANZA */}
         <section className="py-10 md:py-14 border-b border-cyan-500/10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {trustBadges.map((badge, index) => (
@@ -238,7 +242,6 @@ export default function FooterCyber() {
                 key={index}
                 className="group relative bg-zinc-900/40 backdrop-blur-sm rounded-xl p-5 border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 hover:scale-[1.02] overflow-hidden"
               >
-                {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10 transition-all duration-300" />
                 <div className="absolute -inset-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 blur transition-all duration-300" style={{background: `linear-gradient(to right, var(--tw-gradient-stops))`, '--tw-gradient-from': 'rgb(6 182 212 / 0.2)', '--tw-gradient-to': 'rgb(59 130 246 / 0.2)'} as React.CSSProperties} />
                 
@@ -254,13 +257,10 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* 3. NEWSLETTER CTA - Tema Cyber */}
-        {/* ============================================================ */}
+        {/* NEWSLETTER CTA */}
         <section className="py-10 md:py-14 border-b border-cyan-500/10">
           <div className="max-w-3xl mx-auto">
             <div className="relative overflow-hidden bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-transparent rounded-2xl p-8 md:p-10 border border-cyan-500/30">
-              {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
               <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,.05)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
@@ -333,13 +333,9 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* 4. CONTACTO DIRECTO - Cyber Style */}
-        {/* ============================================================ */}
+        {/* CONTACTO DIRECTO */}
         <section className="py-10 md:py-14 border-b border-cyan-500/10">
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            
-            {/* Teléfono */}
             <a
               href={`tel:${SITE_CONFIG.phone}`}
               className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02]"
@@ -362,7 +358,6 @@ export default function FooterCyber() {
               </div>
             </a>
 
-            {/* Email */}
             <a
               href={`mailto:${SITE_CONFIG.email}`}
               className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02]"
@@ -384,13 +379,9 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* 5. ENLACES ÚTILES - Grid mejorado */}
-        {/* ============================================================ */}
+        {/* ENLACES ÚTILES */}
         <section className="py-10 md:py-14 border-b border-cyan-500/10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
-            
-            {/* Sobre nosotros */}
             <div>
               <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
@@ -418,7 +409,6 @@ export default function FooterCyber() {
               </ul>
             </div>
 
-            {/* Comprar */}
             <div>
               <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
@@ -444,7 +434,6 @@ export default function FooterCyber() {
               </ul>
             </div>
 
-            {/* Ayuda */}
             <div>
               <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
@@ -470,7 +459,6 @@ export default function FooterCyber() {
               </ul>
             </div>
 
-            {/* Legal */}
             <div>
               <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
@@ -493,13 +481,9 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* 6. FOOTER FINAL - Marca, redes y pago */}
-        {/* ============================================================ */}
+        {/* FOOTER FINAL */}
         <section className="py-8 md:py-10">
           <div className="flex flex-col gap-6">
-            
-            {/* Logo + Descripción */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="flex-1 max-w-md">
                 <Link href="/" className="inline-flex items-center gap-3 group mb-4">
@@ -523,7 +507,6 @@ export default function FooterCyber() {
                   Tu tienda especializada en colchones de calidad. Fabricados en España con los mejores materiales para garantizar tu mejor descanso.
                 </p>
                 
-                {/* Redes sociales */}
                 <div className="flex items-center gap-3">
                   {SITE_CONFIG.socialMedia.map((social) => (
                     <a
@@ -540,7 +523,6 @@ export default function FooterCyber() {
                 </div>
               </div>
 
-              {/* Métodos de pago y confianza */}
               <div className="flex flex-col gap-4">
                 <div>
                   <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-wide">Métodos de pago</div>
@@ -569,7 +551,6 @@ export default function FooterCyber() {
               </div>
             </div>
 
-            {/* Copyright y reviews */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-cyan-500/10">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-zinc-600">
                 <span className="font-medium">© {new Date().getFullYear()} TiendaColchon</span>
@@ -594,9 +575,6 @@ export default function FooterCyber() {
         </section>
       </div>
 
-      {/* ============================================================ */}
-      {/* ESTILOS Y ANIMACIONES */}
-      {/* ============================================================ */}
       <style jsx>{`
         @keyframes pulse-slow {
           0%, 100% { opacity: 0.3; }
