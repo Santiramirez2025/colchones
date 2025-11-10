@@ -1,5 +1,4 @@
-// ===== components/admin/AdminAuthContext.tsx (NUEVO) =====
-// Crea un contexto para centralizar el estado de la sesión y el loader.
+// ===== components/admin/AdminAuthContext.tsx (CORREGIDO) =====
 'use client'
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
@@ -7,6 +6,7 @@ type AuthContextType = {
   isLoggedIn: boolean | null
   loading: boolean
   adminEmail: string | null
+  login: (email: string) => void  // ✅ AGREGADO
   logout: () => void
 }
 
@@ -25,8 +25,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [adminEmail, setAdminEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // NOTE: En un entorno de producción, esta verificación NO debe usar localStorage.
-  // Debe usar una llamada a la API para validar la sesión/token.
+  // Verificación inicial al cargar
   useEffect(() => {
     const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true'
     const email = localStorage.getItem('adminEmail')
@@ -36,6 +35,14 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }, [])
 
+  // ✅ NUEVA FUNCIÓN: Actualizar estado cuando se hace login
+  const login = (email: string) => {
+    localStorage.setItem('isAdminLoggedIn', 'true')
+    localStorage.setItem('adminEmail', email)
+    setIsLoggedIn(true)
+    setAdminEmail(email)
+  }
+
   const logout = () => {
     localStorage.removeItem('isAdminLoggedIn')
     localStorage.removeItem('adminEmail')
@@ -44,7 +51,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, loading, adminEmail, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, loading, adminEmail, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useAdminAuth } from '@/components/admin/AdminAuthContext'  // ✅ IMPORTAR
 
 const ADMIN_CREDENTIALS = {
   email: 'ramon@gmail.com',
@@ -11,17 +12,18 @@ const ADMIN_CREDENTIALS = {
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const { isLoggedIn, login } = useAdminAuth()  // ✅ USAR EL CONTEXTO
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // ✅ Si ya está logueado, redirigir
   useEffect(() => {
-    const isAdmin = localStorage.getItem('isAdminLoggedIn')
-    if (isAdmin === 'true') {
+    if (isLoggedIn) {
       router.push('/admin')
     }
-  }, [router])
+  }, [isLoggedIn, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,10 +36,9 @@ export default function AdminLoginPage() {
       email === ADMIN_CREDENTIALS.email &&
       password === ADMIN_CREDENTIALS.password
     ) {
-      localStorage.setItem('isAdminLoggedIn', 'true')
-      localStorage.setItem('adminEmail', email)
+      // ✅ USAR LA FUNCIÓN login() DEL CONTEXTO
+      login(email)
       
-      // ✅ CORREGIDO: setLoading(false) antes de redirect
       setLoading(false)
       router.push('/admin')
     } else {
