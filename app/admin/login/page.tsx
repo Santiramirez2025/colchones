@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link' // ⬅️ IMPORTACIÓN AÑADIDA
+import Link from 'next/link'
 
 const ADMIN_CREDENTIALS = {
   email: 'ramon@gmail.com',
@@ -36,6 +36,9 @@ export default function AdminLoginPage() {
     ) {
       localStorage.setItem('isAdminLoggedIn', 'true')
       localStorage.setItem('adminEmail', email)
+      
+      // ✅ CORREGIDO: setLoading(false) antes de redirect
+      setLoading(false)
       router.push('/admin')
     } else {
       setError('Email o contraseña incorrectos')
@@ -106,7 +109,6 @@ export default function AdminLoginPage() {
           </form>
 
           <div className="mt-6 pt-6 border-t border-zinc-800 text-center">
-            {/* ⬅️ CORREGIDO: Usando Link de Next.js */}
             <Link
               href="/"
               className="text-zinc-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2"
