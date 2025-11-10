@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation' // ⬅️ ¡NUEVO! Importación para la ruta
 
 // ============================================================================
 // ICONS - Optimizados con strokeWidth consistente
@@ -75,7 +76,7 @@ const Icons = {
   // Redes sociales
   Instagram: ({ className = "w-5 h-5" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
     </svg>
   ),
   Facebook: ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -116,6 +117,13 @@ const SITE_CONFIG = {
 // MAIN COMPONENT
 // ============================================================================
 export default function FooterCyber() {
+  // 🎯 LÓGICA CLAVE DE OCULTAMIENTO 
+  const pathname = usePathname()
+  if (pathname.startsWith('/admin')) {
+    return null
+  }
+  // 🎯 FIN LÓGICA CLAVE
+
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -520,107 +528,64 @@ export default function FooterCyber() {
                   </div>
                 </Link>
                 <p className="text-sm text-zinc-500 leading-relaxed mb-4">
-                  Tu tienda especializada en colchones de calidad. Fabricados en España con los mejores materiales para garantizar tu mejor descanso.
+                  Tu tienda especializada en colchones de calidad. Fabricados en España con materiales de última generación para garantizar tu descanso.
                 </p>
                 
-                {/* Redes sociales */}
-                <div className="flex items-center gap-3">
+                {/* Redes Sociales */}
+                <div className="flex items-center gap-4 mt-6">
                   {SITE_CONFIG.socialMedia.map((social) => (
                     <a
                       key={social.name}
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-zinc-900/50 border border-cyan-500/20 flex items-center justify-center text-zinc-600 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-zinc-900/70 transition-all hover:scale-110 shadow-lg hover:shadow-cyan-500/20"
-                      aria-label={social.name}
+                      aria-label={`Síguenos en ${social.name}`}
+                      className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-cyan-400 transition-all flex items-center justify-center"
                     >
                       <social.icon className="w-5 h-5" />
                     </a>
                   ))}
                 </div>
               </div>
-
-              {/* Métodos de pago y confianza */}
-              <div className="flex flex-col gap-4">
-                <div>
-                  <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-wide">Métodos de pago</div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {['Visa', 'Mastercard', 'PayPal', 'Bizum'].map((method) => (
-                      <div
-                        key={method}
-                        className="px-3 py-2 bg-zinc-900/50 border border-cyan-500/20 rounded-lg text-xs text-zinc-400 font-semibold hover:border-cyan-500/40 hover:text-cyan-300 transition-all"
-                      >
-                        {method}
-                      </div>
-                    ))}
-                  </div>
+              
+              {/* Medios de Pago */}
+              <div className="flex-shrink-0">
+                <h4 className="text-sm font-bold text-white mb-3">
+                  Pago seguro y financiación
+                </h4>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {/* Ejemplos de imágenes de pago, deberías usar <Image> de Next/image o tus propios assets */}
+                  <span className="bg-white/5 p-2 rounded-lg text-xs font-bold text-zinc-400">VISA</span>
+                  <span className="bg-white/5 p-2 rounded-lg text-xs font-bold text-zinc-400">Mastercard</span>
+                  <span className="bg-white/5 p-2 rounded-lg text-xs font-bold text-zinc-400">PayPal</span>
+                  <span className="bg-white/5 p-2 rounded-lg text-xs font-bold text-cyan-400">Financiación</span>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-3 text-xs">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
-                    <Icons.Shield className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300 font-bold">Pago 100% seguro</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-blue-500/10 rounded-xl border border-blue-500/30">
-                    <span className="text-lg">🇪🇸</span>
-                    <span className="text-blue-300 font-bold">Hecho en España</span>
-                  </div>
-                </div>
+                <p className="text-xs text-zinc-600 mt-4">
+                  Aceptamos todos los métodos de pago.
+                </p>
               </div>
             </div>
 
-            {/* Copyright y reviews */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-cyan-500/10">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-zinc-600">
-                <span className="font-medium">© {new Date().getFullYear()} TiendaColchon</span>
-                <span className="hidden sm:inline text-zinc-800">·</span>
-                <span>Todos los derechos reservados</span>
-                <span className="hidden sm:inline text-zinc-800">·</span>
-                <span className="text-cyan-500 font-medium">Cyber Monday Edition</span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Icons.Star key={i} className="w-4 h-4 text-yellow-500" />
-                  ))}
+            {/* Derechos de autor y legal */}
+            <div className="pt-6 border-t border-zinc-900/50">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-zinc-600">
+                <p>&copy; {new Date().getFullYear()} Tienda Colchon. Todos los derechos reservados.</p>
+                <div className="flex items-center gap-3">
+                  <Link href="/politica-de-datos" className="hover:text-cyan-400 transition-colors">
+                    Política de datos
+                  </Link>
+                  <span className="text-zinc-700">•</span>
+                  <Link href="/mapa-web" className="hover:text-cyan-400 transition-colors">
+                    Mapa web
+                  </Link>
                 </div>
-                <span className="text-xs text-zinc-500 font-medium">
-                  <span className="text-white font-bold">4.8</span>/5 · 2,847 opiniones
-                </span>
               </div>
             </div>
           </div>
         </section>
-      </div>
 
-      {/* ============================================================ */}
-      {/* ESTILOS Y ANIMACIONES */}
-      {/* ============================================================ */}
-      <style jsx>{`
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        
-        .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
-        .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
-        .animate-shimmer { animation: shimmer 3s linear infinite; }
-        
-        @media (prefers-reduced-motion: reduce) {
-          .animate-pulse-slow,
-          .animate-pulse-glow,
-          .animate-shimmer { animation: none !important; }
-        }
-      `}</style>
+      </div>
     </footer>
   )
 }

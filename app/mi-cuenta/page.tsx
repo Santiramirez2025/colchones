@@ -63,33 +63,50 @@ export default function MiCuentaPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loadingOrders, setLoadingOrders] = useState(true)
+  const [errorOrders, setErrorOrders] = useState('')
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login?redirect=/mi-cuenta')
     }
   }, [user, loading, router])
 
+  // Load orders when user is available
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
+      setLoadingOrders(true)
+      setErrorOrders('')
+      
       fetch(`/api/orders?userId=${user.id}`)
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) {
+            throw new Error('Error al cargar pedidos')
+          }
+          return res.json()
+        })
         .then(data => {
           setOrders(data.orders || [])
           setLoadingOrders(false)
         })
         .catch(err => {
           console.error('Error loading orders:', err)
+          setErrorOrders(err.message || 'Error al cargar los pedidos')
           setLoadingOrders(false)
         })
     }
-  }, [user])
+  }, [user?.id])
 
   const handleLogout = async () => {
-    await logout()
-    router.push('/')
+    try {
+      await logout()
+      router.push('/')
+    } catch (err) {
+      console.error('Error logging out:', err)
+    }
   }
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -101,6 +118,7 @@ export default function MiCuentaPage() {
     )
   }
 
+  // Not authenticated - this will trigger redirect but prevents flash
   if (!user) return null
 
   return (
@@ -170,7 +188,7 @@ export default function MiCuentaPage() {
             <div className="grid md:grid-cols-3 gap-4 mb-8">
               <div className="bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border border-violet-500/30 rounded-2xl p-6">
                 <div className="text-4xl font-black text-white mb-2">
-                  {user.totalOrders}
+                  {user.totalOrders || 0}
                 </div>
                 <div className="text-sm text-zinc-300 font-medium">Pedidos realizados</div>
               </div>
@@ -184,7 +202,7 @@ export default function MiCuentaPage() {
 
               <div className="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 rounded-2xl p-6">
                 <div className="text-4xl font-black text-white mb-2">
-                  €{user.totalSpent.toFixed(2)}
+                  €{(user.totalSpent || 0).toFixed(2)}
                 </div>
                 <div className="text-sm text-zinc-300 font-medium">Total invertido</div>
               </div>
@@ -196,18 +214,48 @@ export default function MiCuentaPage() {
                 <h2 className="text-2xl font-bold text-white">
                   Pedidos Recientes
                 </h2>
-                <Link 
-                  href="/mi-cuenta/pedidos"
-                  className="text-sm text-violet-400 hover:text-violet-300 font-semibold transition"
-                >
-                  Ver todos →
-                </Link>
+                {orders.length > 0 && (
+                  <Link 
+                    href="/mi-cuenta/pedidos"
+                    className="text-sm text-violet-400 hover:text-violet-300 font-semibold transition"
+                  >
+                    Ver todos →
+                  </Link>
+                )}
               </div>
 
               {loadingOrders ? (
                 <div className="text-center py-12">
                   <div className="w-12 h-12 border-4 border-violet-500/30 border-t-violet-500 rounded-full animate-spin mx-auto mb-4" />
                   <p className="text-zinc-400">Cargando pedidos...</p>
+                </div>
+              ) : errorOrders ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-red-400 mb-4">{errorOrders}</p>
+                  <button
+                    onClick={() => {
+                      setLoadingOrders(true)
+                      setErrorOrders('')
+                      fetch(`/api/orders?userId=${user.id}`)
+                        .then(res => res.json())
+                        .then(data => {
+                          setOrders(data.orders || [])
+                          setLoadingOrders(false)
+                        })
+                        .catch(err => {
+                          setErrorOrders(err.message)
+                          setLoadingOrders(false)
+                        })
+                    }}
+                    className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-semibold transition"
+                  >
+                    Reintentar
+                  </button>
                 </div>
               ) : orders.length === 0 ? (
                 <div className="text-center py-16">

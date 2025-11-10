@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
+// --- Iconos (Se mantienen igual) ---
 const Icons = {
   Moon: ({ className = "w-6 h-6" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -20,6 +21,7 @@ const Icons = {
     </svg>
   ),
 }
+// --- Fin Iconos ---
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -27,18 +29,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  // El loading del formulario local ahora se gestiona de forma más limpia
+  const [localLoading, setLocalLoading] = useState(false) 
   const [resetSent, setResetSent] = useState(false)
 
-  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth()
+  // Usamos el 'loading' del AuthContext para la redirección
+  const { signIn, signUp, signInWithGoogle, resetPassword, user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/mi-cuenta'
 
+  // Redirigir cuando el usuario esté autenticado y sincronizado
+  useEffect(() => {
+    // Usamos authLoading para sincronizar el estado del Context
+    if (user && !authLoading) { 
+      router.push(redirectTo)
+    }
+  }, [user, authLoading, router, redirectTo]) // Dependemos de authLoading del Context
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+    setLocalLoading(true) // Usamos el loading local para el formulario
 
     try {
       if (isLogin) {
@@ -49,30 +61,37 @@ export default function LoginPage() {
         }
         await signUp(email, password, name)
       }
-      router.push(redirectTo)
+      // NOTA: No desactivamos localLoading aquí, el useEffect de redirección lo gestionará
+      // en el flujo de éxito. Si la autenticación es exitosa, pero la sincronización falla,
+      // el authLoading del contexto se pondrá en false y el localLoading debería seguir ese ejemplo.
+      
     } catch (err: any) {
+      // Manejo de errores
       const errorMessage = err.message || 'Error al autenticar'
       if (errorMessage.includes('auth/email-already-in-use')) {
         setError('Este email ya está registrado')
-      } else if (errorMessage.includes('auth/invalid-credential')) {
+      } else if (errorMessage.includes('auth/invalid-credential') || errorMessage.includes('auth/wrong-password')) {
         setError('Email o contraseña incorrectos')
       } else if (errorMessage.includes('auth/weak-password')) {
         setError('La contraseña debe tener al menos 6 caracteres')
       } else {
+        // En caso de error desconocido, mostramos el mensaje.
+        // También puede ser que la función 'syncUser' en el AuthContext falle y arroje un error.
         setError(errorMessage)
       }
-    } finally {
-      setLoading(false)
+      
+      setLocalLoading(false) // Desactivamos loading solo en caso de error
     }
   }
 
   const handleGoogleSignIn = async () => {
     setError('')
+    setLocalLoading(true)
     try {
       await signInWithGoogle()
-      router.push(redirectTo)
     } catch (err: any) {
       setError('Error al iniciar sesión con Google')
+      setLocalLoading(false)
     }
   }
 
@@ -82,18 +101,29 @@ export default function LoginPage() {
       return
     }
     
+    setError('')
+    
     try {
       await resetPassword(email)
       setResetSent(true)
       setTimeout(() => setResetSent(false), 5000)
-    } catch (err) {
-      setError('Error al enviar el email de recuperación')
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al enviar el email de recuperación'
+      if (errorMessage.includes('auth/user-not-found')) {
+        setError('No existe un usuario con ese email.')
+      } else {
+        setError('Error al enviar el email de recuperación.')
+      }
     }
   }
+  
+  // Usamos el loading del AuthContext para deshabilitar botones mientras se carga el usuario inicial.
+  const isGlobalLoading = localLoading || authLoading;
 
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
+        
         {/* Logo */}
         <Link href="/" className="flex justify-center mb-8 group">
           <div className="flex items-center gap-2.5">
@@ -168,7 +198,9 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={handleResetPassword}
-                    className="text-xs text-violet-400 hover:text-violet-300 transition"
+                    // Deshabilitar si ya está en proceso de carga o si el email está vacío para evitar spam
+                    disabled={isGlobalLoading || email === ''} 
+                    className="text-xs text-violet-400 hover:text-violet-300 transition disabled:opacity-50"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -192,10 +224,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isGlobalLoading}
               className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100 shadow-lg shadow-violet-500/30"
             >
-              {loading ? 'Procesando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+              {isGlobalLoading ? 'Procesando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
             </button>
           </form>
 
@@ -207,7 +239,8 @@ export default function LoginPage() {
 
           <button
             onClick={handleGoogleSignIn}
-            className="w-full py-3.5 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 hover:scale-[1.02]"
+            disabled={isGlobalLoading}
+            className="w-full py-3.5 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] disabled:opacity-50 disabled:scale-100"
           >
             <Icons.Google />
             <span>Google</span>
@@ -221,6 +254,7 @@ export default function LoginPage() {
                 setResetSent(false)
               }}
               className="text-sm text-zinc-400 hover:text-violet-400 transition font-medium"
+              disabled={isGlobalLoading} // Bloquear cambio de vista mientras se procesa
             >
               {isLogin ? (
                 <>¿No tienes cuenta? <span className="text-violet-400 font-bold">Regístrate</span></>
