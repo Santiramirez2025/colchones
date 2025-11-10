@@ -104,6 +104,13 @@ const SITE_CONFIG = {
 const POPULAR_SEARCHES = ['Cyber Monday', 'Ofertas -50%', 'Viscoelástico', 'Muelles ensacados', 'Memory foam']
 
 export default function Header() {
+  const pathname = usePathname()
+  
+  // 🚫 No renderizar Header en rutas de admin
+  if (pathname?.startsWith('/admin')) {
+    return null
+  }
+
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cartCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
