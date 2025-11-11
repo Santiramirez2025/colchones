@@ -90,17 +90,87 @@ const Icons = {
       <path d="M12 23a7.5 7.5 0 01-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14 1 0 2.5 0 5-2.47.27.773.5 1.604.5 2.47A7.5 7.5 0 0112 23z" />
     </svg>
   ),
+  Gift: ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+    </svg>
+  ),
+  Truck: ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+    </svg>
+  ),
 }
+
+// 🎯 Sistema de Campañas Inteligente
+const getCurrentCampaign = () => {
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  
+  // Black Friday / Cyber Week (20-30 Nov)
+  if (month === 11 && day >= 20) {
+    return {
+      tagline: 'BLACK WEEK -50%',
+      code: 'BLACK50',
+      endDate: new Date(now.getFullYear(), 10, 30, 23, 59, 59),
+      showCountdown: true,
+      theme: 'cyber'
+    }
+  }
+  
+  // Rebajas de Enero (1-31 Ene)
+  if (month === 1) {
+    return {
+      tagline: 'REBAJAS -45%',
+      code: 'ENERO45',
+      endDate: new Date(now.getFullYear(), 0, 31, 23, 59, 59),
+      showCountdown: true,
+      theme: 'sale'
+    }
+  }
+  
+  // Navidad (1-31 Dic)
+  if (month === 12) {
+    return {
+      tagline: 'NAVIDAD -40%',
+      code: 'NAVIDAD40',
+      endDate: new Date(now.getFullYear(), 11, 31, 23, 59, 59),
+      showCountdown: true,
+      theme: 'christmas'
+    }
+  }
+  
+  // Campaña permanente (resto del año)
+  return {
+    tagline: 'ENVÍO EXPRESS GRATIS',
+    code: 'ENVIOGRATIS',
+    endDate: null,
+    showCountdown: false,
+    theme: 'default'
+  }
+}
+
+const campaign = getCurrentCampaign()
 
 const SITE_CONFIG = {
   phone: '+34981123456',
   phoneDisplay: '981 12 34 56',
   brandName: 'Tienda Colchon',
-  tagline: 'CYBER MONDAY -50%',
-  cyberCode: 'CYBER24',
+  tagline: campaign.tagline,
+  promoCode: campaign.code,
+  showCountdown: campaign.showCountdown,
+  endDate: campaign.endDate,
+  theme: campaign.theme,
 }
 
-const POPULAR_SEARCHES = ['Cyber Monday', 'Ofertas -50%', 'Viscoelástico', 'Muelles ensacados', 'Memory foam']
+const POPULAR_SEARCHES = [
+  'Ofertas del mes', 
+  'Mejor valorados', 
+  'Viscoelástico', 
+  'Muelles ensacados', 
+  'Memory foam premium'
+]
 
 export default function Header() {
   const pathname = usePathname()
@@ -120,12 +190,19 @@ export default function Header() {
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
+    if (!SITE_CONFIG.showCountdown || !SITE_CONFIG.endDate) return
+    
     const calculateCountdown = () => {
       const now = new Date()
-      const endOfDay = new Date(now)
-      endOfDay.setHours(23, 59, 59, 999)
+      const endDate = SITE_CONFIG.endDate as Date
       
-      const diff = endOfDay.getTime() - now.getTime()
+      const diff = endDate.getTime() - now.getTime()
+      
+      if (diff <= 0) {
+        setCountdown('00:00:00')
+        return
+      }
+      
       const hours = Math.floor(diff / (1000 * 60 * 60))
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
       const seconds = Math.floor((diff % (1000 * 60)) / 1000)
@@ -218,8 +295,8 @@ export default function Header() {
   }, [isMenuOpen])
 
   const navLinks = useMemo(() => [
-    { href: '/catalogo', label: 'Cyber Ofertas', icon: 'catalog', cyber: true },
-    { href: '/simulador', label: 'Test IA', icon: 'ai', featured: true },
+    { href: '/catalogo', label: 'Ver Ofertas', icon: 'catalog', featured: true },
+    { href: '/simulador', label: 'Test IA', icon: 'ai', special: true },
     { href: '/comparador', label: 'Comparar', icon: 'compare' },
     { href: '/blog', label: 'Guía', icon: 'blog' },
   ], [])
@@ -257,7 +334,7 @@ export default function Header() {
     if (product.isNew) {
       badges.push(
         <span key="new" className="px-1.5 py-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[9px] font-black rounded uppercase flex-shrink-0">
-          Cyber
+          Oferta
         </span>
       )
     }
@@ -280,7 +357,7 @@ export default function Header() {
   // ✅ Renderizar Header normal
   return (
     <>
-      {/* TOP BAR CYBER MONDAY */}
+      {/* TOP BAR - SISTEMA INTELIGENTE */}
       <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer" />
@@ -290,18 +367,26 @@ export default function Header() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                <Icons.Fire className="w-4 h-4 text-yellow-300 animate-pulse" />
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-black text-yellow-300 uppercase hidden sm:inline">Termina en</span>
-                  <span className="text-sm font-black text-white tabular-nums">{countdown}</span>
+              {SITE_CONFIG.showCountdown && countdown ? (
+                <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <Icons.Fire className="w-4 h-4 text-yellow-300 animate-pulse" />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-black text-yellow-300 uppercase hidden sm:inline">Termina en</span>
+                    <span className="text-sm font-black text-white tabular-nums">{countdown}</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                  <Icons.Truck className="w-4 h-4 text-cyan-300" />
+                  <span className="text-sm font-black text-white">Envío Express Gratis</span>
+                </div>
+              )}
               
               <div className="hidden md:flex items-center gap-2">
                 <Icons.Tag className="w-4 h-4 text-yellow-300" />
                 <span className="text-xs font-bold text-white">
-                  Código: <span className="text-yellow-300">{SITE_CONFIG.cyberCode}</span> -10% extra
+                  Código: <span className="text-yellow-300">{SITE_CONFIG.promoCode}</span> 
+                  {SITE_CONFIG.showCountdown ? ' -10% extra' : ''}
                 </span>
               </div>
             </div>
@@ -309,7 +394,7 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-white">
                 <Icons.Zap className="w-4 h-4 text-yellow-300" />
-                <span>Envío Express <span className="text-yellow-300">GRATIS</span></span>
+                <span>Entrega <span className="text-yellow-300">24-48h</span></span>
               </div>
               
               <a 
@@ -369,7 +454,7 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchOpen(true)}
-                    placeholder="🔥 Buscar ofertas Cyber Monday..."
+                    placeholder="🔥 Buscar colchones y ofertas..."
                     className="w-full pl-12 pr-12 py-3 bg-white/5 border border-cyan-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
                   />
                   {isSearching && (
@@ -392,8 +477,8 @@ export default function Header() {
                     {searchQuery.trim().length === 0 ? (
                       <div className="p-4">
                         <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">
-                          <Icons.Fire className="w-3.5 h-3.5 animate-pulse" />
-                          <span>Búsquedas Cyber Monday</span>
+                          <Icons.TrendingUp className="w-3.5 h-3.5" />
+                          <span>Búsquedas Populares</span>
                         </div>
                         <div className="space-y-1">
                           {POPULAR_SEARCHES.map((term, idx) => (
@@ -508,34 +593,34 @@ export default function Header() {
                   <Link 
                     href={link.href} 
                     className={`relative group px-4 py-2.5 rounded-lg transition-all ${
-                      link.cyber
+                      link.featured
                         ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30' 
-                        : link.featured 
+                        : link.special 
                         ? 'bg-gradient-to-r from-violet-600/10 to-fuchsia-600/10 border border-violet-500/20' 
                         : 'hover:bg-white/5'
                     }`}
                   >
                     <span className={`font-semibold text-sm transition-colors ${
-                      link.cyber
+                      link.featured
                         ? 'text-cyan-300 group-hover:text-cyan-200'
-                        : link.featured 
+                        : link.special 
                         ? 'text-violet-300 group-hover:text-violet-200' 
                         : 'text-zinc-300 group-hover:text-white'
                     }`}>
                       {link.label}
                     </span>
-                    {link.cyber && (
+                    {link.featured && (
                       <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-[8px] font-black rounded uppercase tracking-wider shadow-lg animate-pulse">
                         HOT
                       </span>
                     )}
-                    {link.featured && (
+                    {link.special && (
                       <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-[8px] font-black rounded uppercase tracking-wider shadow-lg">
                         IA
                       </span>
                     )}
                     <span className={`absolute bottom-0 left-0 w-0 h-0.5 rounded-full transition-all duration-300 group-hover:w-full ${
-                      link.cyber ? 'bg-gradient-to-r from-cyan-400 to-blue-400' : 'bg-gradient-to-r from-violet-400 to-fuchsia-400'
+                      link.featured ? 'bg-gradient-to-r from-cyan-400 to-blue-400' : 'bg-gradient-to-r from-violet-400 to-fuchsia-400'
                     }`} />
                   </Link>
                 </li>
@@ -605,7 +690,7 @@ export default function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="🔥 Buscar ofertas Cyber Monday..."
+                  placeholder="🔥 Buscar colchones y ofertas..."
                   autoFocus
                   className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-cyan-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
                 />
@@ -635,8 +720,8 @@ export default function Header() {
               {searchQuery.trim().length === 0 ? (
                 <div>
                   <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-4">
-                    <Icons.Fire className="w-4 h-4 animate-pulse" />
-                    <span>Búsquedas Cyber Monday</span>
+                    <Icons.TrendingUp className="w-4 h-4" />
+                    <span>Búsquedas Populares</span>
                   </div>
                   <div className="space-y-2">
                     {POPULAR_SEARCHES.map((term, idx) => (
@@ -721,7 +806,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* MOBILE MENU CYBER EDITION */}
+      {/* MOBILE MENU - EDICIÓN INTELIGENTE */}
       {isMenuOpen && (
         <>
           <div 
@@ -740,11 +825,17 @@ export default function Header() {
                 <div className="flex items-center justify-between h-16">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                      <Icons.Fire className="w-5 h-5 text-yellow-300" />
+                      {SITE_CONFIG.showCountdown ? (
+                        <Icons.Fire className="w-5 h-5 text-yellow-300" />
+                      ) : (
+                        <Icons.Gift className="w-5 h-5 text-cyan-300" />
+                      )}
                     </div>
                     <div>
-                      <div className="text-base font-black text-white">Cyber Monday</div>
-                      <div className="text-[9px] text-cyan-100 uppercase tracking-wider font-bold">Termina en {countdown}</div>
+                      <div className="text-base font-black text-white">{SITE_CONFIG.tagline}</div>
+                      {SITE_CONFIG.showCountdown && countdown && (
+                        <div className="text-[9px] text-cyan-100 uppercase tracking-wider font-bold">Termina en {countdown}</div>
+                      )}
                     </div>
                   </div>
                   <button 
@@ -771,7 +862,9 @@ export default function Header() {
                     <div className="relative flex flex-col items-center justify-center p-6 text-white">
                       <Icons.Fire className="w-8 h-8 mb-2 drop-shadow-lg animate-pulse" />
                       <span className="text-base font-black mb-1">Ver Ofertas</span>
-                      <span className="text-xs text-cyan-100 font-bold">Hasta -50%</span>
+                      <span className="text-xs text-cyan-100 font-bold">
+                        {SITE_CONFIG.showCountdown ? 'Hasta -50%' : 'Mejores precios'}
+                      </span>
                     </div>
                   </Link>
                   
@@ -793,8 +886,10 @@ export default function Header() {
                   <div className="relative flex items-center justify-between">
                     <div>
                       <div className="text-xs font-bold text-yellow-300 uppercase mb-1">Código exclusivo</div>
-                      <div className="text-2xl font-black text-white tracking-wider">{SITE_CONFIG.cyberCode}</div>
-                      <div className="text-xs text-zinc-400 mt-1">-10% adicional en todo</div>
+                      <div className="text-2xl font-black text-white tracking-wider">{SITE_CONFIG.promoCode}</div>
+                      <div className="text-xs text-zinc-400 mt-1">
+                        {SITE_CONFIG.showCountdown ? '-10% adicional' : 'Beneficio especial'}
+                      </div>
                     </div>
                     <Icons.Tag className="w-12 h-12 text-yellow-400/30" />
                   </div>
@@ -802,7 +897,7 @@ export default function Header() {
 
                 <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-cyan-950/30 to-blue-950/30 rounded-2xl border border-cyan-500/20">
                   <div className="flex flex-col items-center text-center">
-                    <Icons.Zap className="w-5 h-5 text-yellow-400 mb-2" />
+                    <Icons.Truck className="w-5 h-5 text-cyan-400 mb-2" />
                     <div className="text-xs font-bold text-white">Express</div>
                     <div className="text-[10px] text-cyan-400 mt-0.5">Gratis</div>
                   </div>
@@ -827,20 +922,20 @@ export default function Header() {
                           href={link.href} 
                           onClick={closeMenu} 
                           className={`flex items-center justify-between p-4 rounded-xl font-bold text-base transition-all active:scale-98 ${
-                            link.cyber
+                            link.featured
                               ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 text-white border border-cyan-500/30 shadow-lg' 
-                              : link.featured 
+                              : link.special 
                               ? 'bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 text-white border border-violet-500/30' 
                               : 'text-zinc-300 bg-white/5 border border-white/10 hover:bg-white/10'
                           }`}
                         >
                           <span>{link.label}</span>
-                          {link.cyber && (
+                          {link.featured && (
                             <span className="px-2.5 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-[9px] font-black rounded-full uppercase shadow-lg animate-pulse">
                               Hot
                             </span>
                           )}
-                          {link.featured && (
+                          {link.special && (
                             <span className="px-2.5 py-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-[9px] font-black rounded-full uppercase shadow-lg">
                               IA
                             </span>

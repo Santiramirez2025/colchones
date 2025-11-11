@@ -398,8 +398,8 @@ export function HeroSection() {
                   className="space-y-4 sm:space-y-6"
                 >
                   <p className="text-xl sm:text-2xl md:text-3xl text-zinc-300 leading-relaxed font-light">
-                    Tu cuerpo se adapta al colchón.<br />
-                    <span className="text-white font-medium">Nosotros lo hacemos al revés.</span>
+                  Ofertas flash de la semana.<br />
+                    <span className="text-white font-medium">Hasta -60% de descuento y más...</span>
                   </p>
 
                   {/* Precio */}

@@ -214,7 +214,7 @@ export default function FooterCyber() {
                 </div>
                 <div>
                   <div className="text-xl md:text-2xl font-black text-transparent bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text mb-1">
-                    ¡Cyber Monday Activo! -50%
+                  Ofertas finales del año.
                   </div>
                   <div className="text-sm text-cyan-300 font-bold">
                     Usa el código <span className="px-2 py-0.5 bg-yellow-500 text-black rounded font-black">{SITE_CONFIG.cyberCode}</span> para -10% adicional
@@ -273,7 +273,7 @@ export default function FooterCyber() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl md:text-2xl font-black text-white">
-                        Newsletter Cyber Monday
+                        Newsletter Ofertas finales del año
                       </h3>
                       <span className="px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-[10px] font-black rounded uppercase animate-pulse">
                         -10%
@@ -499,7 +499,7 @@ export default function FooterCyber() {
                       <span className="text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text">Colchon</span>
                     </div>
                     <div className="text-[9px] font-black text-cyan-400 uppercase tracking-wider mt-0.5">
-                      Cyber Monday -50%
+                    Ofertas finales del año
                     </div>
                   </div>
                 </Link>
@@ -557,7 +557,7 @@ export default function FooterCyber() {
                 <span className="hidden sm:inline text-zinc-800">·</span>
                 <span>Todos los derechos reservados</span>
                 <span className="hidden sm:inline text-zinc-800">·</span>
-                <span className="text-cyan-500 font-medium">Cyber Monday Edition</span>
+                <span className="text-cyan-500 font-medium">Ofertas finales del año</span>
               </div>
               
               <div className="flex items-center gap-2">
