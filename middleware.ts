@@ -1,21 +1,35 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const protectedRoutes = ['/mi-cuenta', '/checkout']
-const authRoutes = ['/login']
-
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  // Credenciales desde variables de entorno
+  const STORE_USER = process.env.STORE_USER || 'tienda'
+  const STORE_PASSWORD = process.env.STORE_PASSWORD || 'colchon2025'
   
-  // Verificar si la ruta requiere autenticación
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+  // Obtener el header de autorización
+  const authHeader = request.headers.get('authorization')
   
-  // Si es ruta protegida y no hay sesión, redirigir a login
-  if (isProtectedRoute) {
-    // Aquí podrías verificar una cookie de sesión si la implementas
-    // Por ahora, dejamos que el cliente maneje la redirección
-    return NextResponse.next()
+  // Si no hay header, pedir credenciales
+  if (!authHeader) {
+    return new NextResponse('Acceso restringido', {
+      status: 401,
+      headers: {
+        'WWW-Authenticate': 'Basic realm="Tienda Colchón"',
+      },
+    })
+  }
+  
+  // Decodificar y verificar credenciales
+  const auth = authHeader.split(' ')[1]
+  const [user, password] = Buffer.from(auth, 'base64').toString().split(':')
+  
+  if (user !== STORE_USER || password !== STORE_PASSWORD) {
+    return new NextResponse('Credenciales inválidas', {
+      status: 401,
+      headers: {
+        'WWW-Authenticate': 'Basic realm="Tienda Colchón"',
+      },
+    })
   }
   
   return NextResponse.next()
