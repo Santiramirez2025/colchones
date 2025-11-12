@@ -7,7 +7,8 @@ export function middleware(request: NextRequest) {
   
   const authHeader = request.headers.get('authorization')
   
-  if (!authHeader?.startsWith('Basic ')) {
+  // Si no hay header, pedir autenticación
+  if (!authHeader) {
     return new NextResponse('Acceso restringido', {
       status: 401,
       headers: {
@@ -16,19 +17,35 @@ export function middleware(request: NextRequest) {
     })
   }
   
+  // Decodificar usando una función más simple
+  const base64 = authHeader.replace('Basic ', '')
+  let credentials = ''
+  
   try {
-    const base64Credentials = authHeader.substring(6)
+    // Método simple sin Buffer ni atob
+    const binaryString = base64.split('').map(c => {
+      const code = c.charCodeAt(0)
+      return String.fromCharCode(code > 127 ? code - 256 : code)
+    }).join('')
     
-    // Decodificar base64 de forma compatible con Edge Runtime
-    const credentials = decodeBase64(base64Credentials)
-    const [user, password] = credentials.split(':')
-    
-    if (user !== STORE_USER || password !== STORE_PASSWORD) {
-      throw new Error('Invalid credentials')
+    credentials = decodeURIComponent(escape(binaryString))
+  } catch {
+    // Si falla, usar atob directo
+    try {
+      credentials = atob(base64)
+    } catch {
+      return new NextResponse('Error de autenticación', {
+        status: 401,
+        headers: {
+          'WWW-Authenticate': 'Basic realm="Tienda Colchón"',
+        },
+      })
     }
-    
-    return NextResponse.next()
-  } catch (error) {
+  }
+  
+  const [user, password] = credentials.split(':')
+  
+  if (user !== STORE_USER || password !== STORE_PASSWORD) {
     return new NextResponse('Credenciales inválidas', {
       status: 401,
       headers: {
@@ -36,17 +53,8 @@ export function middleware(request: NextRequest) {
       },
     })
   }
-}
-
-// Función helper compatible con Edge Runtime
-function decodeBase64(str: string): string {
-  const text = atob(str)
-  const length = text.length
-  const bytes = new Uint8Array(length)
-  for (let i = 0; i < length; i++) {
-    bytes[i] = text.charCodeAt(i)
-  }
-  return new TextDecoder().decode(bytes)
+  
+  return NextResponse.next()
 }
 
 export const config = {
