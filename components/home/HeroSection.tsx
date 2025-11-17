@@ -37,8 +37,6 @@ const CAROUSEL_IMAGES = [
     category: 'lifestyle',
     blurDataURL: 'data:image/jpeg;base64,...'
   },
-
-  // ✅ Añadir tres nuevas imágenes
   {
     url: '/images/astralnature4.jpg',
     alt: 'Espuma viscoelástica de alta densidad que se adapta al contorno del cuerpo',
@@ -138,7 +136,7 @@ export function HeroSection() {
   const [currentImage, setCurrentImage] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false])
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false, false, false, false])
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -511,7 +509,7 @@ export function HeroSection() {
                             quality={90}
                             placeholder="blur"
                             blurDataURL={CAROUSEL_IMAGES[currentImage].blurDataURL}
-                            onLoadingComplete={() => {
+                            onLoad={() => {
                               setImagesLoaded(prev => {
                                 const newState = [...prev]
                                 newState[currentImage] = true

@@ -1,4 +1,4 @@
-// app/comparador/comparador-client.tsx - REDISEÑADO MOBILE-FIRST
+// app/comparador/comparador-client.tsx - OPTIMIZADO 2025
 'use client'
 
 import { useState, useRef } from 'react'
@@ -50,7 +50,7 @@ export default function ComparadorClient({ products }: ComparadorClientProps) {
   const addProduct = (product: Product) => {
     if (selectedProducts.length < 4 && !selectedProducts.find(p => p.id === product.id)) {
       setSelectedProducts([...selectedProducts, product])
-      setActiveTabMobile(selectedProducts.length) // Mover a la nueva pestaña
+      setActiveTabMobile(selectedProducts.length)
     }
     setShowSelector(false)
   }
@@ -380,7 +380,7 @@ function ProductCardMobile({
 }
 
 // ============================================================================
-// COMPARISON TABLE - DESKTOP
+// COMPARISON TABLE - DESKTOP OPTIMIZADO
 // ============================================================================
 function ComparisonTable({
   products,
@@ -392,43 +392,52 @@ function ComparisonTable({
   onAddMore: () => void
 }) {
   const rows = [
-    { label: 'Producto', key: 'product' },
-    { label: 'Precio', key: 'price' },
-    { label: 'Valoración', key: 'rating' },
+    { label: 'Producto', key: 'product', isHeader: true },
+    { label: 'Precio', key: 'price', highlight: true },
+    { label: 'Valoración', key: 'rating', highlight: true },
     { label: 'Firmeza', key: 'firmness' },
     { label: 'Altura', key: 'height' },
     { label: 'Garantía', key: 'warranty' },
-    { label: 'Noches de Prueba', key: 'trial' },
     { label: 'Refrigeración', key: 'cooling' },
     { label: 'Ecológico', key: 'eco' },
     { label: 'Hipoalergénico', key: 'hypoallergenic' },
     { label: 'Transpiración', key: 'transpirability' },
     { label: 'Satisfacción', key: 'satisfaction' },
-    { label: 'Características', key: 'features' },
+    { label: 'Características Clave', key: 'features' },
   ]
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full border-collapse">
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr
                 key={row.key}
-                className={`${
-                  rowIndex % 2 === 0 ? 'bg-white/5' : 'bg-transparent'
-                } border-b border-white/5 last:border-0`}
+                className={`
+                  ${row.isHeader ? 'bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20' : ''}
+                  ${row.highlight ? 'bg-white/10' : ''}
+                  ${!row.isHeader && !row.highlight && rowIndex % 2 === 0 ? 'bg-white/5' : ''}
+                  ${!row.isHeader && !row.highlight && rowIndex % 2 === 1 ? 'bg-transparent' : ''}
+                  border-b border-white/5 last:border-0
+                  transition-colors hover:bg-white/5
+                `}
               >
                 {/* Row label */}
-                <td className="sticky left-0 bg-zinc-900/95 backdrop-blur-xl border-r border-white/10 px-6 py-4 font-bold text-white whitespace-nowrap z-10">
-                  {row.label}
+                <td className="sticky left-0 bg-zinc-900/95 backdrop-blur-xl border-r border-white/10 px-6 py-5 font-bold text-white whitespace-nowrap z-10 min-w-[180px]">
+                  <div className="flex items-center gap-2">
+                    {row.highlight && (
+                      <div className="w-1 h-6 bg-gradient-to-b from-violet-500 to-fuchsia-500 rounded-full" />
+                    )}
+                    <span className={row.highlight ? 'text-lg' : ''}>{row.label}</span>
+                  </div>
                 </td>
 
                 {/* Product columns */}
-                {products.map((product, colIndex) => (
+                {products.map((product) => (
                   <td
                     key={product.id}
-                    className="px-6 py-4 text-center relative"
+                    className="px-8 py-5 text-center relative min-w-[280px]"
                   >
                     {row.key === 'product' && (
                       <ProductHeader
@@ -443,18 +452,35 @@ function ComparisonTable({
                       <RatingCell product={product} />
                     )}
                     {row.key === 'firmness' && (
-                      <span className="text-white font-semibold">
-                        {product.firmness}
-                      </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-white font-bold text-lg">
+                          {product.firmness}
+                        </span>
+                        <div className="w-full max-w-[120px] h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full"
+                            style={{ width: `${(product.firmnessValue / 10) * 100}%` }}
+                          />
+                        </div>
+                      </div>
                     )}
                     {row.key === 'height' && (
-                      <span className="text-white">{product.height}cm</span>
+                      <div className="flex items-center justify-center gap-2">
+                        <Ruler className="w-4 h-4 text-violet-400" />
+                        <span className="text-white font-semibold text-lg">{product.height}cm</span>
+                      </div>
                     )}
                     {row.key === 'warranty' && (
-                      <span className="text-white">{product.warranty} años</span>
+                      <div className="flex items-center justify-center gap-2">
+                        <Shield className="w-4 h-4 text-emerald-400" />
+                        <span className="text-white font-semibold text-lg">{product.warranty} años</span>
+                      </div>
                     )}
                     {row.key === 'trial' && (
-                      <span className="text-white">{product.trialNights} noches</span>
+                      <div className="flex items-center justify-center gap-2">
+                        <Moon className="w-4 h-4 text-cyan-400" />
+                        <span className="text-white font-semibold text-lg">{product.trialNights} noches</span>
+                      </div>
                     )}
                     {row.key === 'cooling' && (
                       <BooleanCell value={product.cooling} />
@@ -466,10 +492,10 @@ function ComparisonTable({
                       <BooleanCell value={product.hypoallergenic} />
                     )}
                     {row.key === 'transpirability' && (
-                      <PercentageBar value={product.transpirability} />
+                      <PercentageBar value={product.transpirability} label="Transpiración" />
                     )}
                     {row.key === 'satisfaction' && (
-                      <PercentageBar value={product.satisfaction} />
+                      <PercentageBar value={product.satisfaction} label="Satisfacción" />
                     )}
                     {row.key === 'features' && (
                       <FeaturesList features={product.features} />
@@ -479,14 +505,19 @@ function ComparisonTable({
 
                 {/* Add more column */}
                 {products.length < 4 && (
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-8 py-5 text-center min-w-[280px]">
                     {row.key === 'product' && (
                       <button
                         onClick={onAddMore}
-                        className="w-full h-32 border-2 border-dashed border-white/20 rounded-2xl flex flex-col items-center justify-center gap-2 text-zinc-400 hover:text-white hover:border-white/40 transition group"
+                        className="w-full h-full min-h-[240px] border-2 border-dashed border-white/20 rounded-2xl flex flex-col items-center justify-center gap-3 text-zinc-400 hover:text-white hover:border-violet-500/50 hover:bg-violet-500/5 transition-all group"
                       >
-                        <Plus className="w-8 h-8 group-hover:scale-110 transition" />
-                        <span className="text-sm font-semibold">Añadir</span>
+                        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Plus className="w-8 h-8" />
+                        </div>
+                        <div className="text-center">
+                          <div className="font-bold text-lg mb-1">Añadir Producto</div>
+                          <div className="text-xs text-zinc-500">Compara hasta 4</div>
+                        </div>
                       </button>
                     )}
                   </td>
@@ -501,50 +532,65 @@ function ComparisonTable({
 }
 
 // ============================================================================
-// TABLE CELLS
+// TABLE CELLS - OPTIMIZADAS
 // ============================================================================
 function ProductHeader({ product, onRemove }: { product: Product; onRemove: () => void }) {
   return (
-    <div className="relative">
+    <div className="relative pb-4">
       <button
         onClick={onRemove}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500/20 border border-red-500/50 rounded-full flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition z-10"
+        className="absolute -top-2 -right-2 w-8 h-8 bg-red-500/20 border border-red-500/50 rounded-full flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition-all hover:scale-110 z-20"
       >
-        <X className="w-3 h-3" />
+        <X className="w-4 h-4" />
       </button>
       
-      <div className="relative w-full h-32 rounded-xl overflow-hidden mb-3 bg-white/5">
+      {/* Imagen con tamaño fijo y aspect ratio consistente */}
+      <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-white/5 border border-white/10 group">
         <Image
           src={product.images[0] || '/placeholder.jpg'}
           alt={product.name}
           fill
-          className="object-cover"
-          sizes="300px"
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          sizes="280px"
+          priority
         />
+        {/* Overlay sutil al hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
       
-      <h3 className="text-lg font-black text-white mb-2">{product.name}</h3>
+      <h3 className="text-xl font-black text-white mb-3 leading-tight min-h-[3rem] flex items-center justify-center">
+        {product.name}
+      </h3>
       
       <Link
         href={`/producto/${product.slug}`}
-        className="inline-flex items-center gap-1 text-violet-400 hover:text-violet-300 text-sm font-semibold transition"
+        className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all hover:scale-105 shadow-lg hover:shadow-xl"
       >
-        Ver detalles
-        <ArrowRight className="w-3 h-3" />
+        Ver Detalles
+        <ArrowRight className="w-4 h-4" />
       </Link>
     </div>
   )
 }
 
 function PriceCell({ product }: { product: Product }) {
+  const discount = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0
+
   return (
-    <div>
-      <div className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">
+    <div className="py-2">
+      <div className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent mb-1">
         {product.price}€
       </div>
       {product.originalPrice && product.originalPrice > product.price && (
-        <div className="text-sm text-zinc-500 line-through">
-          {product.originalPrice}€
+        <div className="space-y-1">
+          <div className="text-base text-zinc-500 line-through">
+            {product.originalPrice}€
+          </div>
+          <div className="inline-block bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 px-3 py-1 rounded-full text-xs font-bold">
+            -{discount}% OFF
+          </div>
         </div>
       )}
     </div>
@@ -553,12 +599,12 @@ function PriceCell({ product }: { product: Product }) {
 
 function RatingCell({ product }: { product: Product }) {
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-2 py-2">
       <div className="flex items-center gap-1">
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-4 h-4 ${
+            className={`w-5 h-5 ${
               i < Math.floor(product.rating)
                 ? 'fill-amber-400 text-amber-400'
                 : 'text-zinc-600'
@@ -566,11 +612,16 @@ function RatingCell({ product }: { product: Product }) {
           />
         ))}
       </div>
-      <span className="text-white font-semibold text-sm">
-        {product.rating.toFixed(1)}
-      </span>
-      <span className="text-zinc-400 text-xs">
-        ({product.reviewCount})
+      <div className="flex items-baseline gap-1">
+        <span className="text-white font-black text-2xl">
+          {product.rating.toFixed(1)}
+        </span>
+        <span className="text-zinc-400 text-sm font-medium">
+          / 5.0
+        </span>
+      </div>
+      <span className="text-zinc-500 text-xs">
+        {product.reviewCount.toLocaleString()} valoraciones
       </span>
     </div>
   )
@@ -578,37 +629,54 @@ function RatingCell({ product }: { product: Product }) {
 
 function BooleanCell({ value }: { value: boolean }) {
   return value ? (
-    <Check className="w-6 h-6 text-emerald-400 mx-auto" />
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
+        <Check className="w-6 h-6 text-emerald-400" />
+      </div>
+      <span className="text-emerald-400 font-semibold text-sm">Sí</span>
+    </div>
   ) : (
-    <X className="w-6 h-6 text-zinc-600 mx-auto" />
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-12 h-12 rounded-full bg-zinc-800/50 border border-zinc-700 flex items-center justify-center">
+        <X className="w-6 h-6 text-zinc-600" />
+      </div>
+      <span className="text-zinc-600 font-semibold text-sm">No</span>
+    </div>
   )
 }
 
-function PercentageBar({ value }: { value: number }) {
+function PercentageBar({ value, label }: { value: number; label: string }) {
   return (
-    <div className="w-full max-w-[120px] mx-auto">
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-1">
-        <div
-          className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full"
-          style={{ width: `${value}%` }}
+    <div className="w-full max-w-[160px] mx-auto py-2">
+      <div className="mb-2">
+        <span className="text-3xl font-black text-white">{value}%</span>
+      </div>
+      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${value}%` }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="h-full bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 rounded-full"
         />
       </div>
-      <span className="text-white text-sm font-semibold">{value}%</span>
+      <div className="mt-1 text-xs text-zinc-500 font-medium">{label}</div>
     </div>
   )
 }
 
 function FeaturesList({ features }: { features: string[] }) {
   return (
-    <div className="text-left space-y-1">
-      {features.slice(0, 3).map((feature, i) => (
+    <div className="text-left space-y-2 max-w-[240px] mx-auto">
+      {features.slice(0, 4).map((feature, i) => (
         <div key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-          <Check className="w-3 h-3 text-emerald-400 flex-shrink-0 mt-0.5" />
-          <span className="line-clamp-2">{feature}</span>
+          <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <span className="line-clamp-2 leading-snug">{feature}</span>
         </div>
       ))}
-      {features.length > 3 && (
-        <span className="text-xs text-zinc-500">+{features.length - 3} más</span>
+      {features.length > 4 && (
+        <div className="text-xs text-violet-400 font-semibold pl-6">
+          +{features.length - 4} características más
+        </div>
       )}
     </div>
   )

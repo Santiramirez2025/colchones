@@ -1,6 +1,6 @@
 import React, { RefObject } from 'react'
 import { motion, MotionValue } from 'framer-motion'
-import { Sparkles, Award, Star, TrendingUp, ArrowRight, Zap } from 'lucide-react'
+import { Sparkles, Award, Star, TrendingUp, ArrowRight } from 'lucide-react'
 
 interface HeroSectionProps {
   heroRef: RefObject<HTMLDivElement>
@@ -65,35 +65,29 @@ export default function HeroSection({
           {/* Main Title - Modern Typography */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6">
             <span className="block bg-gradient-to-br from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent drop-shadow-2xl">
-              Descubre lo
+            Tu descanso 
             </span>
             <span className="block mt-2 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
-              Extraordinario
+            merece lo mejor
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 font-light max-w-3xl mx-auto mb-12 leading-relaxed">
-            Más de <span className="text-white font-semibold">500+ productos premium</span> seleccionados 
-            para transformar tu experiencia
+          Una selección exclusiva <span className="text-white font-semibold">exclusiva</span> de colchones y productos
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          {/* CTA Button - Centered */}
+          <div className="flex justify-center items-center mb-16">
             <button
               onClick={scrollToProducts}
-              className="group relative px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl font-semibold text-white overflow-hidden hover:scale-105 transition-all duration-300 shadow-lg shadow-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/60"
+              className="group relative px-10 py-5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl font-semibold text-white text-lg overflow-hidden hover:scale-105 transition-all duration-300 shadow-lg shadow-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/60"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Explorar Catálogo
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
-            
-            <button className="px-8 py-4 rounded-2xl font-semibold text-white border-2 border-zinc-700 hover:border-violet-500/50 hover:bg-zinc-900/50 backdrop-blur-sm transition-all duration-300 flex items-center gap-2 group">
-              <Zap className="w-5 h-5 text-violet-400 group-hover:text-violet-300" />
-              Ver Novedades
             </button>
           </div>
 

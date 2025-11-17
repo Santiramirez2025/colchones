@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import './globals.css'
 import Header from '../components/sections/Header'
 import Footer from '../components/sections/Footer'
+import WhatsAppButton from '../components/WhatsAppButton'
 import { AuthProvider } from '@/lib/context/AuthContext'
 import { Analytics } from '@/components/analytics'
 
@@ -262,22 +263,21 @@ const jsonLd = {
               value: '0',
               currency: 'EUR'
             },
-"deliveryTime": {
-  "@type": "ShippingDeliveryTime",
-  "handlingTime": {
-    "@type": "QuantitativeValue",
-    "minValue": 0,
-    "maxValue": 1,
-    "unitCode": "DAY"
-  },
-  "transitTime": {
-    "@type": "QuantitativeValue",
-    "minValue": 3,
-    "maxValue": 10,
-    "unitCode": "DAY"
-  }
-}
-
+            deliveryTime: {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 1,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 3,
+                "maxValue": 10,
+                "unitCode": "DAY"
+              }
+            }
           }
         }
       ]
@@ -503,6 +503,14 @@ export default function RootLayout({
           
           {/* Footer Component */}
           <Footer />
+
+          {/* Botón de WhatsApp flotante */}
+          <WhatsAppButton 
+            phoneNumber="34600123456"
+            message="¡Hola! Me interesa conocer más sobre vuestros colchones viscoelásticos"
+            position="right"
+            showTooltip={true}
+          />
         </AuthProvider>
 
         {/* ✅ ANALYTICS - Todos los servicios de tracking modulares */}
