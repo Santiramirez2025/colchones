@@ -269,7 +269,7 @@ export default function SocialProof({
         `Alta demanda - Stock bajo`
       ],
       delivery: [
-        `⚡ Envío express disponible para ${location}`,
+        `⚡ Envío disponible para ${location}`,
         `🚚 Entrega en 24-48h para tu zona`,
         `Última entrega en ${location} hace ${Math.floor(Math.random() * 60) + 10} minutos`,
         `✨ Envío gratis disponible`

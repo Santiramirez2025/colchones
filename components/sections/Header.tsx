@@ -143,7 +143,7 @@ const getCurrentCampaign = () => {
   
   // Campaña permanente (resto del año)
   return {
-    tagline: 'ENVÍO EXPRESS GRATIS',
+    tagline: 'ENVÍO GRATIS',
     code: 'ENVIOGRATIS',
     endDate: null,
     showCountdown: false,
@@ -378,7 +378,7 @@ export default function Header() {
               ) : (
                 <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
                   <Icons.Truck className="w-4 h-4 text-cyan-300" />
-                  <span className="text-sm font-black text-white">Envío Express Gratis</span>
+                  <span className="text-sm font-black text-white">Envío Gratis</span>
                 </div>
               )}
               

@@ -232,7 +232,7 @@ export const BENEFITS: Benefit[] = [
   },
   {
     icon: Truck,
-    title: 'Envío Express Gratuito',
+    title: 'Envío Gratuito',
     description: 'Recibe tu colchón en 3-6 días laborables sin coste adicional. Entrega en planta baja o llevamos el colchón hasta tu habitación por solo 15€.',
     gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
     link: '#envio',
@@ -290,7 +290,7 @@ export const COMPETITIVE_ADVANTAGES = [
 export const QUICK_FAQ = [
   {
     question: '¿Cuánto tarda en llegar?',
-    answer: 'Entre 3 y 6 días laborables. Envío express gratuito.'
+    answer: 'Entre 3 y 6 días laborables. Envío gratuito.'
   },
   {
     question: '¿Puedo probarlo antes de comprarlo?',

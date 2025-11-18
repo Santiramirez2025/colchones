@@ -165,7 +165,7 @@ export default function SiteAccessPage() {
         <div className="mt-6 text-center">
           <p className="text-zinc-500 text-sm">
             ¿Problemas para acceder?{' '}
-            <a href="mailto:soporte@tudominio.com" className="text-blue-400 hover:text-blue-300 transition-colors">
+            <a href="mailto:soporte@tiendacolchon.es" className="text-blue-400 hover:text-blue-300 transition-colors">
               Contacta con soporte
             </a>
           </p>

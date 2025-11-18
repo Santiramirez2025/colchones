@@ -169,7 +169,7 @@ export default function FooterCyber() {
     },
     {
       icon: Icons.Truck,
-      title: 'Envío Express GRATIS',
+      title: 'Envío GRATIS',
       description: 'Península 24-48h',
       gradient: 'from-cyan-600 to-blue-600'
     },

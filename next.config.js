@@ -123,8 +123,8 @@ const nextConfig = {
       // Ejemplo: redirigir www a no-www
       // {
       //   source: '/:path*',
-      //   has: [{ type: 'host', value: 'www.tudominio.com' }],
-      //   destination: 'https://tudominio.com/:path*',
+      //   has: [{ type: 'host', value: 'www.tiendacolchon.es' }],
+      //   destination: 'https://tiendacolchon.es/:path*',
       //   permanent: true,
       // },
     ]
