@@ -17,7 +17,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 días
     // ✅ Agregar qualities para evitar warnings
-    qualities: [75, 90, 100],
+    qualities: [50, 75, 90, 95, 100],
     // Deshabilitar lazy loading para imágenes críticas (puedes sobreescribir con priority)
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

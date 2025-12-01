@@ -79,7 +79,7 @@ export default function StickyBar({
         {/* Contador de resultados */}
         <div className="flex items-center justify-between mt-3 text-sm">
           <span className="text-gray-600">
-            <span className="font-bold text-gray-900">{filteredProductsLength}</span> {filteredProductsLength === 1 ? 'colchón' : 'colchones'}
+            <span className="font-bold text-gray-900">{filteredProductsLength}</span> {filteredProductsLength === 1 ? 'colchón' : 'Productos'}
           </span>
           {activeFiltersCount > 0 && (
             <button

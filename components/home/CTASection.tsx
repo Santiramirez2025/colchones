@@ -54,8 +54,8 @@ export function CTASection() {
       className="relative py-20 sm:py-32 lg:py-40 overflow-hidden"
       aria-labelledby="cta-heading"
     >
-      {/* Background base */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-fuchsia-600 to-purple-600" />
+      {/* Background base - colores Azul Colchones */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600" />
       
       {/* Orbes animados - simplificados en móvil */}
       {shouldAnimate && (
@@ -74,7 +74,7 @@ export function CTASection() {
                 y: [0, -80, 0],
               }}
               transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-0 left-0 w-[600px] sm:w-[900px] h-[600px] sm:h-[900px] bg-gradient-to-br from-cyan-400/40 to-blue-500/40 rounded-full mix-blend-screen filter blur-[80px] sm:blur-[120px]"
+              className="absolute top-0 left-0 w-[600px] sm:w-[900px] h-[600px] sm:h-[900px] bg-gradient-to-br from-blue-400/40 to-cyan-500/40 rounded-full mix-blend-screen filter blur-[80px] sm:blur-[120px]"
             />
             <motion.div
               animate={{ 
@@ -83,7 +83,7 @@ export function CTASection() {
                 y: [0, 100, 0],
               }}
               transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-0 right-0 w-[500px] sm:w-[800px] h-[500px] sm:h-[800px] bg-gradient-to-br from-fuchsia-400/40 to-purple-500/40 rounded-full mix-blend-screen filter blur-[80px] sm:blur-[120px]"
+              className="absolute bottom-0 right-0 w-[500px] sm:w-[800px] h-[500px] sm:h-[800px] bg-gradient-to-br from-indigo-400/40 to-purple-500/40 rounded-full mix-blend-screen filter blur-[80px] sm:blur-[120px]"
             />
           </div>
         </motion.div>
@@ -112,10 +112,10 @@ export function CTASection() {
               transition={{ delay: 0.2, duration: 0.8 }}
             >
               <h2 id="cta-heading" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight">
-                ¿Listo para dormir
+                Creamos un Test
                 <br />
                 <span className="relative inline-block">
-                  como nunca antes?
+                Para elegir tu colchón. 
                   {shouldAnimate && (
                     <motion.div
                       initial={{ scaleX: 0 }}
@@ -137,8 +137,24 @@ export function CTASection() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/95 max-w-3xl mx-auto leading-relaxed font-semibold px-4"
             >
-              Descubre en 2 minutos qué colchón se adapta perfectamente a ti
+              Descubrí en 2 minutos qué colchón se adapta perfectamente a vos
             </motion.p>
+
+            {/* Badge Villa María */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="flex justify-center"
+            >
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/30">
+                <span className="text-2xl" role="img" aria-label="Argentina">🇦🇷</span>
+                <span className="text-white font-bold text-sm sm:text-base">
+                  Envío GRATIS en Villa María · 35+ años de experiencia
+                </span>
+              </div>
+            </motion.div>
           </div>
 
           {/* CTA Button principal */}
@@ -152,13 +168,32 @@ export function CTASection() {
             <Link
               href="/simulador"
               prefetch={true}
-              className="group relative inline-flex items-center gap-3 sm:gap-4 bg-white text-violet-600 px-8 sm:px-10 lg:px-12 py-5 sm:py-6 lg:py-7 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-white/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              className="group relative inline-flex items-center gap-3 sm:gap-4 bg-white text-blue-600 px-8 sm:px-10 lg:px-12 py-5 sm:py-6 lg:py-7 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-xl lg:text-2xl shadow-2xl hover:shadow-white/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               aria-label="Hacer test de colchón personalizado ahora"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white via-violet-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl sm:rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white via-blue-50 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl sm:rounded-3xl" />
               <Brain className="w-6 h-6 sm:w-7 sm:h-7 relative z-10 group-hover:scale-110 transition-transform" aria-hidden="true" />
               <span className="relative z-10">Hacer test ahora</span>
               <ArrowRight className="w-6 h-6 sm:w-7 sm:h-7 relative z-10 group-hover:translate-x-2 transition-transform" aria-hidden="true" />
+            </Link>
+          </motion.div>
+
+          {/* WhatsApp alternativo */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="flex justify-center"
+          >
+            <Link
+              href="https://wa.me/5493531234567?text=Hola!%20Quiero%20saber%20más%20sobre%20colchones"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 text-white/90 hover:text-white font-semibold text-sm sm:text-base transition-all"
+            >
+              <span>O hablá con nosotros por WhatsApp</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
 
@@ -171,7 +206,7 @@ export function CTASection() {
 
       {/* Efectos de brillo en las esquinas */}
       <div className="absolute top-0 left-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-br from-cyan-400/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-tl from-fuchsia-400/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-gradient-to-tl from-blue-400/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
     </section>
   )
 }

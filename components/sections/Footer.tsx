@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 
 // ============================================================================
-// ICONS - Optimizados con strokeWidth consistente
+// ICONS - Optimizados
 // ============================================================================
 const Icons = {
   Shield: ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -33,6 +33,11 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
     </svg>
   ),
+  WhatsApp: ({ className = "w-5 h-5" }: { className?: string }) => (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+  ),
   Mail: ({ className = "w-5 h-5" }: { className?: string }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -58,11 +63,6 @@ const Icons = {
       <path d="M12 23a7.5 7.5 0 01-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14 1 0 2.5 0 5-2.47.27.773.5 1.604.5 2.47A7.5 7.5 0 0112 23z" />
     </svg>
   ),
-  Zap: ({ className = "w-4 h-4" }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  ),
   Tag: ({ className = "w-4 h-4" }: { className?: string }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -71,6 +71,12 @@ const Icons = {
   Moon: ({ className = "w-6 h-6" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
       <path d="M21.64 13a1 1 0 00-1.05-.14 8.05 8.05 0 01-3.37.73 8.15 8.15 0 01-8.14-8.1 8.59 8.59 0 01.25-2A1 1 0 008 2.36a10.14 10.14 0 1014 11.69 1 1 0 00-.36-1.05z" />
+    </svg>
+  ),
+  MapPin: ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   Instagram: ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -83,11 +89,6 @@ const Icons = {
       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
     </svg>
   ),
-  Twitter: ({ className = "w-5 h-5" }: { className?: string }) => (
-    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-    </svg>
-  ),
   Youtube: ({ className = "w-5 h-5" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -96,138 +97,187 @@ const Icons = {
 }
 
 // ============================================================================
-// CONFIG
+// 🇦🇷 SISTEMA DE CAMPAÑAS ARGENTINA
 // ============================================================================
+const getCurrentCampaign = () => {
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  
+  // Hot Sale Argentina (Mayo)
+  if (month === 5 && day >= 20 && day <= 31) {
+    return {
+      tagline: 'HOT SALE -40%',
+      code: 'HOTSALE40',
+      description: 'Descuentos especiales Hot Sale Argentina',
+      endDate: new Date(now.getFullYear(), 4, 31, 23, 59, 59),
+      showCountdown: true,
+      theme: 'hotsale'
+    }
+  }
+  
+  // Cyber Monday Argentina (Noviembre)
+  if (month === 11 && day >= 1 && day <= 10) {
+    return {
+      tagline: 'CYBER -45%',
+      code: 'CYBER45',
+      description: 'Ofertas exclusivas Cyber Monday',
+      endDate: new Date(now.getFullYear(), 10, 10, 23, 59, 59),
+      showCountdown: true,
+      theme: 'cyber'
+    }
+  }
+  
+  // Campaña permanente
+  return {
+    tagline: 'Ofertas fin de año Hasta 50% OFF',
+    code: 'VILLAMARIA',
+    description: 'Financiación especial',
+    endDate: null,
+    showCountdown: false,
+    theme: 'default'
+  }
+}
+
+// ============================================================================
+// CONFIG ARGENTINA 🇦🇷
+// ============================================================================
+const campaign = getCurrentCampaign()
+
 const SITE_CONFIG = {
-  phone: '+34981123456',
-  phoneDisplay: '981 12 34 56',
-  email: 'info@tiendacolchon.es',
-  schedule: 'L-V: 9:00-19:00h',
-  cyberCode: 'CYBER24',
+  phone: '+5493531234567',
+  phoneDisplay: '353 123-4567',
+  whatsappNumber: '5493531234567',
+  email: 'info@azulcolchones.com.ar',
+  brandName: 'Azul Colchones',
+  location: 'Villa María, Córdoba',
+  schedule: 'Lun-Vie: 9:00-19:00hs | Sáb: 9:00-13:00hs',
+  tagline: campaign.tagline,
+  promoCode: campaign.code,
+  campaignDescription: campaign.description,
+  showCountdown: campaign.showCountdown,
+  endDate: campaign.endDate,
+  theme: campaign.theme,
   socialMedia: [
-    { name: 'Instagram', href: 'https://instagram.com/tiendacolchon', icon: Icons.Instagram },
-    { name: 'Facebook', href: 'https://facebook.com/tiendacolchon', icon: Icons.Facebook },
-    { name: 'Twitter', href: 'https://twitter.com/tiendacolchon', icon: Icons.Twitter },
-    { name: 'Youtube', href: 'https://youtube.com/tiendacolchon', icon: Icons.Youtube },
+    { name: 'Instagram', href: 'https://instagram.com/azulcolchones', icon: Icons.Instagram },
+    { name: 'Facebook', href: 'https://facebook.com/azulcolchones', icon: Icons.Facebook },
+    { name: 'Youtube', href: 'https://youtube.com/@azulcolchones', icon: Icons.Youtube },
   ]
 }
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
-export default function FooterCyber() {
+export default function Footer() {
   const pathname = usePathname()
   
-  // ✅ TODOS los hooks PRIMERO (antes del return condicional)
+  // ✅ TODOS los hooks PRIMERO
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || isSubmitting || submitted) return
     
     setIsSubmitting(true)
+    
+    // Simulación de envío (reemplazar con tu API)
     setTimeout(() => {
       setSubmitted(true)
       setEmail('')
       setTimeout(() => {
         setSubmitted(false)
         setIsSubmitting(false)
-      }, 2500)
+      }, 3000)
     }, 1000)
   }
 
   const quickLinks = [
-    { href: '/catalogo', label: 'Catálogo Cyber', hot: true },
-    { href: '/guia-compra', label: 'Cómo comprar' },
+    { href: '/catalogo', label: 'Ver Ofertas', hot: true },
+    { href: '/guia-compra', label: 'Guía de compra' },
     { href: '/envios', label: 'Envíos y entregas' },
-    { href: '/garantia', label: 'Garantía 10 años' },
+    { href: '/garantia', label: 'Garantía extendida' },
     { href: '/opiniones', label: 'Opiniones' },
   ]
 
   const helpLinks = [
     { href: '/contacto', label: 'Contacto' },
-    { href: '/preguntas-frecuentes', label: 'FAQ' },
-    { href: '/simulador', label: 'Test IA', featured: true },
-    { href: '/cuidado-colchon', label: 'Cuidado del colchón' },
+    { href: '/preguntas-frecuentes', label: 'Preguntas frecuentes' },
+    { href: '/simulador', label: 'Test IA Colchones', featured: true },
+    { href: '/cuidado-colchon', label: 'Cuidado del Colchon' },
+    { href: '/blog', label: 'Blog y consejos' },
   ]
 
   const legalLinks = [
-    { href: '/aviso-legal', label: 'Aviso legal' },
-    { href: '/privacidad', label: 'Privacidad' },
+    { href: '/terminos', label: 'Términos y condiciones' },
+    { href: '/privacidad', label: 'Política de privacidad' },
+    { href: '/condiciones-compra', label: 'Condiciones de Compra' },
     { href: '/cookies', label: 'Cookies' },
-    { href: '/condiciones-compra', label: 'Condiciones' },
   ]
 
   const trustBadges = [
     {
       icon: Icons.Shield,
-      title: 'Garantía 10 años',
-      description: 'En todos los productos',
+      title: 'Garantía Extendida',
+      description: 'Hasta 10 años',
       gradient: 'from-emerald-600 to-teal-600'
     },
     {
       icon: Icons.Truck,
       title: 'Envío GRATIS',
-      description: 'Península 24-48h',
+      description: 'Villa María y zona',
       gradient: 'from-cyan-600 to-blue-600'
     },
     {
-      icon: Icons.Return,
-      title: '100 noches prueba',
-      description: 'Devolución sin coste',
-      gradient: 'from-blue-600 to-indigo-600'
-    },
-    {
       icon: Icons.CreditCard,
-      title: 'Pago 100% seguro',
-      description: 'Protección total',
+      title: '12 Cuotas Sin Interés',
+      description: 'Todas las tarjetas',
       gradient: 'from-purple-600 to-pink-600'
     }
   ]
 
-  // 🚫 Return condicional AL FINAL (después de TODOS los hooks)
+  // 🚫 Return condicional AL FINAL
   if (pathname?.startsWith('/admin')) {
     return null
   }
 
-  // ✅ Renderizar Footer normal
+  // ✅ Renderizar Footer
   return (
-    <footer className="relative bg-zinc-950 text-zinc-400 border-t border-cyan-500/20 overflow-hidden">
+    <footer className="relative bg-zinc-950 text-zinc-400 border-t border-blue-500/20 overflow-hidden">
       {/* Efectos de fondo */}
-      <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/10 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1s'}} />
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-950/10 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse-slow" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1s'}} />
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         
-        {/* CYBER MONDAY BANNER */}
-        <section className="py-8 md:py-10 border-b border-cyan-500/10">
-          <div className="relative overflow-hidden bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 rounded-2xl p-6 md:p-8 border border-cyan-500/30">
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
+        {/* BANNER DE CAMPAÑA ARGENTINA 🇦🇷 */}
+        <section className="py-8 md:py-10 border-b border-blue-500/10">
+          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600/20 via-cyan-600/20 to-blue-600/20 rounded-2xl p-6 md:p-8 border border-blue-500/30">
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(59,130,246,.15)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
             
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/50">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/50">
                   <Icons.Fire className="w-7 h-7 text-white animate-pulse" />
                 </div>
                 <div>
-                  <div className="text-xl md:text-2xl font-black text-transparent bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text mb-1">
-                  Ofertas finales del año.
+                  <div className="text-xl md:text-2xl font-black text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-300 bg-clip-text mb-1">
+                    {SITE_CONFIG.tagline} 🇦🇷
                   </div>
-                  <div className="text-sm text-cyan-300 font-bold">
-                    Usa el código <span className="px-2 py-0.5 bg-yellow-500 text-black rounded font-black">{SITE_CONFIG.cyberCode}</span> para -10% adicional
+                  <div className="text-sm text-blue-300 font-bold">
+                    {SITE_CONFIG.campaignDescription} · Código: <span className="px-2 py-0.5 bg-yellow-500 text-black rounded font-black">{SITE_CONFIG.promoCode}</span>
                   </div>
                 </div>
               </div>
               
               <Link 
                 href="/catalogo"
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
               >
                 <Icons.Tag className="w-5 h-5" />
-                <span>Ver Ofertas</span>
+                <span>Ver Catálogo</span>
                 <Icons.ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -235,21 +285,20 @@ export default function FooterCyber() {
         </section>
 
         {/* BADGES DE CONFIANZA */}
-        <section className="py-10 md:py-14 border-b border-cyan-500/10">
+        <section className="py-10 md:py-14 border-b border-blue-500/10">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {trustBadges.map((badge, index) => (
               <div
                 key={index}
-                className="group relative bg-zinc-900/40 backdrop-blur-sm rounded-xl p-5 border border-cyan-500/20 hover:border-cyan-500/40 transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+                className="group relative bg-zinc-900/40 backdrop-blur-sm rounded-xl p-5 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 hover:scale-[1.02] overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10 transition-all duration-300" />
-                <div className="absolute -inset-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 blur transition-all duration-300" style={{background: `linear-gradient(to right, var(--tw-gradient-stops))`, '--tw-gradient-from': 'rgb(6 182 212 / 0.2)', '--tw-gradient-to': 'rgb(59 130 246 / 0.2)'} as React.CSSProperties} />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-cyan-500/10 transition-all duration-300" />
                 
                 <div className="relative z-10">
-                  <div className={`w-12 h-12 mb-3 rounded-xl bg-gradient-to-br ${badge.gradient} flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 group-hover:scale-110 transition-all duration-300`}>
+                  <div className={`w-12 h-12 mb-3 rounded-xl bg-gradient-to-br ${badge.gradient} flex items-center justify-center text-white shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 group-hover:scale-110 transition-all duration-300`}>
                     <badge.icon className="w-6 h-6" />
                   </div>
-                  <h4 className="text-sm font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">{badge.title}</h4>
+                  <h4 className="text-sm font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">{badge.title}</h4>
                   <p className="text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors">{badge.description}</p>
                 </div>
               </div>
@@ -257,30 +306,30 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* NEWSLETTER CTA */}
-        <section className="py-10 md:py-14 border-b border-cyan-500/10">
+        {/* NEWSLETTER */}
+        <section className="py-10 md:py-14 border-b border-blue-500/10">
           <div className="max-w-3xl mx-auto">
-            <div className="relative overflow-hidden bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-transparent rounded-2xl p-8 md:p-10 border border-cyan-500/30">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl" />
-              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,.05)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
+            <div className="relative overflow-hidden bg-gradient-to-br from-blue-950/30 via-cyan-950/20 to-transparent rounded-2xl p-8 md:p-10 border border-blue-500/30">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-cyan-600/10 rounded-full blur-3xl" />
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(59,130,246,.05)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
               
               <div className="relative z-10">
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                  <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                     <Icons.Mail className="w-7 h-7 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-xl md:text-2xl font-black text-white">
-                        Newsletter Ofertas finales del año
+                        Newsletter Exclusivo
                       </h3>
                       <span className="px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-[10px] font-black rounded uppercase animate-pulse">
                         -10%
                       </span>
                     </div>
                     <p className="text-sm md:text-base text-zinc-400">
-                      Suscríbete y recibe <span className="text-cyan-400 font-bold">ofertas exclusivas</span>, consejos para tu descanso y promociones especiales.
+                      Suscribite y recibí <span className="text-blue-400 font-bold">ofertas exclusivas</span>, consejos para tu mejor descanso y promociones especiales 🇦🇷
                     </p>
                   </div>
                 </div>
@@ -292,7 +341,8 @@ export default function FooterCyber() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="tu@email.com"
-                      className="w-full px-5 py-3.5 bg-zinc-900/60 backdrop-blur-sm border border-cyan-500/30 rounded-xl text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                      required
+                      className="w-full px-5 py-3.5 bg-zinc-900/60 backdrop-blur-sm border border-blue-500/30 rounded-xl text-white text-sm placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                     />
                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
                       <Icons.Mail className="w-4 h-4 text-zinc-700" />
@@ -301,14 +351,14 @@ export default function FooterCyber() {
                   <button
                     type="submit"
                     disabled={isSubmitting || submitted || !email}
-                    className="px-8 py-3.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-bold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-[1.02] active:scale-95 whitespace-nowrap"
+                    className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-sm font-bold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-[1.02] active:scale-95 whitespace-nowrap"
                   >
                     {submitted ? (
                       <span className="flex items-center gap-2">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        ¡Suscrito!
+                        ¡Suscripto!
                       </span>
                     ) : isSubmitting ? (
                       <span className="flex items-center gap-2">
@@ -319,99 +369,103 @@ export default function FooterCyber() {
                         Enviando...
                       </span>
                     ) : (
-                      'Suscribirme ahora'
+                      'Suscribirme Gratis'
                     )}
                   </button>
                 </form>
                 
                 <p className="text-xs text-zinc-600 mt-4 flex items-center gap-1.5">
-                  <Icons.Shield className="w-3.5 h-3.5 text-cyan-500" />
-                  <span>Tus datos están seguros. Puedes darte de baja en cualquier momento.</span>
+                  <Icons.Shield className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Tus datos están protegidos. Cancelá tu suscripción cuando quieras.</span>
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CONTACTO DIRECTO */}
-        <section className="py-10 md:py-14 border-b border-cyan-500/10">
+        {/* CONTACTO DIRECTO ARGENTINA 🇦🇷 */}
+        <section className="py-10 md:py-14 border-b border-blue-500/10">
           <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            
             <a
-              href={`tel:${SITE_CONFIG.phone}`}
-              className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02]"
+              href={`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('¡Hola! Me interesa conocer más sobre los colchones')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/30 hover:border-emerald-500/50 transition-all duration-300 hover:scale-[1.02]"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10 transition-all duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/0 to-emerald-500/0 group-hover:from-emerald-500/10 group-hover:to-teal-500/10 transition-all duration-300" />
               
               <div className="relative flex items-center gap-4">
-                <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300 group-hover:scale-110">
-                  <Icons.Phone className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all duration-300 group-hover:scale-110">
+                  <Icons.WhatsApp className="w-7 h-7 text-white" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xs font-bold text-cyan-400 mb-1 uppercase tracking-wide">Llámanos ahora</div>
-                  <div className="text-xl font-black text-white mb-1 group-hover:text-cyan-300 transition-colors">{SITE_CONFIG.phoneDisplay}</div>
+                  <div className="text-xs font-bold text-emerald-400 mb-1 uppercase tracking-wide">Consultá por WhatsApp</div>
+                  <div className="text-xl font-black text-white mb-1 group-hover:text-emerald-300 transition-colors">{SITE_CONFIG.phoneDisplay}</div>
                   <div className="flex items-center gap-1.5 text-xs text-zinc-500">
                     <Icons.Clock className="w-3.5 h-3.5" />
                     <span>{SITE_CONFIG.schedule}</span>
                   </div>
                 </div>
-                <Icons.ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+                <Icons.ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
               </div>
             </a>
 
             <a
-              href={`mailto:${SITE_CONFIG.email}`}
-              className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02]"
+              href={`tel:${SITE_CONFIG.phone}`}
+              className="group relative overflow-hidden bg-zinc-900/40 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02]"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10 transition-all duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:to-cyan-500/10 transition-all duration-300" />
               
               <div className="relative flex items-center gap-4">
-                <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:scale-110">
-                  <Icons.Mail className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 flex-shrink-0 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300 group-hover:scale-110">
+                  <Icons.Phone className="w-7 h-7 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold text-cyan-400 mb-1 uppercase tracking-wide">Escríbenos</div>
-                  <div className="text-sm font-bold text-white mb-1 truncate group-hover:text-cyan-300 transition-colors">{SITE_CONFIG.email}</div>
-                  <div className="text-xs text-zinc-500">Respuesta en menos de 24h</div>
+                  <div className="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wide">Llamanos Ahora</div>
+                  <div className="text-xl font-black text-white mb-1 truncate group-hover:text-blue-300 transition-colors">{SITE_CONFIG.phoneDisplay}</div>
+                  <div className="text-xs text-zinc-500">Atención personalizada</div>
                 </div>
-                <Icons.ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                <Icons.ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-blue-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
               </div>
             </a>
+
           </div>
         </section>
 
         {/* ENLACES ÚTILES */}
-        <section className="py-10 md:py-14 border-b border-cyan-500/10">
+        <section className="py-10 md:py-14 border-b border-blue-500/10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             <div>
-              <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
+              <h3 className="text-xs font-black text-blue-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-5 h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                 Empresa
               </h3>
               <ul className="space-y-3">
                 <li>
                   <Link href="/nosotros" className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group">
-                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
                     <span>Sobre nosotros</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/tiendas" className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group">
-                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
-                    <span>Nuestras tiendas</span>
+                  <Link href="/login" className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group">
+                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    <span>Login</span>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sostenibilidad" className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group">
-                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
-                    <span>Sostenibilidad</span>
+                  <Link href="/aviso-legal" className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group">
+                    <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                    <span>Aviso Legal</span>
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
+              <h3 className="text-xs font-black text-blue-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-5 h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                 Comprar
               </h3>
               <ul className="space-y-3">
@@ -421,7 +475,7 @@ export default function FooterCyber() {
                       href={link.href}
                       className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group"
                     >
-                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
                       <span>{link.label}</span>
                       {link.hot && (
                         <span className="ml-1.5 px-1.5 py-0.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-[8px] font-black rounded uppercase">
@@ -435,8 +489,8 @@ export default function FooterCyber() {
             </div>
 
             <div>
-              <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
+              <h3 className="text-xs font-black text-blue-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-5 h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                 Ayuda
               </h3>
               <ul className="space-y-3">
@@ -446,10 +500,10 @@ export default function FooterCyber() {
                       href={link.href}
                       className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group"
                     >
-                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
                       <span>{link.label}</span>
                       {link.featured && (
-                        <span className="ml-1.5 px-1.5 py-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[8px] font-black rounded uppercase">
+                        <span className="ml-1.5 px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-[8px] font-black rounded uppercase">
                           IA
                         </span>
                       )}
@@ -460,8 +514,8 @@ export default function FooterCyber() {
             </div>
 
             <div>
-              <h3 className="text-xs font-black text-cyan-400 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <span className="w-5 h-0.5 bg-gradient-to-r from-cyan-500 to-transparent" />
+              <h3 className="text-xs font-black text-blue-400 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-5 h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
                 Legal
               </h3>
               <ul className="space-y-3">
@@ -471,7 +525,7 @@ export default function FooterCyber() {
                       href={link.href}
                       className="text-sm text-zinc-400 hover:text-white transition-colors inline-flex items-center group"
                     >
-                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
+                      <Icons.ChevronRight className="w-3.5 h-3.5 mr-1.5 text-zinc-800 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
                       <span>{link.label}</span>
                     </Link>
                   </li>
@@ -481,56 +535,65 @@ export default function FooterCyber() {
           </div>
         </section>
 
-        {/* FOOTER FINAL */}
+        {/* FOOTER FINAL 🇦🇷 */}
         <section className="py-8 md:py-10">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="flex-1 max-w-md">
                 <Link href="/" className="inline-flex items-center gap-3 group mb-4">
                   <div className="relative">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-cyan-500/50">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/50">
                       <Icons.Moon className="w-6 h-6 text-white" />
                     </div>
-                    <div className="absolute inset-0 rounded-xl bg-cyan-400/30 blur-md -z-10 animate-pulse-glow" />
+                    <div className="absolute inset-0 rounded-xl bg-blue-400/30 blur-md -z-10 animate-pulse-glow" />
                   </div>
                   <div>
                     <div className="text-lg font-black leading-none tracking-tight">
-                      <span className="text-white">Tienda</span>
-                      <span className="text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text">Colchon</span>
+                      <span className="text-white">Azul</span>
+                      <span className="text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text">Colchones</span>
                     </div>
-                    <div className="text-[9px] font-black text-cyan-400 uppercase tracking-wider mt-0.5">
-                    Ofertas finales del año
+                    <div className="text-[9px] font-black text-blue-400 uppercase tracking-wider mt-0.5 flex items-center gap-1">
+                      <Icons.MapPin className="w-2.5 h-2.5" />
+                      <span>{SITE_CONFIG.location}</span>
                     </div>
                   </div>
                 </Link>
                 <p className="text-sm text-zinc-500 leading-relaxed mb-4">
-                  Tu tienda especializada en colchones de calidad. Fabricados en España con los mejores materiales para garantizar tu mejor descanso.
+                  Tu tienda de colchones premium en Villa María, Córdoba. Más de 35 años de experiencia ofreciendo calidad y confort para tu mejor descanso 🇦🇷
                 </p>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-4">
                   {SITE_CONFIG.socialMedia.map((social) => (
                     <a
                       key={social.name}
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-zinc-900/50 border border-cyan-500/20 flex items-center justify-center text-zinc-600 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-zinc-900/70 transition-all hover:scale-110 shadow-lg hover:shadow-cyan-500/20"
+                      className="w-10 h-10 rounded-xl bg-zinc-900/50 border border-blue-500/20 flex items-center justify-center text-zinc-600 hover:text-blue-400 hover:border-blue-500/50 hover:bg-zinc-900/70 transition-all hover:scale-110 shadow-lg hover:shadow-blue-500/20"
                       aria-label={social.name}
                     >
                       <social.icon className="w-5 h-5" />
                     </a>
                   ))}
                 </div>
+
+                <a
+                  href={`mailto:${SITE_CONFIG.email}`}
+                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <Icons.Mail className="w-3.5 h-3.5" />
+                  <span>{SITE_CONFIG.email}</span>
+                </a>
               </div>
 
               <div className="flex flex-col gap-4">
                 <div>
-                  <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-wide">Métodos de pago</div>
+                  <div className="text-xs font-bold text-blue-400 mb-3 uppercase tracking-wide">Métodos de pago 🇦🇷</div>
                   <div className="flex flex-wrap items-center gap-2">
-                    {['Visa', 'Mastercard', 'PayPal', 'Bizum'].map((method) => (
+                    {['Mercado Pago', 'Transferencia', 'Visa', 'Mastercard', 'Efectivo'].map((method) => (
                       <div
                         key={method}
-                        className="px-3 py-2 bg-zinc-900/50 border border-cyan-500/20 rounded-lg text-xs text-zinc-400 font-semibold hover:border-cyan-500/40 hover:text-cyan-300 transition-all"
+                        className="px-3 py-2 bg-zinc-900/50 border border-blue-500/20 rounded-lg text-xs text-zinc-400 font-semibold hover:border-blue-500/40 hover:text-blue-300 transition-all"
                       >
                         {method}
                       </div>
@@ -541,23 +604,31 @@ export default function FooterCyber() {
                 <div className="flex flex-wrap items-center gap-3 text-xs">
                   <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
                     <Icons.Shield className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300 font-bold">Pago 100% seguro</span>
+                    <span className="text-emerald-300 font-bold">Compra 100% segura</span>
                   </div>
                   <div className="flex items-center gap-2 px-3 py-2 bg-blue-500/10 rounded-xl border border-blue-500/30">
-                    <span className="text-lg">🇪🇸</span>
-                    <span className="text-blue-300 font-bold">Hecho en España</span>
+                    <span className="text-lg">🇦🇷</span>
+                    <span className="text-blue-300 font-bold">Hecho en Argentina</span>
                   </div>
+                  <a
+                    href="https://www.argentina.gob.ar/produccion/defensadelconsumidor"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 bg-zinc-900/50 rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-all"
+                  >
+                    <span className="text-blue-300 font-bold text-[10px]">Defensa del Consumidor</span>
+                  </a>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-cyan-500/10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-blue-500/10">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-zinc-600">
-                <span className="font-medium">© {new Date().getFullYear()} TiendaColchon</span>
+                <span className="font-medium">© {new Date().getFullYear()} Azul Colchones</span>
                 <span className="hidden sm:inline text-zinc-800">·</span>
-                <span>Todos los derechos reservados</span>
+                <span>Villa María, Córdoba, Argentina</span>
                 <span className="hidden sm:inline text-zinc-800">·</span>
-                <span className="text-cyan-500 font-medium">Ofertas finales del año</span>
+                <span className="text-blue-500 font-medium">{SITE_CONFIG.tagline}</span>
               </div>
               
               <div className="flex items-center gap-2">
@@ -567,7 +638,7 @@ export default function FooterCyber() {
                   ))}
                 </div>
                 <span className="text-xs text-zinc-500 font-medium">
-                  <span className="text-white font-bold">4.8</span>/5 · 2,847 opiniones
+                  <span className="text-white font-bold">4.9</span>/5 · 1,234 opiniones
                 </span>
               </div>
             </div>
@@ -597,6 +668,13 @@ export default function FooterCyber() {
           .animate-pulse-slow,
           .animate-pulse-glow,
           .animate-shimmer { animation: none !important; }
+        }
+
+        @supports (scrollbar-width: thin) {
+          * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+          }
         }
       `}</style>
     </footer>

@@ -6,165 +6,240 @@ export default function AvisoLegalPage() {
       icon: Building2,
       title: 'Datos Identificativos',
       items: [
-        'Razón Social: TiendaColchon S.L.',
-        'CIF: B-12345678',
-        'Registro Mercantil: Madrid, Tomo 1234, Folio 56, Hoja M-123456',
-        'Domicilio: Calle del Descanso, 25, 28001 Madrid'
+        'Razón Social: TiendaColchon Argentina S.R.L.',
+        'CUIT: 30-12345678-9',
+        'Inscripción IGJ: Registro N° 123456',
+        'Domicilio: Av. Córdoba 1234, C1055AAB CABA, Argentina'
       ]
     },
     {
       icon: MapPin,
       title: 'Contacto',
       items: [
-        'Email: info@tiendacolchon.es',
-        'Teléfono: +34 900 123 456',
-        'Horario: L-V de 9:00 a 19:00h',
-        'Web: www.tiendacolchon.es'
+        'Email: info@tiendacolchon.com.ar',
+        'Teléfono: +54 11 4000-0000',
+        'WhatsApp: +54 9 11 5000-0000',
+        'Horario: Lunes a Viernes de 9:00 a 18:00hs'
       ]
     },
     {
       icon: Scale,
       title: 'Condiciones de Uso',
       items: [
-        'Acceso libre y gratuito',
-        'Uso responsable del sitio web',
-        'Prohibido uso fraudulento',
-        'Nos reservamos el derecho de modificar contenidos'
+        'Acceso libre y gratuito al sitio web',
+        'Uso responsable de los contenidos',
+        'Prohibido el uso fraudulento o ilegal',
+        'Nos reservamos el derecho de modificar contenidos sin previo aviso'
       ]
     },
     {
       icon: FileText,
       title: 'Propiedad Intelectual',
-      content: 'Todos los contenidos del sitio (textos, imágenes, logotipos, diseño) son propiedad de TiendaColchon S.L. o de terceros con licencia. Queda prohibida su reproducción sin autorización.'
+      content: 'Todos los contenidos del sitio (textos, imágenes, logotipos, marcas, diseño) son propiedad exclusiva de TiendaColchon Argentina S.R.L. o están debidamente licenciados. Queda prohibida su reproducción, distribución o modificación sin autorización expresa por escrito.'
     }
   ]
 
   const legalInfo = [
     {
       title: 'Responsabilidad',
-      content: 'TiendaColchon S.L. no se hace responsable de los daños y perjuicios derivados del uso inadecuado del sitio web. Nos esforzamos por mantener la información actualizada, pero no garantizamos la ausencia de errores.'
+      content: 'TiendaColchon Argentina S.R.L. no se responsabiliza por daños directos o indirectos derivados del uso del sitio web. Nos esforzamos por mantener la información actualizada y precisa, pero no garantizamos la ausencia de errores u omisiones.'
     },
     {
-      title: 'Enlaces Externos',
-      content: 'Nuestro sitio puede contener enlaces a sitios web de terceros. No nos hacemos responsables del contenido o políticas de privacidad de estos sitios externos.'
+      title: 'Enlaces a Terceros',
+      content: 'Nuestro sitio puede contener enlaces a sitios web de terceros. No nos responsabilizamos por el contenido, políticas de privacidad o prácticas de estos sitios externos. El acceso a los mismos es bajo responsabilidad del usuario.'
     },
     {
-      title: 'Ley Aplicable',
-      content: 'Este aviso legal se rige por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales del domicilio del usuario.'
+      title: 'Ley Aplicable y Jurisdicción',
+      content: 'Este aviso legal se rige por las leyes de la República Argentina. Para cualquier controversia o conflicto, las partes se someten a la jurisdicción de los Tribunales Ordinarios de la Ciudad Autónoma de Buenos Aires, renunciando expresamente a cualquier otro fuero o jurisdicción que pudiera corresponderles.'
+    },
+    {
+      title: 'Defensa del Consumidor',
+      content: 'Cumplimos con la Ley 24.240 de Defensa del Consumidor y sus modificatorias. Los consumidores pueden presentar reclamos ante la Dirección General de Defensa y Protección del Consumidor de la Ciudad Autónoma de Buenos Aires o el organismo provincial correspondiente.'
     }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 pt-32 pb-20">
-      <div className="container mx-auto px-4 max-w-5xl">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-2xl mb-6 border border-violet-500/30">
-            <Scale className="w-10 h-10 text-violet-400" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-            Aviso Legal
-          </h1>
-          <p className="text-zinc-400">Última actualización: Octubre 2025</p>
-        </div>
-
-        {/* Main Sections Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {sections.map((section, index) => (
-            <div 
-              key={index}
-              className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-violet-500/30 transition-all"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center">
-                  <section.icon className="w-6 h-6 text-violet-400" />
-                </div>
-                <h2 className="text-xl font-bold text-white">{section.title}</h2>
-              </div>
-              
-              {section.items ? (
-                <ul className="space-y-2">
-                  {section.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                      <span className="text-violet-400 mt-1">•</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  {section.content}
-                </p>
-              )}
+    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden antialiased">
+      {/* Hero Section */}
+      <section className="w-full border-b border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-zinc-800/50 border border-zinc-700/50 rounded-2xl mb-6">
+              <Scale className="w-8 h-8 md:w-10 md:h-10 text-zinc-300" />
             </div>
-          ))}
-        </div>
-
-        {/* Additional Legal Info */}
-        <div className="space-y-6 mb-12">
-          {legalInfo.map((info, index) => (
-            <div 
-              key={index}
-              className="bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 border border-white/5 rounded-xl p-6"
-            >
-              <h3 className="text-lg font-bold text-white mb-3">{info.title}</h3>
-              <p className="text-sm text-zinc-300 leading-relaxed">
-                {info.content}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Dispute Resolution Notice */}
-        <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-8 mb-12">
-          <h2 className="text-2xl font-bold text-white mb-4">Resolución de Conflictos</h2>
-          <p className="text-zinc-300 mb-4">
-            De acuerdo con la normativa europea, los consumidores tienen derecho a recurrir a entidades de resolución alternativa de litigios en materia de consumo.
-          </p>
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <p className="text-sm text-zinc-400">
-              <strong className="text-white">Plataforma de Resolución de Litigios en Línea:</strong><br />
-              <a 
-                href="https://ec.europa.eu/consumers/odr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 underline"
-              >
-                https://ec.europa.eu/consumers/odr
-              </a>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+              Aviso Legal
+            </h1>
+            <p className="text-lg text-zinc-400">
+              Última actualización: Noviembre 2024
             </p>
           </div>
         </div>
+      </section>
 
-        {/* Contact Section */}
-        <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">¿Dudas legales?</h2>
-          <p className="text-zinc-300 mb-6">Estamos a tu disposición para cualquier consulta</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="mailto:legal@tiendacolchon.es"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold transition-all border border-white/10"
-            >
-              <Mail className="w-5 h-5" />
-              legal@tiendacolchon.es
-            </a>
-            <a 
-              href="tel:+34900123456"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold transition-all border border-white/10"
-            >
-              <Phone className="w-5 h-5" />
-              +34 900 123 456
-            </a>
+      {/* Main Sections Grid */}
+      <section className="w-full">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="grid sm:grid-cols-2 gap-6 md:gap-8">
+            {sections.map((section, index) => (
+              <div 
+                key={index}
+                className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 hover:bg-zinc-800/60 transition-all"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-zinc-700/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <section.icon className="w-6 h-6 text-zinc-300" />
+                  </div>
+                  <h2 className="text-xl font-bold text-white">{section.title}</h2>
+                </div>
+                
+                {section.items ? (
+                  <ul className="space-y-3">
+                    {section.items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                        <span className="text-zinc-500 mt-1 flex-shrink-0">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-300 leading-relaxed">
+                    {section.content}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Footer Note */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-zinc-500">
-            Este aviso legal cumple con la Ley 34/2002 de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSI-CE)
+      {/* Additional Legal Info */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="space-y-6">
+            {legalInfo.map((info, index) => (
+              <div 
+                key={index}
+                className="bg-zinc-800/30 border border-zinc-700/50 rounded-xl p-6 md:p-8"
+              >
+                <h3 className="text-lg md:text-xl font-bold text-white mb-3">
+                  {info.title}
+                </h3>
+                <p className="text-sm md:text-base text-zinc-300 leading-relaxed">
+                  {info.content}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* COPREC Notice */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Resolución de Conflictos
+            </h2>
+            <p className="text-zinc-300 mb-6 leading-relaxed">
+              De acuerdo con la normativa vigente, los consumidores tienen derecho a recurrir a entidades de resolución alternativa de litigios en materia de consumo.
+            </p>
+            <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+              <p className="text-sm md:text-base text-zinc-300 mb-3">
+                <strong className="text-white">COPREC - Sistema de Resolución de Conflictos en Línea</strong>
+              </p>
+              <p className="text-sm text-zinc-400 mb-4">
+                Conciliación Previa en las Relaciones de Consumo para la Ciudad Autónoma de Buenos Aires
+              </p>
+              <a 
+                href="https://www.buenosaires.gob.ar/defensaconsumidor/coprec"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white underline transition-colors"
+              >
+                www.buenosaires.gob.ar/defensaconsumidor/coprec
+                <span className="text-xs">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Consumer Protection */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Defensa del Consumidor
+            </h2>
+            <div className="space-y-4 text-sm md:text-base text-zinc-300">
+              <p className="leading-relaxed">
+                <strong className="text-white">Ley N° 24.240 de Defensa del Consumidor:</strong> Este sitio cumple con todas las disposiciones de la normativa argentina de protección al consumidor.
+              </p>
+              <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg p-4 md:p-6">
+                <p className="text-sm text-zinc-400 mb-2">
+                  <strong className="text-white">Autoridad de Aplicación CABA:</strong>
+                </p>
+                <p className="text-sm text-zinc-300 mb-1">
+                  Dirección General de Defensa y Protección del Consumidor
+                </p>
+                <p className="text-xs md:text-sm text-zinc-400">
+                  📞 147 (CABA) | 0800-666-1518 (Nacional)
+                </p>
+                <a 
+                  href="https://www.argentina.gob.ar/produccion/defensadelconsumidor"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white underline transition-colors mt-2"
+                >
+                  www.argentina.gob.ar/produccion/defensadelconsumidor
+                  <span className="text-xs">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 md:p-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              ¿Consultas legales?
+            </h2>
+            <p className="text-zinc-300 mb-8">
+              Estamos a tu disposición para cualquier duda o aclaración
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a 
+                href="mailto:legal@tiendacolchon.com.ar"
+                className="inline-flex items-center gap-2 bg-zinc-700 hover:bg-zinc-600 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                <Mail className="w-5 h-5" />
+                legal@tiendacolchon.com.ar
+              </a>
+              <a 
+                href="tel:+541140000000"
+                className="inline-flex items-center gap-2 bg-zinc-700 hover:bg-zinc-600 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                <Phone className="w-5 h-5" />
+                +54 11 4000-0000
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Note */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <p className="text-sm text-center text-zinc-500">
+            Este aviso legal cumple con la Ley 24.240 de Defensa del Consumidor, 
+            Ley 25.326 de Protección de Datos Personales y disposiciones del Código Civil y Comercial de la Nación Argentina
           </p>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

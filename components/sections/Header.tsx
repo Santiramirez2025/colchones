@@ -4,8 +4,23 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useDebounce } from '@/lib/hooks/use-debounce'
-import type { ProductWithCategory } from '@/lib/api/products'
 import { usePathname } from 'next/navigation'
+
+// Tipo para productos en búsqueda
+type SearchProduct = {
+  id: string
+  name: string
+  slug: string
+  subtitle?: string | null
+  price: number
+  originalPrice?: number | null
+  images: string[]
+  category: { name: string } | null
+  rating: number
+  isBestSeller?: boolean
+  isNew?: boolean
+  isEco?: boolean
+}
 
 // ✅ Iconos inline SVG optimizados
 const Icons = {
@@ -27,6 +42,11 @@ const Icons = {
   Phone: ({ className = "w-4 h-4" }: { className?: string }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+    </svg>
+  ),
+  WhatsApp: ({ className = "w-5 h-5" }: { className?: string }) => (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
     </svg>
   ),
   User: ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -100,51 +120,51 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
     </svg>
   ),
+  CreditCard: ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+  ),
+  MapPin: ({ className = "w-4 h-4" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
 }
 
-// 🎯 Sistema de Campañas Inteligente
+// 🇦🇷 Sistema de Campañas Argentina
 const getCurrentCampaign = () => {
   const now = new Date()
   const month = now.getMonth() + 1
   const day = now.getDate()
   
-  // Black Friday / Cyber Week (20-30 Nov)
-  if (month === 11 && day >= 20) {
+  // Hot Sale Argentina (Mayo)
+  if (month === 5 && day >= 20 && day <= 31) {
     return {
-      tagline: 'BLACK WEEK -50%',
-      code: 'BLACK50',
-      endDate: new Date(now.getFullYear(), 10, 30, 23, 59, 59),
+      tagline: 'HOT SALE -40%',
+      code: 'HOTSALE40',
+      endDate: new Date(now.getFullYear(), 4, 31, 23, 59, 59),
+      showCountdown: true,
+      theme: 'hotsale'
+    }
+  }
+  
+  // Cyber Monday Argentina (Noviembre)
+  if (month === 11 && day >= 1 && day <= 10) {
+    return {
+      tagline: 'CYBER -45%',
+      code: 'CYBER45',
+      endDate: new Date(now.getFullYear(), 10, 10, 23, 59, 59),
       showCountdown: true,
       theme: 'cyber'
     }
   }
   
-  // Rebajas de Enero (1-31 Ene)
-  if (month === 1) {
-    return {
-      tagline: 'REBAJAS -45%',
-      code: 'ENERO45',
-      endDate: new Date(now.getFullYear(), 0, 31, 23, 59, 59),
-      showCountdown: true,
-      theme: 'sale'
-    }
-  }
-  
-  // Navidad (1-31 Dic)
-  if (month === 12) {
-    return {
-      tagline: 'NAVIDAD -40%',
-      code: 'NAVIDAD40',
-      endDate: new Date(now.getFullYear(), 11, 31, 23, 59, 59),
-      showCountdown: true,
-      theme: 'christmas'
-    }
-  }
-  
-  // Campaña permanente (resto del año)
+  // Campaña permanente
   return {
-    tagline: 'ENVÍO GRATIS',
-    code: 'ENVIOGRATIS',
+    tagline: '12 CUOTAS SIN INTERÉS',
+    code: 'VILLAMARIA',
     endDate: null,
     showCountdown: false,
     theme: 'default'
@@ -154,9 +174,11 @@ const getCurrentCampaign = () => {
 const campaign = getCurrentCampaign()
 
 const SITE_CONFIG = {
-  phone: '+34981123456',
-  phoneDisplay: '981 12 34 56',
-  brandName: 'Tienda Colchon',
+  phone: '+5493531234567', // TODO: Reemplazar con tu número real
+  phoneDisplay: '353 123-4567',
+  whatsappNumber: '5493531234567',
+  brandName: 'Azul Colchones',
+  location: 'Villa María, Córdoba',
   tagline: campaign.tagline,
   promoCode: campaign.code,
   showCountdown: campaign.showCountdown,
@@ -166,22 +188,22 @@ const SITE_CONFIG = {
 
 const POPULAR_SEARCHES = [
   'Ofertas del mes', 
-  'Mejor valorados', 
+  'Más vendidos', 
   'Viscoelástico', 
-  'Muelles ensacados', 
-  'Memory foam premium'
+  'Sommier 2 plazas', 
+  'Memory foam'
 ]
 
 export default function Header() {
   const pathname = usePathname()
   
-  // ✅ TODOS los hooks PRIMERO (antes del return condicional)
+  // ✅ TODOS los hooks PRIMERO
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [cartCount] = useState(0)
   const [scrolled, setScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState<ProductWithCategory[]>([])
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [countdown, setCountdown] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -297,8 +319,7 @@ export default function Header() {
   const navLinks = useMemo(() => [
     { href: '/catalogo', label: 'Ver Ofertas', icon: 'catalog', featured: true },
     { href: '/simulador', label: 'Test IA', icon: 'ai', special: true },
-    { href: '/comparador', label: 'Comparar', icon: 'compare' },
-    { href: '/blog', label: 'Guía', icon: 'blog' },
+    { href: '/blog', label: 'Guía de Sueño', icon: 'blog' },
   ], [])
 
   const handleSearchClick = (slug: string) => {
@@ -313,15 +334,15 @@ export default function Header() {
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'EUR',
+      currency: 'ARS',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price)
   }
 
-  const renderProductBadges = (product: ProductWithCategory) => {
+  const renderProductBadges = (product: SearchProduct) => {
     const badges = []
     
     if (product.isBestSeller) {
@@ -333,7 +354,7 @@ export default function Header() {
     }
     if (product.isNew) {
       badges.push(
-        <span key="new" className="px-1.5 py-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[9px] font-black rounded uppercase flex-shrink-0">
+        <span key="new" className="px-1.5 py-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-[9px] font-black rounded uppercase flex-shrink-0">
           Oferta
         </span>
       )
@@ -349,19 +370,18 @@ export default function Header() {
     return badges
   }
 
-  // 🚫 Return condicional AL FINAL (después de TODOS los hooks)
+  // 🚫 Return condicional AL FINAL
   if (pathname?.startsWith('/admin')) {
     return null
   }
 
-  // ✅ Renderizar Header normal
+  // ✅ Renderizar Header
   return (
     <>
-      {/* TOP BAR - SISTEMA INTELIGENTE */}
-      <div className="relative bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 overflow-hidden">
+      {/* TOP BAR - ARGENTINA 🇦🇷 */}
+      <div className="relative bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.1),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.15)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer" />
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
@@ -377,33 +397,34 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                  <Icons.Truck className="w-4 h-4 text-cyan-300" />
-                  <span className="text-sm font-black text-white">Envío Gratis</span>
+                  <Icons.CreditCard className="w-4 h-4 text-cyan-200" />
+                  <span className="text-sm font-black text-white">12 Cuotas Sin Interés</span>
                 </div>
               )}
               
-              <div className="hidden md:flex items-center gap-2">
-                <Icons.Tag className="w-4 h-4 text-yellow-300" />
+              <div className="hidden md:flex items-center gap-2 bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                <Icons.MapPin className="w-4 h-4 text-cyan-200" />
                 <span className="text-xs font-bold text-white">
-                  Código: <span className="text-yellow-300">{SITE_CONFIG.promoCode}</span> 
-                  {SITE_CONFIG.showCountdown ? ' -10% extra' : ''}
+                  <span className="text-cyan-200">{SITE_CONFIG.location}</span>
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-white">
-                <Icons.Zap className="w-4 h-4 text-yellow-300" />
-                <span>Entrega <span className="text-yellow-300">24-48h</span></span>
+                <Icons.Truck className="w-4 h-4 text-cyan-200" />
+                <span>Envío <span className="text-cyan-200">GRATIS</span> Villa María</span>
               </div>
               
               <a 
-                href={`tel:${SITE_CONFIG.phone}`} 
-                className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all"
+                href={`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('¡Hola! Me interesa conocer más sobre los colchones')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-emerald-500/90 hover:bg-emerald-500 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all shadow-lg"
               >
-                <Icons.Phone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{SITE_CONFIG.phoneDisplay}</span>
-                <span className="sm:hidden">Llamar</span>
+                <Icons.WhatsApp className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">WhatsApp</span>
+                <span className="sm:hidden">Consultar</span>
               </a>
             </div>
           </div>
@@ -413,30 +434,30 @@ export default function Header() {
       {/* HEADER PRINCIPAL */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl transition-all duration-300 ${
         scrolled 
-          ? 'bg-zinc-950/95 border-b border-cyan-500/20 shadow-2xl shadow-cyan-500/10' 
-          : 'bg-zinc-950/90 border-b border-cyan-500/10'
+          ? 'bg-zinc-950/95 border-b border-blue-500/20 shadow-2xl shadow-blue-500/10' 
+          : 'bg-zinc-950/90 border-b border-blue-500/10'
       }`}>
-        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
 
         <nav className="container mx-auto px-4 relative z-10">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="group relative flex-shrink-0 z-50">
               <div className="flex items-center gap-2.5 md:gap-3 transition-transform group-hover:scale-[1.02]">
                 <div className="relative">
-                  <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/50">
+                  <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/50">
                     <Icons.Moon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
-                  <div className="absolute inset-0 rounded-xl bg-cyan-400/30 blur-md -z-10 animate-pulse-glow" />
+                  <div className="absolute inset-0 rounded-xl bg-blue-400/30 blur-md -z-10 animate-pulse-glow" />
                 </div>
                 
                 <div className="flex flex-col">
                   <div className="text-lg md:text-xl font-black leading-none tracking-tight">
-                    <span className="text-white">Tienda</span>
-                    <span className="text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text">Colchon</span>
+                    <span className="text-white">Azul</span>
+                    <span className="text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text">Colchones</span>
                   </div>
                   <div className="text-[9px] md:text-[10px] font-black tracking-wider uppercase mt-0.5">
-                    <span className="text-transparent bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text animate-pulse">
-                      {SITE_CONFIG.tagline}
+                    <span className="text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text">
+                      {SITE_CONFIG.location}
                     </span>
                   </div>
                 </div>
@@ -447,19 +468,19 @@ export default function Header() {
             <div ref={searchContainerRef} className="hidden lg:flex flex-1 max-w-2xl mx-8 relative">
               <div className="relative w-full">
                 <div className="relative">
-                  <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400 pointer-events-none" />
+                  <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 pointer-events-none" />
                   <input
                     ref={searchInputRef}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchOpen(true)}
-                    placeholder="🔥 Buscar colchones y ofertas..."
-                    className="w-full pl-12 pr-12 py-3 bg-white/5 border border-cyan-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                    placeholder="🔥 Buscá colchones, sommiers y ofertas..."
+                    className="w-full pl-12 pr-12 py-3 bg-white/5 border border-blue-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                   />
                   {isSearching && (
                     <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                      <Icons.Loader className="w-5 h-5 text-cyan-400 animate-spin" />
+                      <Icons.Loader className="w-5 h-5 text-blue-400 animate-spin" />
                     </div>
                   )}
                   {searchQuery && !isSearching && (
@@ -473,10 +494,10 @@ export default function Header() {
                 </div>
 
                 {isSearchOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/98 backdrop-blur-xl border border-cyan-500/20 rounded-xl shadow-2xl shadow-black/50 max-h-[500px] overflow-y-auto animate-slide-down">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/98 backdrop-blur-xl border border-blue-500/20 rounded-xl shadow-2xl shadow-black/50 max-h-[500px] overflow-y-auto animate-slide-down">
                     {searchQuery.trim().length === 0 ? (
                       <div className="p-4">
-                        <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">
+                        <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-3">
                           <Icons.TrendingUp className="w-3.5 h-3.5" />
                           <span>Búsquedas Populares</span>
                         </div>
@@ -485,9 +506,9 @@ export default function Header() {
                             <button
                               key={idx}
                               onClick={() => handlePopularSearch(term)}
-                              className="w-full text-left px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-cyan-500/10 rounded-lg transition-all flex items-center gap-2 group"
+                              className="w-full text-left px-3 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-blue-500/10 rounded-lg transition-all flex items-center gap-2 group"
                             >
-                              <Icons.Search className="w-4 h-4 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
+                              <Icons.Search className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
                               <span className="font-medium">{term}</span>
                             </button>
                           ))}
@@ -495,14 +516,14 @@ export default function Header() {
                       </div>
                     ) : searchResults.length > 0 ? (
                       <div className="p-2">
-                        <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider px-3 py-2">
+                        <div className="text-xs font-bold text-blue-400 uppercase tracking-wider px-3 py-2">
                           {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''}
                         </div>
                         {searchResults.map((product) => (
                           <button
                             key={product.id}
                             onClick={() => handleSearchClick(product.slug)}
-                            className="w-full text-left p-3 hover:bg-cyan-500/10 rounded-lg transition-all group"
+                            className="w-full text-left p-3 hover:bg-blue-500/10 rounded-lg transition-all group"
                           >
                             <div className="flex items-start gap-3">
                               {product.images && product.images.length > 0 && (
@@ -520,7 +541,7 @@ export default function Header() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-3 mb-1">
                                   <div className="flex-1 min-w-0">
-                                    <h4 className="font-semibold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
+                                    <h4 className="font-semibold text-white group-hover:text-blue-300 transition-colors line-clamp-1">
                                       {product.name}
                                     </h4>
                                     {product.subtitle && (
@@ -530,7 +551,7 @@ export default function Header() {
                                     )}
                                   </div>
                                   <div className="flex-shrink-0 text-right">
-                                    <div className="text-lg font-bold text-cyan-400">
+                                    <div className="text-lg font-bold text-blue-400">
                                       {formatPrice(product.price)}
                                     </div>
                                     {product.originalPrice && product.originalPrice > product.price && (
@@ -567,7 +588,7 @@ export default function Header() {
                       </div>
                     ) : isSearching ? (
                       <div className="p-8 text-center">
-                        <Icons.Loader className="w-8 h-8 mx-auto mb-4 text-cyan-400 animate-spin" />
+                        <Icons.Loader className="w-8 h-8 mx-auto mb-4 text-blue-400 animate-spin" />
                         <p className="text-zinc-400 font-medium">Buscando ofertas...</p>
                       </div>
                     ) : (
@@ -577,7 +598,7 @@ export default function Header() {
                         </div>
                         <p className="text-zinc-400 font-medium mb-1">No encontramos resultados</p>
                         <p className="text-sm text-zinc-600">
-                          Intenta con otras palabras clave
+                          Probá con otras palabras
                         </p>
                       </div>
                     )}
@@ -594,7 +615,7 @@ export default function Header() {
                     href={link.href} 
                     className={`relative group px-4 py-2.5 rounded-lg transition-all ${
                       link.featured
-                        ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30' 
+                        ? 'bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30' 
                         : link.special 
                         ? 'bg-gradient-to-r from-violet-600/10 to-fuchsia-600/10 border border-violet-500/20' 
                         : 'hover:bg-white/5'
@@ -602,7 +623,7 @@ export default function Header() {
                   >
                     <span className={`font-semibold text-sm transition-colors ${
                       link.featured
-                        ? 'text-cyan-300 group-hover:text-cyan-200'
+                        ? 'text-blue-300 group-hover:text-blue-200'
                         : link.special 
                         ? 'text-violet-300 group-hover:text-violet-200' 
                         : 'text-zinc-300 group-hover:text-white'
@@ -620,7 +641,7 @@ export default function Header() {
                       </span>
                     )}
                     <span className={`absolute bottom-0 left-0 w-0 h-0.5 rounded-full transition-all duration-300 group-hover:w-full ${
-                      link.featured ? 'bg-gradient-to-r from-cyan-400 to-blue-400' : 'bg-gradient-to-r from-violet-400 to-fuchsia-400'
+                      link.featured ? 'bg-gradient-to-r from-blue-400 to-cyan-400' : 'bg-gradient-to-r from-violet-400 to-fuchsia-400'
                     }`} />
                   </Link>
                 </li>
@@ -631,9 +652,9 @@ export default function Header() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-cyan-500/20 transition-all"
+                className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-blue-500/20 transition-all"
               >
-                <Icons.Search className="w-5 h-5 text-cyan-300" />
+                <Icons.Search className="w-5 h-5 text-blue-300" />
               </button>
 
               <Link 
@@ -649,7 +670,7 @@ export default function Header() {
               >
                 <Icons.ShoppingCart className="w-4 h-4 md:w-5 md:h-5 text-zinc-300 group-hover:text-white transition-colors" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-cyan-500/50 animate-scale-in">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center shadow-lg shadow-blue-500/50 animate-scale-in">
                     {cartCount}
                   </span>
                 )}
@@ -657,7 +678,7 @@ export default function Header() {
 
               <Link 
                 href="/simulador" 
-                className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95"
+                className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95"
               >
                 <Icons.Sparkles className="w-4 h-4" />
                 <span>Ver Ofertas</span>
@@ -685,18 +706,18 @@ export default function Header() {
           <div className="container mx-auto px-4 py-4 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <div className="relative flex-1">
-                <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400 pointer-events-none" />
+                <Icons.Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="🔥 Buscar colchones y ofertas..."
+                  placeholder="🔥 Buscá colchones y ofertas..."
                   autoFocus
-                  className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-cyan-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all"
+                  className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-blue-500/20 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                 />
                 {isSearching && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                    <Icons.Loader className="w-5 h-5 text-cyan-400 animate-spin" />
+                    <Icons.Loader className="w-5 h-5 text-blue-400 animate-spin" />
                   </div>
                 )}
                 {searchQuery && !isSearching && (
@@ -719,7 +740,7 @@ export default function Header() {
             <div className="flex-1 overflow-y-auto -mx-4 px-4">
               {searchQuery.trim().length === 0 ? (
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-4">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-wider mb-4">
                     <Icons.TrendingUp className="w-4 h-4" />
                     <span>Búsquedas Populares</span>
                   </div>
@@ -728,9 +749,9 @@ export default function Header() {
                       <button
                         key={idx}
                         onClick={() => handlePopularSearch(term)}
-                        className="w-full text-left px-4 py-3.5 bg-white/5 hover:bg-cyan-500/10 rounded-xl transition-all flex items-center gap-3 group border border-cyan-500/20"
+                        className="w-full text-left px-4 py-3.5 bg-white/5 hover:bg-blue-500/10 rounded-xl transition-all flex items-center gap-3 group border border-blue-500/20"
                       >
-                        <Icons.Search className="w-5 h-5 text-zinc-600 group-hover:text-cyan-400 transition-colors" />
+                        <Icons.Search className="w-5 h-5 text-zinc-600 group-hover:text-blue-400 transition-colors" />
                         <span className="font-semibold text-zinc-300 group-hover:text-white transition-colors">{term}</span>
                       </button>
                     ))}
@@ -738,7 +759,7 @@ export default function Header() {
                 </div>
               ) : searchResults.length > 0 ? (
                 <div>
-                  <div className="text-sm font-bold text-cyan-400 uppercase tracking-wider mb-4">
+                  <div className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4">
                     {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''}
                   </div>
                   <div className="space-y-3">
@@ -746,7 +767,7 @@ export default function Header() {
                       <button
                         key={product.id}
                         onClick={() => handleSearchClick(product.slug)}
-                        className="w-full text-left p-4 bg-white/5 hover:bg-cyan-500/10 rounded-xl transition-all border border-cyan-500/20"
+                        className="w-full text-left p-4 bg-white/5 hover:bg-blue-500/10 rounded-xl transition-all border border-blue-500/20"
                       >
                         <div className="flex items-start gap-3">
                           {product.images && product.images.length > 0 && (
@@ -767,7 +788,7 @@ export default function Header() {
                                 {product.name}
                               </h4>
                               <div className="flex-shrink-0 text-right">
-                                <div className="text-xl font-black text-cyan-400">
+                                <div className="text-xl font-black text-blue-400">
                                   {formatPrice(product.price)}
                                 </div>
                                 {product.originalPrice && product.originalPrice > product.price && (
@@ -789,7 +810,7 @@ export default function Header() {
                 </div>
               ) : isSearching ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <Icons.Loader className="w-12 h-12 mx-auto mb-6 text-cyan-400 animate-spin" />
+                  <Icons.Loader className="w-12 h-12 mx-auto mb-6 text-blue-400 animate-spin" />
                   <p className="text-lg text-zinc-300 font-bold">Buscando ofertas...</p>
                 </div>
               ) : (
@@ -798,7 +819,7 @@ export default function Header() {
                     <Icons.Search className="w-10 h-10 text-zinc-600" />
                   </div>
                   <p className="text-lg text-zinc-300 font-bold mb-2">No encontramos resultados</p>
-                  <p className="text-sm text-zinc-600">Intenta con otras palabras</p>
+                  <p className="text-sm text-zinc-600">Probá con otras palabras</p>
                 </div>
               )}
             </div>
@@ -806,7 +827,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* MOBILE MENU - EDICIÓN INTELIGENTE */}
+      {/* MOBILE MENU - ARGENTINA */}
       {isMenuOpen && (
         <>
           <div 
@@ -819,8 +840,8 @@ export default function Header() {
             className="fixed inset-0 lg:hidden flex flex-col animate-slide-up"
             style={{ zIndex: 9999 }}
           >
-            <div className="flex-shrink-0 bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
+            <div className="flex-shrink-0 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 relative overflow-hidden">
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.15)_50%,transparent_75%)] bg-[length:250%_250%] animate-shimmer" />
               <div className="container mx-auto px-4 relative z-10">
                 <div className="flex items-center justify-between h-16">
                   <div className="flex items-center gap-2.5">
@@ -828,7 +849,7 @@ export default function Header() {
                       {SITE_CONFIG.showCountdown ? (
                         <Icons.Fire className="w-5 h-5 text-yellow-300" />
                       ) : (
-                        <Icons.Gift className="w-5 h-5 text-cyan-300" />
+                        <Icons.CreditCard className="w-5 h-5 text-cyan-200" />
                       )}
                     </div>
                     <div>
@@ -857,64 +878,66 @@ export default function Header() {
                     onClick={closeMenu} 
                     className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform shadow-xl"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-600" />
-                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500" />
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.15)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
                     <div className="relative flex flex-col items-center justify-center p-6 text-white">
                       <Icons.Fire className="w-8 h-8 mb-2 drop-shadow-lg animate-pulse" />
                       <span className="text-base font-black mb-1">Ver Ofertas</span>
                       <span className="text-xs text-cyan-100 font-bold">
-                        {SITE_CONFIG.showCountdown ? 'Hasta -50%' : 'Mejores precios'}
+                        {SITE_CONFIG.showCountdown ? 'Hasta -45%' : 'Mejores precios'}
                       </span>
                     </div>
                   </Link>
                   
                   <a 
-                    href={`tel:${SITE_CONFIG.phone}`} 
+                    href={`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent('¡Hola! Me interesa conocer más')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="relative overflow-hidden rounded-2xl active:scale-95 transition-transform shadow-xl"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-600" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500" />
                     <div className="relative flex flex-col items-center justify-center p-6 text-white">
-                      <Icons.Phone className="w-8 h-8 mb-2 drop-shadow-lg" />
-                      <span className="text-base font-black mb-1">Llamar</span>
+                      <Icons.WhatsApp className="w-8 h-8 mb-2 drop-shadow-lg" />
+                      <span className="text-base font-black mb-1">WhatsApp</span>
                       <span className="text-xs text-emerald-100 font-medium">Asesoría</span>
                     </div>
                   </a>
                 </div>
 
-                <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 rounded-2xl border-2 border-yellow-500/30 relative overflow-hidden">
+                <div className="mb-6 p-4 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-blue-500/20 rounded-2xl border-2 border-blue-500/30 relative overflow-hidden">
                   <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_50%,transparent_75%)] bg-[length:200%_200%] animate-shimmer" />
                   <div className="relative flex items-center justify-between">
                     <div>
-                      <div className="text-xs font-bold text-yellow-300 uppercase mb-1">Código exclusivo</div>
+                      <div className="text-xs font-bold text-cyan-300 uppercase mb-1">Código exclusivo</div>
                       <div className="text-2xl font-black text-white tracking-wider">{SITE_CONFIG.promoCode}</div>
                       <div className="text-xs text-zinc-400 mt-1">
-                        {SITE_CONFIG.showCountdown ? '-10% adicional' : 'Beneficio especial'}
+                        {SITE_CONFIG.showCountdown ? 'Descuento adicional' : 'Beneficio especial'}
                       </div>
                     </div>
-                    <Icons.Tag className="w-12 h-12 text-yellow-400/30" />
+                    <Icons.Tag className="w-12 h-12 text-cyan-400/30" />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-cyan-950/30 to-blue-950/30 rounded-2xl border border-cyan-500/20">
+                <div className="grid grid-cols-3 gap-2 mb-6 p-4 bg-gradient-to-br from-blue-950/30 to-cyan-950/30 rounded-2xl border border-blue-500/20">
                   <div className="flex flex-col items-center text-center">
-                    <Icons.Truck className="w-5 h-5 text-cyan-400 mb-2" />
-                    <div className="text-xs font-bold text-white">Express</div>
-                    <div className="text-[10px] text-cyan-400 mt-0.5">Gratis</div>
+                    <Icons.Truck className="w-5 h-5 text-blue-400 mb-2" />
+                    <div className="text-xs font-bold text-white">Envío</div>
+                    <div className="text-[10px] text-blue-400 mt-0.5">Gratis VM</div>
                   </div>
-                  <div className="flex flex-col items-center text-center border-x border-cyan-500/20">
-                    <Icons.Clock className="w-5 h-5 text-cyan-400 mb-2" />
-                    <div className="text-xs font-bold text-white">24-48h</div>
-                    <div className="text-[10px] text-cyan-400 mt-0.5">Entrega</div>
+                  <div className="flex flex-col items-center text-center border-x border-blue-500/20">
+                    <Icons.CreditCard className="w-5 h-5 text-cyan-400 mb-2" />
+                    <div className="text-xs font-bold text-white">12 cuotas</div>
+                    <div className="text-[10px] text-cyan-400 mt-0.5">Sin interés</div>
                   </div>
                   <div className="flex flex-col items-center text-center">
-                    <Icons.Sparkles className="w-5 h-5 text-purple-400 mb-2" />
+                    <Icons.Sparkles className="w-5 h-5 text-blue-400 mb-2" />
                     <div className="text-xs font-bold text-white">Premium</div>
                     <div className="text-[10px] text-cyan-400 mt-0.5">Calidad</div>
                   </div>
                 </div>
 
                 <nav className="mb-6">
-                  <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3 px-1">Navegación</div>
+                  <div className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 px-1">Navegación</div>
                   <ul className="space-y-2">
                     {navLinks.map((link) => (
                       <li key={link.href}>
@@ -923,7 +946,7 @@ export default function Header() {
                           onClick={closeMenu} 
                           className={`flex items-center justify-between p-4 rounded-xl font-bold text-base transition-all active:scale-98 ${
                             link.featured
-                              ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 text-white border border-cyan-500/30 shadow-lg' 
+                              ? 'bg-gradient-to-r from-blue-600/20 to-cyan-600/20 text-white border border-blue-500/30 shadow-lg' 
                               : link.special 
                               ? 'bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 text-white border border-violet-500/30' 
                               : 'text-zinc-300 bg-white/5 border border-white/10 hover:bg-white/10'
@@ -946,12 +969,12 @@ export default function Header() {
                   </ul>
                 </nav>
 
-                <div className="border-t border-cyan-500/20 pt-6">
-                  <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3 px-1">Mi cuenta</div>
+                <div className="border-t border-blue-500/20 pt-6">
+                  <div className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 px-1">Mi cuenta</div>
                   <Link 
                     href="/mi-cuenta" 
                     onClick={closeMenu} 
-                    className="flex items-center gap-3 p-4 text-zinc-300 bg-white/5 border border-cyan-500/20 rounded-xl transition-all active:scale-98 hover:bg-cyan-500/10"
+                    className="flex items-center gap-3 p-4 text-zinc-300 bg-white/5 border border-blue-500/20 rounded-xl transition-all active:scale-98 hover:bg-blue-500/10"
                   >
                     <Icons.User className="w-5 h-5" />
                     <span className="font-semibold">Acceder a mi cuenta</span>
@@ -1013,7 +1036,7 @@ export default function Header() {
         @supports (scrollbar-width: thin) {
           * {
             scrollbar-width: thin;
-            scrollbar-color: rgba(34, 211, 238, 0.3) transparent;
+            scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
           }
         }
       `}</style>

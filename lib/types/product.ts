@@ -1,21 +1,11 @@
-// lib/types/product.ts - VERSIÓN OPTIMIZADA
+// lib/types/product.ts
+import { Product, Review, ProductVariant } from '@prisma/client'
 
-import { Product, Category, Review, ProductVariant } from '@prisma/client'
 // ============================================================================
 // PRODUCT TYPES CON JSON PARSEADO
 // ============================================================================
 
-/**
- * ⚡ Producto con campos JSON parseados como arrays/objetos
- * 
- * Este tipo extiende el modelo Product de Prisma pero con los campos
- * JSON convertidos de string a arrays/objetos para usar directamente en componentes
- */
-export type ProductWithParsedJson = Omit<
-  Product,
-  'features' | 'techFeatures' | 'certifications' | 'images' | 'tags' | 'highlights' | 'materials' | 'layers'
-> & {
-  // ✅ Campos JSON parseados
+export type ProductWithParsedJson = Omit<Product, 'features' | 'techFeatures' | 'certifications' | 'images' | 'tags' | 'highlights' | 'materials' | 'layers' | 'foamLayers'> & {
   features: string[]
   techFeatures: string[]
   certifications: string[]
@@ -29,43 +19,44 @@ export type ProductWithParsedJson = Omit<
     thickness?: string
     material?: string
   }>
+  foamLayers: Array<{
+    type: string
+    density: string
+    thickness: number
+  }>
 }
 
-/**
- * ⚡ Producto con relaciones incluidas (Category)
- */
+// Tipo simple para categoría (ya que el campo category en Product es solo string)
+export type ProductCategory = {
+  name: string
+  slug: string
+}
+
 export type ProductWithCategory = ProductWithParsedJson & {
-  category: Category | null
+  category: string | null
 }
 
-/**
- * ⚡ Producto completo para página de detalle
- * 
- * Incluye: category, reviews, variants
- */
 export type ProductWithRelations = ProductWithParsedJson & {
-  category: Category | null
+  category: string | null
   reviews: Review[]
   variants: ProductVariant[]
 }
 
 // ============================================================================
-// CATEGORY TYPES
+// CATEGORY TYPES (si category es solo string en tu schema)
 // ============================================================================
 
-/**
- * ⚡ Categoría con contador de productos
- */
-export type CategoryWithCount = Category & {
+export type CategoryWithCount = {
+  name: string
+  slug: string
   _count: {
     products: number
   }
 }
 
-/**
- * ⚡ Categoría con productos incluidos
- */
-export type CategoryWithProducts = Category & {
+export type CategoryWithProducts = {
+  name: string
+  slug: string
   products: ProductWithParsedJson[]
 }
 
@@ -73,9 +64,6 @@ export type CategoryWithProducts = Category & {
 // VARIANT TYPES
 // ============================================================================
 
-/**
- * ⚡ Variante de producto para selector de tallas
- */
 export type VariantOption = {
   id: string
   size: string
@@ -86,14 +74,12 @@ export type VariantOption = {
   originalPrice: number | null
   stock: number
   isAvailable: boolean
-  isPopular: boolean
+  isDefault: boolean
   sku: string
   weight: number | null
+  order: number
 }
 
-/**
- * ⚡ Variante seleccionada en el frontend
- */
 export interface SelectedVariant extends VariantOption {
   quantity: number
   discount?: number
@@ -103,24 +89,19 @@ export interface SelectedVariant extends VariantOption {
 // REVIEW TYPES
 // ============================================================================
 
-/**
- * ⚡ Review con valoraciones detalladas calculadas
- */
 export type ReviewWithRatings = Review & {
-  averageDetailRating?: number // Promedio de comfort, quality, value
-  isHelpfulToUser?: boolean // Si el usuario actual lo marcó como útil
+  averageDetailRating?: number
+  isHelpfulToUser?: boolean
 }
 
-/**
- * ⚡ Resumen de valoraciones de un producto
- */
 export type ProductRatingSummary = {
-  average: number       // Promedio general
-  count: number         // Total de reviews
-  comfort: number       // Promedio comfort
-  quality: number       // Promedio calidad
-  value: number         // Promedio relación calidad-precio
-  delivery: number      // Promedio entrega
+  average: number
+  count: number
+  comfort: number
+  quality: number
+  value: number
+  delivery: number
+  firmness: number
   distribution: {
     5: number
     4: number
@@ -130,9 +111,6 @@ export type ProductRatingSummary = {
   }
 }
 
-/**
- * ⚡ Review con paginación
- */
 export interface ReviewsWithPagination {
   reviews: Review[]
   total: number
@@ -143,39 +121,29 @@ export interface ReviewsWithPagination {
 // FILTER & SEARCH TYPES
 // ============================================================================
 
-/**
- * ⚡ Opciones de filtrado para el catálogo
- */
 export interface ProductFilterOptions {
-  // Filtros de producto
   firmness?: string
+  springType?: string
   minPrice?: number
   maxPrice?: number
   minRating?: number
-  categoryId?: string
+  category?: string
   tags?: string[]
-  
-  // Filtros de disponibilidad
   inStock?: boolean
-  
-  // Filtros de características
   isEco?: boolean
   cooling?: boolean
   hypoallergenic?: boolean
+  antiMite?: boolean
+  airFlow?: boolean
+  pillowTop?: boolean
+  includesBase?: boolean
   reversible?: boolean
   motionIsolation?: boolean
-  
-  // Ordenamiento
   sortBy?: 'featured' | 'price-asc' | 'price-desc' | 'rating' | 'newest' | 'popular'
-  
-  // Paginación
   page?: number
   pageSize?: number
 }
 
-/**
- * ⚡ Resultado de búsqueda con metadata
- */
 export interface ProductSearchResult {
   products: ProductWithCategory[]
   total: number
@@ -186,6 +154,7 @@ export interface ProductSearchResult {
     categories: CategoryWithCount[]
     priceRange: { min: number; max: number }
     firmnesses: string[]
+    springTypes?: string[]
   }
 }
 
@@ -193,36 +162,24 @@ export interface ProductSearchResult {
 // CART TYPES
 // ============================================================================
 
-/**
- * ⚡ Item del carrito con información del producto
- */
 export interface CartItem {
-  id: string              // ID único del item en el carrito
-  productId: string       // ID del producto
-  variantId?: string      // ID de la variante (talla)
+  id: string
+  productId: string
+  variantId?: string
   name: string
   subtitle?: string
   price: number
   originalPrice?: number
   quantity: number
   image: string
-  
-  // Información de la variante
   size?: string
   dimensions?: string
   sku?: string
-  
-  // Límites
   maxStock: number
-  
-  // Características
   freeShipping?: boolean
   deliveryDays?: number
 }
 
-/**
- * ⚡ Resumen del carrito
- */
 export interface CartSummary {
   items: CartItem[]
   subtotal: number
@@ -238,25 +195,19 @@ export interface CartSummary {
 // STOCK INFO
 // ============================================================================
 
-/**
- * ⚡ Información de stock de un producto
- */
 export interface StockInfo {
   available: boolean
   quantity: number
   lowStock: boolean
   availableVariantsCount: number
   totalVariantsCount: number
-  message?: string // "Solo quedan 3 unidades" | "En stock" | "Agotado"
+  message?: string
 }
 
 // ============================================================================
 // BREADCRUMB
 // ============================================================================
 
-/**
- * ⚡ Breadcrumb para navegación
- */
 export interface Breadcrumb {
   name: string
   href: string
@@ -267,9 +218,6 @@ export interface Breadcrumb {
 // COMPARISON
 // ============================================================================
 
-/**
- * ⚡ Producto para comparador
- */
 export interface ProductComparison {
   id: string
   name: string
@@ -277,8 +225,6 @@ export interface ProductComparison {
   price: number
   originalPrice: number | null
   rating: number
-  
-  // Características comparables
   firmness: string
   firmnessValue: number
   transpirability: number
@@ -286,21 +232,23 @@ export interface ProductComparison {
   height: number
   warranty: number
   trialNights: number
-  
-  // Features booleanas
+  springType?: string
+  springCount?: number
+  fabricType?: string
+  foamDensity?: string
   cooling: boolean
   hypoallergenic: boolean
+  antiMite: boolean
+  airFlow: boolean
+  pillowTop: boolean
+  includesBase: boolean
   washable: boolean
   reversible: boolean
   silent: boolean
   motionIsolation: boolean
   edgeSupport: boolean
   isEco: boolean
-  
-  // Materiales
   materials: string[]
-  
-  // Social proof
   reviewCount: number
   satisfaction: number
 }
@@ -309,9 +257,6 @@ export interface ProductComparison {
 // WISHLIST
 // ============================================================================
 
-/**
- * ⚡ Item de wishlist
- */
 export interface WishlistItem {
   id: string
   productId: string
@@ -325,9 +270,6 @@ export interface WishlistItem {
 // PRODUCT CARD
 // ============================================================================
 
-/**
- * ⚡ Props mínimas para ProductCard
- */
 export interface ProductCardProps {
   id: string
   name: string
@@ -345,92 +287,80 @@ export interface ProductCardProps {
   isBestSeller: boolean
   isNew: boolean
   isEco: boolean
+  isPremium?: boolean
   inStock: boolean
   freeShipping: boolean
   deliveryDays: number
-  category?: {
-    name: string
-    slug: string
-  } | null
+  category?: string | null
 }
 
 // ============================================================================
 // FORM DATA
 // ============================================================================
 
-/**
- * ⚡ Datos para crear/actualizar producto
- */
 export interface ProductFormData {
-  // Basic Info
   name: string
   slug: string
   subtitle: string
   description: string
   story?: string
-  
-  // Pricing
   price: number
   originalPrice?: number
-  
-  // Características
   firmnessValue: number
   firmness: string
   transpirability: number
   adaptability: number
   height: number
-  
-  // Media
+  baseHeight?: number
+  totalHeight?: number
+  springType?: string
+  springCount?: number
+  foamDensity?: string
+  fabricType?: string
   image: string
   images: string[]
   videoUrl?: string
   gradient: string
-  
-  // Features
   features: string[]
   techFeatures: string[]
   highlights: string[]
   materials: string[]
   layers: Array<{ name: string; description: string }>
-  
-  // Status
+  foamLayers?: Array<{ type: string; density: string; thickness: number }>
+  antiMite?: boolean
+  airFlow?: boolean
+  pillowTop?: boolean
+  includesBase?: boolean
   isActive: boolean
   isFeatured: boolean
   isBestSeller: boolean
   isNew: boolean
   isEco: boolean
-  
-  // Category
-  categoryId?: string
-  
-  // SEO
+  isPremium?: boolean
+  category?: string
   metaTitle?: string
   metaDescription?: string
   metaKeywords?: string
 }
 
-/**
- * ⚡ Datos para crear variante
- */
 export interface VariantFormData {
   size: string
   width: number
   length: number
+  dimensions?: string
   price: number
   originalPrice?: number
   stock: number
   sku: string
   weight?: number
-  isPopular?: boolean
+  isDefault?: boolean
+  order?: number
 }
 
 // ============================================================================
 // API RESPONSES
 // ============================================================================
 
-/**
- * ⚡ Respuesta estándar de API
- */
 export interface ApiResponse<T> {
   success: boolean
   data?: T
@@ -438,9 +368,6 @@ export interface ApiResponse<T> {
   message?: string
 }
 
-/**
- * ⚡ Respuesta paginada
- */
 export interface PaginatedResponse<T> {
   data: T[]
   total: number
@@ -454,17 +381,8 @@ export interface PaginatedResponse<T> {
 // HELPERS DE TIPO
 // ============================================================================
 
-/**
- * ⚡ Extraer tipo de array
- */
 export type ArrayElement<T> = T extends (infer U)[] ? U : never
 
-/**
- * ⚡ Hacer campos opcionales
- */
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-/**
- * ⚡ Hacer campos requeridos
- */
 export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

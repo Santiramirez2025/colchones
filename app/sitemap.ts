@@ -1,33 +1,32 @@
-// app/sitemap.ts - Optimizado con Prisma
+// app/sitemap.ts - Optimizado para Azul Colchones Villa María
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
-const BASE_URL = 'https://www.tiendacolchon.es'
+const BASE_URL = 'https://azulcolchones.com'
 export const revalidate = 3600 // Regenerar cada hora
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
-    // Fetch paralelo de toda la data
-    const [products, categories, blogPosts] = await Promise.all([
+    // ✅ Fetch paralelo solo de modelos que existen
+    const [products, uniqueCategories] = await Promise.all([
       prisma.product.findMany({
         where: { isActive: true },
         select: { 
           slug: true, 
           updatedAt: true,
           isBestSeller: true,
-          isFeatured: true 
+          isFeatured: true,
+          category: true
         },
         orderBy: { updatedAt: 'desc' }
       }),
-      prisma.category.findMany({
-        where: { isActive: true },
-        select: { slug: true, updatedAt: true },
-        orderBy: { order: 'asc' }
-      }),
-      prisma.blogPost.findMany({
-        where: { isPublished: true },
-        select: { slug: true, publishedAt: true, updatedAt: true },
-        orderBy: { publishedAt: 'desc' }
+      // ✅ Obtener categorías únicas desde productos
+      prisma.product.findMany({
+        where: { 
+          isActive: true
+        },
+        select: { category: true },
+        distinct: ['category']
       })
     ])
 
@@ -49,32 +48,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'daily',
         priority: 0.9
       },
-      {
-        url: `${BASE_URL}/comparador`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.85
-      },
-      {
-        url: `${BASE_URL}/guia-compra`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.8
-      },
-      {
-        url: `${BASE_URL}/simulador`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.75
-      },
 
-      // 3. CATEGORÍAS - Alta prioridad
-      ...categories.map(cat => ({
-        url: `${BASE_URL}/categoria/${cat.slug}`,
-        lastModified: cat.updatedAt,
-        changeFrequency: 'weekly' as const,
-        priority: 0.85
-      })),
+      // 3. CATEGORÍAS - Alta prioridad (desde productos)
+      ...uniqueCategories
+        .filter(cat => cat.category && cat.category.trim() !== '')
+        .map(cat => ({
+          url: `${BASE_URL}/catalogo?category=${encodeURIComponent(cat.category!)}`,
+          lastModified: now,
+          changeFrequency: 'weekly' as const,
+          priority: 0.85
+        })),
 
       // 4. PRODUCTOS - Prioridad diferenciada
       ...products.map(prod => ({
@@ -84,99 +67,73 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: prod.isBestSeller || prod.isFeatured ? 0.9 : 0.8
       })),
 
-      // 5. BLOG
+      // 5. PÁGINAS LOCALES VILLA MARÍA
       {
-        url: `${BASE_URL}/blog`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.7
-      },
-      ...blogPosts.map(post => ({
-        url: `${BASE_URL}/blog/${post.slug}`,
-        lastModified: post.publishedAt || post.updatedAt,
-        changeFrequency: 'monthly' as const,
-        priority: 0.6
-      })),
-
-      // 6. GUÍAS Y CONTENIDO
-      {
-        url: `${BASE_URL}/cuidado-colchon`,
+        url: `${BASE_URL}/villa-maria`,
         lastModified: now,
         changeFrequency: 'monthly',
-        priority: 0.65
-      },
-      {
-        url: `${BASE_URL}/higiene-sueno`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.65
-      },
-      {
-        url: `${BASE_URL}/dormir-rapido`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.65
-      },
-      {
-        url: `${BASE_URL}/dormitorio-perfecto`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.65
+        priority: 0.8
       },
 
-      // 7. PÁGINAS INSTITUCIONALES
+      // 6. PÁGINAS INSTITUCIONALES
       {
         url: `${BASE_URL}/nosotros`,
         lastModified: now,
         changeFrequency: 'monthly',
         priority: 0.6
       },
-      {
-        url: `${BASE_URL}/profesional`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.55
-      },
-      {
-        url: `${BASE_URL}/opiniones`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.7
-      },
 
-      // 8. SERVICIO AL CLIENTE
+      // 7. SERVICIO AL CLIENTE
       {
         url: `${BASE_URL}/contacto`,
-        lastModified: now,
-        changeFrequency: 'monthly',
-        priority: 0.5
-      },
-      {
-        url: `${BASE_URL}/preguntas-frecuentes`,
         lastModified: now,
         changeFrequency: 'monthly',
         priority: 0.6
       },
       {
+        url: `${BASE_URL}/preguntas-frecuentes`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
+      },
+      {
         url: `${BASE_URL}/envios`,
         lastModified: now,
         changeFrequency: 'monthly',
-        priority: 0.5
+        priority: 0.6
       },
       {
         url: `${BASE_URL}/devoluciones`,
         lastModified: now,
         changeFrequency: 'monthly',
-        priority: 0.5
+        priority: 0.55
       },
       {
         url: `${BASE_URL}/garantia`,
         lastModified: now,
         changeFrequency: 'monthly',
-        priority: 0.5
+        priority: 0.55
+      },
+      {
+        url: `${BASE_URL}/financiacion`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.65
       },
 
-      // 9. PÁGINAS LEGALES - Baja prioridad
+      // 8. PÁGINAS LEGALES - Baja prioridad
+      {
+        url: `${BASE_URL}/defensa-consumidor`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.4
+      },
+      {
+        url: `${BASE_URL}/boton-arrepentimiento`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.4
+      },
       {
         url: `${BASE_URL}/privacidad`,
         lastModified: now,
@@ -209,7 +166,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     ]
   } catch (error) {
-    console.error('Error generando sitemap:', error)
+    console.error('❌ Error generando sitemap:', error)
     
     // Fallback: devolver solo páginas principales
     return [
@@ -226,10 +183,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9
       },
       {
+        url: `${BASE_URL}/villa-maria`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.8
+      },
+      {
         url: `${BASE_URL}/contacto`,
         lastModified: new Date(),
         changeFrequency: 'monthly',
-        priority: 0.5
+        priority: 0.6
       }
     ]
   }

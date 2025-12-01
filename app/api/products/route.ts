@@ -72,8 +72,10 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         subtitle: true,
+        description: true, // 🆕
         price: true,
         originalPrice: true,
+        compareAtPrice: true, // 🆕
         firmness: true,
         rating: true,
         reviewCount: true,
@@ -86,18 +88,19 @@ export async function GET(request: Request) {
         gradient: true,
         story: true,
         image: true,
+        images: true,
         certifications: true,
         slug: true,
+        shippingCost: true, // 🆕
+        category: true, // 🆕
+        isActive: true, // 🆕
       }
     })
 
-    // Parse JSON strings to arrays
+    // Ya son arrays, no necesitan JSON.parse
     const parsedProducts = products.map(product => ({
       ...product,
-      features: JSON.parse(product.features),
-      techFeatures: JSON.parse(product.techFeatures),
-      certifications: JSON.parse(product.certifications),
-      reviews: product.reviewCount, // Mapear reviewCount a reviews para compatibilidad
+      reviews: product.reviewCount,
     }))
 
     return NextResponse.json(parsedProducts)

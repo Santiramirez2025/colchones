@@ -1,7 +1,6 @@
-// lib/metadata.ts - SEO Optimizado
+// lib/metadata.ts - SEO Optimizado para Azul Colchones Villa María
 import { Metadata } from 'next'
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants'
-import { HERO_PRODUCT, SOCIAL_PROOF } from '@/lib/product-data'
 
 // ============================================
 // METADATA PRINCIPAL PARA HOME
@@ -15,42 +14,33 @@ export const homeMetadata: Metadata = {
     template: `%s | ${SITE_CONFIG.name}`
   },
   
-  // OPTIMIZADO: Description con USPs + precio
-  description: 'Colchón Premium 1.800 muelles Multisac®. Envío gratis 24h, Tu descanso asegurado, garantía 3 años. Desde 39€/mes. Test personalizado gratis.',
+  // OPTIMIZADO: Description con USPs argentinos
+  description: 'Colchonería en Villa María, Córdoba. Envío GRATIS Villa María 24-48hs. 12 cuotas sin interés con Mercado Pago. 8+ años de experiencia. Garantía extendida.',
   
-  // OPTIMIZADO: Keywords long-tail específicos
-  keywords: [
-    'colchón premium muelles ensacados',
-    'colchón 1800 muelles',
-    'colchón 32cm altura',
-    'Garantía de Satisfacción Total',
-    'colchón envío 24 horas',
-    'colchón garantía 3 años',
-    'colchón firmeza 70',
-    'colchón Multisac'
-  ],
+  // OPTIMIZADO: Keywords long-tail locales
+  keywords: SEO_DEFAULTS.keywords,
   
   authors: [{ 
     name: SITE_CONFIG.name, 
     url: SITE_CONFIG.url 
   }],
   
-  creator: SITE_CONFIG.name,
+  creator: SITE_CONFIG.displayName,
   publisher: SITE_CONFIG.name,
   
   openGraph: {
     type: 'website',
-    locale: 'es_ES',
+    locale: 'es_AR',
     url: SITE_CONFIG.url,
-    siteName: SITE_CONFIG.name,
+    siteName: SITE_CONFIG.displayName,
     title: SEO_DEFAULTS.title,
-    description: 'Colchón Premium 1.800 muelles. Envío gratis 24h. Garantía de Satisfacción Total.',
+    description: 'Tu colchonería en Villa María. Envío GRATIS. 12 cuotas sin interés. Garantía extendida.',
     images: [
       {
-        url: '/og-colchon-premium-multisac.jpg', // Nombre descriptivo
+        url: '/og-azul-colchones-villa-maria.jpg',
         width: 1200,
         height: 630,
-        alt: 'Colchón Premium Multisac 1.800 muelles ensacados',
+        alt: 'Azul Colchones - Colchonería en Villa María, Córdoba',
         type: 'image/jpeg',
       },
     ],
@@ -58,13 +48,13 @@ export const homeMetadata: Metadata = {
   
   twitter: {
     card: 'summary_large_image',
-    site: '@tiendacolchon',
-    creator: '@tiendacolchon',
+    site: '@azulcolchones',
+    creator: '@azulcolchones',
     title: SEO_DEFAULTS.title,
-    description: 'Colchón Premium 1.800 muelles. Envío gratis 24h. Desde 39€/mes.',
+    description: 'Tu colchonería en Villa María. Envío GRATIS. 12 cuotas sin interés.',
     images: {
-      url: '/og-colchon-premium-multisac.jpg',
-      alt: 'Colchón Premium Multisac',
+      url: '/og-azul-colchones-villa-maria.jpg',
+      alt: 'Azul Colchones Villa María',
     },
   },
   
@@ -85,21 +75,17 @@ export const homeMetadata: Metadata = {
   // NOTA: Completar con códigos reales o eliminar antes de producción
   verification: {
     google: 'COMPLETAR_GOOGLE_SEARCH_CONSOLE',
-    // yandex: 'tu-codigo-si-aplica',
-    // other: {
-    //   'facebook-domain-verification': 'tu-codigo-facebook',
-    // },
   },
   
   alternates: {
     canonical: SITE_CONFIG.url,
     languages: {
-      'es-ES': SITE_CONFIG.url,
+      'es-AR': SITE_CONFIG.url,
     },
   },
   
   category: 'Hogar y Descanso',
-  classification: 'E-commerce de Colchones',
+  classification: 'Colchonería Online',
   manifest: '/manifest.json',
   applicationName: SITE_CONFIG.name,
   
@@ -119,7 +105,7 @@ export const homeMetadata: Metadata = {
 }
 
 // ============================================
-// STRUCTURED DATA (JSON-LD) - OPTIMIZADO
+// STRUCTURED DATA (JSON-LD) - OPTIMIZADO ARGENTINA
 // ============================================
 
 export const structuredData = {
@@ -130,6 +116,7 @@ export const structuredData = {
       '@type': 'Organization',
       '@id': `${SITE_CONFIG.url}/#organization`,
       name: SITE_CONFIG.name,
+      alternateName: SITE_CONFIG.displayName,
       url: SITE_CONFIG.url,
       logo: {
         '@type': 'ImageObject',
@@ -139,35 +126,62 @@ export const structuredData = {
       },
       description: SITE_CONFIG.description,
       telephone: SITE_CONFIG.phone.number,
-      email: `info@${SITE_CONFIG.domain}`,
+      email: SITE_CONFIG.email,
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Madrid',
-        addressRegion: 'Comunidad de Madrid',
-        postalCode: '28001',
-        streetAddress: 'Calle del Descanso 123',
-        addressCountry: 'ES',
+        addressLocality: SITE_CONFIG.location.city,
+        addressRegion: SITE_CONFIG.location.state,
+        postalCode: SITE_CONFIG.location.postalCode,
+        streetAddress: SITE_CONFIG.location.address,
+        addressCountry: SITE_CONFIG.location.countryCode,
       },
+      areaServed: [
+        {
+          '@type': 'City',
+          name: 'Villa María'
+        },
+        {
+          '@type': 'State',
+          name: 'Córdoba'
+        },
+        {
+          '@type': 'Country',
+          name: 'Argentina'
+        }
+      ],
       contactPoint: [
         {
           '@type': 'ContactPoint',
           telephone: SITE_CONFIG.phone.number,
           contactType: 'Atención al Cliente',
-          areaServed: 'ES',
+          areaServed: 'AR',
           availableLanguage: ['Spanish'],
+          hoursAvailable: [
+            {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+              opens: '09:00',
+              closes: '19:00'
+            },
+            {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: 'Saturday',
+              opens: '09:00',
+              closes: '13:00'
+            }
+          ]
         },
       ],
       aggregateRating: {
         '@type': 'AggregateRating',
-        ratingValue: SOCIAL_PROOF.rating.value.toString(),
-        reviewCount: SOCIAL_PROOF.rating.count.toString(),
+        ratingValue: '4.9',
+        reviewCount: '850',
         bestRating: '5',
         worstRating: '1',
       },
       sameAs: [
-        `https://facebook.com/${SITE_CONFIG.domain.split('.')[0]}`,
-        `https://instagram.com/${SITE_CONFIG.domain.split('.')[0]}`,
-        `https://twitter.com/${SITE_CONFIG.domain.split('.')[0]}`,
+        SITE_CONFIG.social.facebook,
+        SITE_CONFIG.social.instagram,
       ],
     },
     
@@ -176,8 +190,9 @@ export const structuredData = {
       '@type': 'WebSite',
       '@id': `${SITE_CONFIG.url}/#website`,
       url: SITE_CONFIG.url,
-      name: SITE_CONFIG.name,
+      name: SITE_CONFIG.displayName,
       description: SITE_CONFIG.description,
+      inLanguage: 'es-AR',
       publisher: {
         '@id': `${SITE_CONFIG.url}/#organization`,
       },
@@ -191,90 +206,122 @@ export const structuredData = {
       },
     },
     
-    // Product (Hero Product)
+    // LocalBusiness
     {
-      '@type': 'Product',
-      '@id': `${SITE_CONFIG.url}/#product`,
-      name: HERO_PRODUCT.name,
-      description: HERO_PRODUCT.description,
-      image: HERO_PRODUCT.images.hero,
-      brand: {
-        '@type': 'Brand',
-        name: SITE_CONFIG.name,
+      '@type': 'LocalBusiness',
+      '@id': `${SITE_CONFIG.url}/#localbusiness`,
+      name: SITE_CONFIG.name,
+      image: `${SITE_CONFIG.url}/logo.png`,
+      url: SITE_CONFIG.url,
+      telephone: SITE_CONFIG.phone.number,
+      priceRange: '$$',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: SITE_CONFIG.location.address,
+        addressLocality: SITE_CONFIG.location.city,
+        addressRegion: SITE_CONFIG.location.state,
+        postalCode: SITE_CONFIG.location.postalCode,
+        addressCountry: SITE_CONFIG.location.countryCode
       },
-      offers: {
-        '@type': 'Offer',
-        url: SITE_CONFIG.url,
-        priceCurrency: 'EUR',
-        price: HERO_PRODUCT.price.current.toString(),
-        priceValidUntil: '2025-12-31',
-        availability: 'https://schema.org/InStock',
-        itemCondition: 'https://schema.org/NewCondition',
-        seller: {
-          '@id': `${SITE_CONFIG.url}/#organization`,
-        },
-        shippingDetails: {
-          '@type': 'OfferShippingDetails',
-          shippingRate: {
-            '@type': 'MonetaryAmount',
-            value: '0',
-            currency: 'EUR',
-          },
-          deliveryTime: {
-            '@type': 'ShippingDeliveryTime',
-            handlingTime: {
-              '@type': 'QuantitativeValue',
-              minValue: 1,
-              maxValue: 2,
-              unitCode: 'DAY',
-            },
-          },
-        },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: SITE_CONFIG.location.coordinates.lat,
+        longitude: SITE_CONFIG.location.coordinates.lng
       },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '19:00'
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: 'Saturday',
+          opens: '09:00',
+          closes: '13:00'
+        }
+      ],
       aggregateRating: {
         '@type': 'AggregateRating',
-        ratingValue: SOCIAL_PROOF.rating.value.toString(),
-        reviewCount: SOCIAL_PROOF.rating.count.toString(),
+        ratingValue: '4.9',
+        reviewCount: '850',
         bestRating: '5',
         worstRating: '1',
       },
-      // OPTIMIZADO: Solo 2 reviews en lugar de 3
-      review: SOCIAL_PROOF.reviews.slice(0, 2).map((review) => ({
-        '@type': 'Review',
-        author: {
-          '@type': 'Person',
-          name: review.name,
+      paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'Mercado Pago', 'Bank Transfer'],
+      currenciesAccepted: 'ARS',
+    },
+    
+    // Offer - Colchones genérico
+    {
+      '@type': 'Offer',
+      '@id': `${SITE_CONFIG.url}/#offer`,
+      itemOffered: {
+        '@type': 'Product',
+        name: 'Colchones Premium',
+        description: 'Colchones de alta calidad con garantía extendida'
+      },
+      availability: 'https://schema.org/InStock',
+      priceCurrency: 'ARS',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        priceCurrency: 'ARS',
+        minPrice: '150000',
+        maxPrice: '800000'
+      },
+      seller: {
+        '@id': `${SITE_CONFIG.url}/#organization`,
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'ARS',
         },
-        datePublished: new Date().toISOString(),
-        reviewBody: review.text,
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: review.rating.toString(),
-          bestRating: '5',
-          worstRating: '1',
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'AR',
+          addressRegion: 'Córdoba'
         },
-      })),
-      warranty: {
-        '@type': 'WarrantyPromise',
-        durationOfWarranty: {
-          '@type': 'QuantitativeValue',
-          value: '10',
-          unitCode: 'ANN',
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
         },
       },
     },
     
-    // OPTIMIZADO: FAQ reducido a 3 preguntas clave
+    // FAQ - Optimizado para Argentina
     {
       '@type': 'FAQPage',
       '@id': `${SITE_CONFIG.url}/#faq`,
       mainEntity: [
         {
           '@type': 'Question',
-          name: '¿Cuánto tiempo tarda el envío?',
+          name: '¿Hacen envíos a Villa María?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Realizamos envíos gratuitos en 24-48 horas a toda España peninsular.',
+            text: 'Sí, realizamos envíos GRATIS en Villa María en 24-48 horas. También enviamos a toda Córdoba y el resto de Argentina con costos preferenciales.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿Puedo pagar en cuotas?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sí, aceptamos Mercado Pago con hasta 12 cuotas sin interés. También ofrecemos 10% de descuento en transferencia bancaria y 15% en efectivo.',
           },
         },
         {
@@ -282,15 +329,23 @@ export const structuredData = {
           name: '¿Qué garantía tienen los colchones?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Todos nuestros colchones incluyen 3 años de garantía del fabricante contra defectos de fabricación.',
+            text: 'Todos nuestros colchones incluyen garantía extendida del fabricante contra defectos de fabricación. Además, cumplimos con la Ley de Defensa del Consumidor Argentina (24.240).',
           },
         },
         {
           '@type': 'Question',
-          name: '¿Por qué confiar en la calidad de nuestros colchones?',
+          name: '¿Tienen local físico en Villa María?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.',
+            text: 'Sí, tenemos showroom en Villa María donde podés ver y probar nuestros colchones. También atendemos por WhatsApp para consultas rápidas.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo funciona el derecho de arrepentimiento?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Según la Ley 24.240 de Defensa del Consumidor, tenés 10 días corridos desde que recibís el producto para arrepentirte de la compra sin dar explicaciones.',
           },
         },
       ],
@@ -321,9 +376,16 @@ export function generateProductMetadata(product: {
     ? `${SITE_CONFIG.url}/producto/${product.slug}`
     : SITE_CONFIG.url
 
+  const formattedPrice = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(product.price)
+
   return {
-    title: `${product.name} - Comprar Online`,
-    description: `${product.description} Precio: ${product.price}€. Envío gratis 24h. Garantía 3 años. Certificados de calidad europea.`,
+    title: `${product.name} - Comprar en Villa María`,
+    description: `${product.description} Precio: ${formattedPrice}. Envío GRATIS Villa María 24-48hs. 12 cuotas sin interés. Garantía extendida.`,
     openGraph: {
       title: product.name,
       description: product.description,
@@ -335,11 +397,13 @@ export function generateProductMetadata(product: {
       }],
       type: 'website',
       url,
+      locale: 'es_AR',
     },
     twitter: {
       card: 'summary_large_image',
       title: product.name,
       description: product.description,
+      images: product.image,
     },
     alternates: {
       canonical: url,
@@ -357,13 +421,14 @@ export function generateCategoryMetadata(category: {
     : SITE_CONFIG.url
 
   return {
-    title: `${category.name} - Comprar Online`,
-    description: category.description,
+    title: `${category.name} en Villa María - Envío Gratis`,
+    description: `${category.description} Envío GRATIS Villa María 24-48hs. 12 cuotas sin interés. Garantía extendida.`,
     openGraph: {
       title: category.name,
       description: category.description,
       type: 'website',
       url,
+      locale: 'es_AR',
     },
     twitter: {
       card: 'summary_large_image',
@@ -405,14 +470,96 @@ export function generateBlogMetadata(article: {
       publishedTime: article.date,
       authors: [article.author],
       url,
+      locale: 'es_AR',
     },
     twitter: {
       card: 'summary_large_image',
       title: article.title,
       description: article.excerpt,
+      images: article.image,
     },
     alternates: {
       canonical: url,
     },
+  }
+}
+
+// ============================================
+// HELPER PARA PRODUCTO ESPECÍFICO CON SCHEMA
+// ============================================
+
+export function generateProductStructuredData(product: {
+  name: string
+  description: string
+  price: number
+  originalPrice?: number
+  image: string
+  slug: string
+  rating?: number
+  reviewCount?: number
+  sku?: string
+}) {
+  const nextYear = new Date()
+  nextYear.setFullYear(nextYear.getFullYear() + 1)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.image.startsWith('http') ? product.image : `${SITE_CONFIG.url}${product.image}`,
+    sku: product.sku,
+    brand: {
+      '@type': 'Brand',
+      name: SITE_CONFIG.name,
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `${SITE_CONFIG.url}/producto/${product.slug}`,
+      priceCurrency: 'ARS',
+      price: product.price.toFixed(2),
+      priceValidUntil: nextYear.toISOString().split('T')[0],
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: {
+        '@type': 'Organization',
+        name: SITE_CONFIG.name
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'ARS',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'AR',
+          addressRegion: 'Córdoba'
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
+        },
+      },
+    },
+    aggregateRating: product.reviewCount && product.reviewCount > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: (product.rating || 4.9).toFixed(1),
+      reviewCount: product.reviewCount.toString(),
+      bestRating: '5',
+      worstRating: '1',
+    } : undefined,
   }
 }

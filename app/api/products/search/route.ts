@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('🔍 API Search:', query)
-    const results = await searchProducts(query, { limit })
+    const results = await searchProducts(query, limit)
     console.log('✅ API Results:', results.length)
     
     return NextResponse.json(results)

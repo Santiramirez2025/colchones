@@ -53,39 +53,38 @@ export const viewport: Viewport = {
 // ============================================================================
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tiendacolchon.es'),
+  metadataBase: new URL('https://azulcolchones.com'),
   title: {
-    default: 'Tienda Colchón | Colchones Viscoelásticos Premium con Envío Gratis',
-    template: '%s | Tienda Colchón'
+    default: 'Azul Colchones Villa María | Colchonería en Córdoba con Envío Gratis',
+    template: '%s | Azul Colchones'
   },
-  description: 'Compra colchones viscoelásticos premium en España. ✓ Envío gratis 3 a 6 dias ✓ Tu descanso asegurado ✓ 3 años garantía ✓ +50.000 clientes. Encuentra tu colchón perfecto hoy.',
-  applicationName: 'Tienda Colchón',
+  description: 'Colchonería en Villa María, Córdoba. ✓ Envío GRATIS en Villa María 24-48hs ✓ 8+ años de experiencia ✓ Garantía extendida ✓ 12 cuotas sin interés. Tu colchonería de confianza.',
+  applicationName: 'Azul Colchones',
   
   keywords: [
-    'colchones viscoelásticos',
-    'comprar colchón online',
-    'colchones baratos calidad',
-    'mejor colchón 2025',
-    'colchón viscoelástico 150x190',
-    'colchón matrimonio oferta',
-    'colchón espalda dolor lumbar',
-    'colchón ortopédico cervical',
-    'colchones Madrid',
-    'colchones Barcelona',
-    'tienda colchones España',
-    'opiniones colchones viscoelásticos',
-    'comparativa colchones 2025',
-    'qué colchón comprar',
-    'colchón firme o blando',
-    'envío gratis colchones',
-    'tu descanso asegurado',
-    'colchón garantía 3 años',
-    'financiación colchones'
+    'colchones villa maría',
+    'colchonería villa maría',
+    'colchones córdoba',
+    'colchones villa maría córdoba',
+    'sommier villa maría',
+    'donde comprar colchones villa maría',
+    'colchones premium villa maría',
+    'colchonería córdoba',
+    'colchones baratos villa maría',
+    'colchones matrimonio villa maría',
+    'colchones ortopédicos villa maría',
+    'colchones viscoelásticos córdoba',
+    'azul colchones villa maría',
+    'tienda colchones villa maría',
+    'colchones con garantía villa maría',
+    'financiación colchones córdoba',
+    'envío gratis colchones villa maría',
+    'sommier y colchón villa maría'
   ],
   
-  authors: [{ name: 'Tienda Colchón', url: 'https://tiendacolchon.es' }],
-  creator: 'Tienda Colchón',
-  publisher: 'Tienda Colchón',
+  authors: [{ name: 'Azul Colchones', url: 'https://azulcolchones.com' }],
+  creator: 'Azul Colchones Villa María',
+  publisher: 'Azul Colchones',
   
   formatDetection: {
     email: false,
@@ -95,24 +94,24 @@ export const metadata: Metadata = {
   
   openGraph: {
     type: 'website',
-    locale: 'es_ES',
-    url: 'https://tiendacolchon.es',
-    siteName: 'Tienda Colchón',
-    title: 'Colchones Viscoelásticos Premium | Envío Gratis 24h y Tu descanso asegurado',
-    description: '🛏️ +50.000 clientes duermen mejor. Colchones premium con tecnología adaptativa. ✓ Envío gratis ✓ Sin riesgo ✓ Garantía 3 años',
+    locale: 'es_AR',
+    url: 'https://azulcolchones.com',
+    siteName: 'Azul Colchones Villa María',
+    title: 'Azul Colchones | Colchonería en Villa María, Córdoba',
+    description: '🛏️ Tu colchonería de confianza en Villa María. 8+ años de experiencia. ✓ Envío GRATIS Villa María ✓ 12 cuotas sin interés ✓ Garantía extendida',
     images: [
       {
-        url: 'https://tiendacolchon.es/og-image-home.jpg',
+        url: 'https://azulcolchones.com/og-image-home.jpg',
         width: 1200,
         height: 630,
-        alt: 'Colchón viscoelástico premium de Tienda Colchón con capas de confort',
+        alt: 'Azul Colchones - Colchonería en Villa María, Córdoba',
         type: 'image/jpeg',
       },
       {
-        url: 'https://tiendacolchon.es/og-image-square.jpg',
+        url: 'https://azulcolchones.com/og-image-square.jpg',
         width: 1080,
         height: 1080,
-        alt: 'Tienda Colchón - Descanso Premium',
+        alt: 'Azul Colchones Villa María',
         type: 'image/jpeg',
       }
     ],
@@ -120,13 +119,13 @@ export const metadata: Metadata = {
   
   twitter: {
     card: 'summary_large_image',
-    site: '@tiendacolchon',
-    creator: '@tiendacolchon',
-    title: '🛏️ Colchones Viscoelásticos Premium | Envío Gratis 24h',
-    description: '+50k clientes satisfechos. Tu descanso asegurado. Encuentra tu colchón perfecto hoy.',
+    site: '@azulcolchones',
+    creator: '@azulcolchones',
+    title: '🛏️ Azul Colchones | Colchonería Villa María',
+    description: '8+ años de experiencia en descanso. Envío GRATIS en Villa María. Tu colchonería de confianza.',
     images: {
-      url: 'https://tiendacolchon.es/twitter-image.jpg',
-      alt: 'Tienda Colchón - Colchones Premium',
+      url: 'https://azulcolchones.com/twitter-image.jpg',
+      alt: 'Azul Colchones Villa María',
     },
   },
   
@@ -148,14 +147,13 @@ export const metadata: Metadata = {
     google: 'google-site-verification-code-aqui',
     other: {
       'facebook-domain-verification': 'facebook-verification-code',
-      'pinterest-site-verification': 'pinterest-code',
     },
   },
   
   alternates: {
-    canonical: 'https://tiendacolchon.es',
+    canonical: 'https://azulcolchones.com',
     languages: {
-      'es-ES': 'https://tiendacolchon.es',
+      'es-AR': 'https://azulcolchones.com',
     },
   },
   
@@ -175,7 +173,7 @@ export const metadata: Metadata = {
       {
         rel: 'mask-icon',
         url: '/safari-pinned-tab.svg',
-        color: '#4f46e5',
+        color: '#3b82f6',
       },
     ],
   },
@@ -186,9 +184,9 @@ export const metadata: Metadata = {
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'Tienda Colchón',
+    'apple-mobile-web-app-title': 'Azul Colchones',
     'mobile-web-app-capable': 'yes',
-    'msapplication-TileColor': '#4f46e5',
+    'msapplication-TileColor': '#3b82f6',
     'msapplication-config': '/browserconfig.xml',
   },
 }
@@ -202,43 +200,53 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'Organization',
-      '@id': 'https://tiendacolchon.es/#organization',
-      name: 'Tienda Colchón',
-      alternateName: 'Tienda Colchon',
-      url: 'https://tiendacolchon.es',
+      '@id': 'https://azulcolchones.com/#organization',
+      name: 'Azul Colchones',
+      alternateName: 'Azul Colchones Villa María',
+      url: 'https://azulcolchones.com',
       logo: {
         '@type': 'ImageObject',
-        '@id': 'https://tiendacolchon.es/#logo',
-        url: 'https://tiendacolchon.es/logo.png',
-        contentUrl: 'https://tiendacolchon.es/logo.png',
+        '@id': 'https://azulcolchones.com/#logo',
+        url: 'https://azulcolchones.com/logo.png',
+        contentUrl: 'https://azulcolchones.com/logo.png',
         width: 512,
         height: 512,
-        caption: 'Tienda Colchón Logo',
+        caption: 'Azul Colchones Logo',
       },
-      image: { '@id': 'https://tiendacolchon.es/#logo' },
-      description: 'Tienda online de colchones viscoelásticos premium con envío gratis en 24-48h. Más de 50.000 clientes satisfechos en España.',
-      telephone: '+34-900-123-456',
-      email: 'info@tiendacolchon.es',
+      image: { '@id': 'https://azulcolchones.com/#logo' },
+      description: 'Colchonería en Villa María, Córdoba con 8+ años de experiencia. Colchones premium, sommiers y almohadas con envío gratis en Villa María.',
+      telephone: '+54-353-XXXXXXX',
+      email: 'info@azulcolchones.com',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Calle de Alcalá',
-        addressLocality: 'Madrid',
-        addressRegion: 'Comunidad de Madrid',
-        postalCode: '28001',
-        addressCountry: 'ES'
+        streetAddress: '[Tu dirección]',
+        addressLocality: 'Villa María',
+        addressRegion: 'Córdoba',
+        postalCode: '5900',
+        addressCountry: 'AR'
       },
+      areaServed: [
+        {
+          '@type': 'City',
+          name: 'Villa María'
+        },
+        {
+          '@type': 'State',
+          name: 'Córdoba'
+        },
+        {
+          '@type': 'Country',
+          name: 'Argentina'
+        }
+      ],
       sameAs: [
-        'https://www.facebook.com/tiendacolchon',
-        'https://www.instagram.com/tiendacolchon',
-        'https://www.youtube.com/@tiendacolchon',
-        'https://www.linkedin.com/company/tiendacolchon',
-        'https://www.pinterest.es/tiendacolchon',
-        'https://twitter.com/tiendacolchon'
+        'https://www.facebook.com/azulcolchones',
+        'https://www.instagram.com/azulcolchones',
       ],
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.9',
-        reviewCount: '5247',
+        reviewCount: '850',
         bestRating: '5',
         worstRating: '1'
       },
@@ -247,21 +255,26 @@ const jsonLd = {
           '@type': 'Offer',
           itemOffered: {
             '@type': 'Product',
-            name: 'Colchones Viscoelásticos Premium'
+            name: 'Colchones y Sommiers Premium'
           },
           availability: 'https://schema.org/InStock',
           priceSpecification: {
             '@type': 'PriceSpecification',
-            priceCurrency: 'EUR',
-            minPrice: '299',
-            maxPrice: '1299'
+            priceCurrency: 'ARS',
+            minPrice: '150000',
+            maxPrice: '800000'
           },
           shippingDetails: {
             '@type': 'OfferShippingDetails',
             shippingRate: {
               '@type': 'MonetaryAmount',
               value: '0',
-              currency: 'EUR'
+              currency: 'ARS'
+            },
+            shippingDestination: {
+              '@type': 'DefinedRegion',
+              addressCountry: 'AR',
+              addressRegion: 'Córdoba'
             },
             deliveryTime: {
               "@type": "ShippingDeliveryTime",
@@ -273,8 +286,8 @@ const jsonLd = {
               },
               "transitTime": {
                 "@type": "QuantitativeValue",
-                "minValue": 3,
-                "maxValue": 10,
+                "minValue": 1,
+                "maxValue": 2,
                 "unitCode": "DAY"
               }
             }
@@ -284,79 +297,92 @@ const jsonLd = {
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://tiendacolchon.es/#website',
-      url: 'https://tiendacolchon.es',
-      name: 'Tienda Colchón',
-      description: 'Compra colchones viscoelásticos premium online con envío gratis',
-      publisher: { '@id': 'https://tiendacolchon.es/#organization' },
-      inLanguage: 'es-ES',
+      '@id': 'https://azulcolchones.com/#website',
+      url: 'https://azulcolchones.com',
+      name: 'Azul Colchones Villa María',
+      description: 'Colchonería en Villa María, Córdoba. Envío gratis y financiación.',
+      publisher: { '@id': 'https://azulcolchones.com/#organization' },
+      inLanguage: 'es-AR',
       potentialAction: {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: 'https://tiendacolchon.es/buscar?q={search_term_string}'
+          urlTemplate: 'https://azulcolchones.com/buscar?q={search_term_string}'
         },
         'query-input': 'required name=search_term_string'
       },
     },
     {
       '@type': 'WebPage',
-      '@id': 'https://tiendacolchon.es/#webpage',
-      url: 'https://tiendacolchon.es',
-      name: 'Colchones Viscoelásticos Premium | Tienda Colchón',
-      isPartOf: { '@id': 'https://tiendacolchon.es/#website' },
-      about: { '@id': 'https://tiendacolchon.es/#organization' },
-      primaryImageOfPage: { '@id': 'https://tiendacolchon.es/#logo' },
-      description: 'Compra colchones viscoelásticos premium en España. Envío gratis 3 a 6 dias, Tu descanso asegurado y 3 años de garantía.',
-      inLanguage: 'es-ES',
+      '@id': 'https://azulcolchones.com/#webpage',
+      url: 'https://azulcolchones.com',
+      name: 'Azul Colchones | Colchonería en Villa María, Córdoba',
+      isPartOf: { '@id': 'https://azulcolchones.com/#website' },
+      about: { '@id': 'https://azulcolchones.com/#organization' },
+      primaryImageOfPage: { '@id': 'https://azulcolchones.com/#logo' },
+      description: 'Colchonería en Villa María con envío gratis, 12 cuotas sin interés y garantía extendida.',
+      inLanguage: 'es-AR',
     },
     {
-      '@type': 'Store',
-      '@id': 'https://tiendacolchon.es/#localbusiness',
-      name: 'Tienda Colchón',
-      image: 'https://tiendacolchon.es/logo.png',
-      priceRange: '€€-€€€',
-      telephone: '+34-900-123-456',
-      email: 'info@tiendacolchon.es',
+      '@type': 'LocalBusiness',
+      '@id': 'https://azulcolchones.com/#localbusiness',
+      name: 'Azul Colchones',
+      image: 'https://azulcolchones.com/logo.png',
+      priceRange: '$$',
+      telephone: '+54-353-XXXXXXX',
+      email: 'info@azulcolchones.com',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Calle Ejemplo 123',
-        addressLocality: 'Madrid',
-        addressRegion: 'Comunidad de Madrid',
-        postalCode: '28001',
-        addressCountry: 'ES'
+        streetAddress: '[Tu dirección física]',
+        addressLocality: 'Villa María',
+        addressRegion: 'Córdoba',
+        postalCode: '5900',
+        addressCountry: 'AR'
       },
       geo: {
         '@type': 'GeoCoordinates',
-        latitude: 40.4168,
-        longitude: -3.7038
+        latitude: -32.4075,
+        longitude: -63.2406
       },
       openingHoursSpecification: [
         {
           '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-          opens: '00:00',
-          closes: '23:59'
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          opens: '09:00',
+          closes: '19:00'
+        },
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: 'Saturday',
+          opens: '09:00',
+          closes: '13:00'
         }
       ],
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.9',
-        reviewCount: '5247',
+        reviewCount: '850',
         bestRating: '5',
         worstRating: '1'
       },
-      paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'PayPal', 'Bank Transfer', 'Financing'],
-      currenciesAccepted: 'EUR',
+      paymentAccepted: ['Cash', 'Credit Card', 'Debit Card', 'Mercado Pago', 'Bank Transfer'],
+      currenciesAccepted: 'ARS',
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
-        name: 'Colchones Premium',
+        name: 'Colchones y Sommiers',
         itemListElement: [
           {
             '@type': 'Offer',
             itemOffered: {
               '@type': 'Product',
-              name: 'Colchón Viscoelástico'
+              name: 'Colchones Premium'
+            }
+          },
+          {
+            '@type': 'Offer',
+            itemOffered: {
+              '@type': 'Product',
+              name: 'Sommiers'
             }
           }
         ]
@@ -371,18 +397,18 @@ const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuánto tarda el envío de un colchón?',
+      name: '¿Hacen envíos a Villa María?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Realizamos envíos gratis en 24-48 horas a toda España peninsular. Recibirás tu colchón enrollado al vacío en un paquete compacto.'
+        text: 'Sí, realizamos envíos GRATIS en Villa María en 24-48 horas. También enviamos a toda Córdoba y el resto del país con costos preferenciales.'
       }
     },
     {
       '@type': 'Question',
-      name: '¿Por qué confiar en la calidad de nuestros colchones?',
+      name: '¿Puedo pagar en cuotas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Trabajamos con fabricantes nacionales que utilizan materiales certificados y tecnologías de última generación en descanso. Cada colchón pasa por rigurosos controles de calidad antes de llegar a tu hogar, garantizando confort y durabilidad desde la primera noche.'
+        text: 'Sí, ofrecemos financiación en hasta 12 cuotas sin interés con Mercado Pago. También aceptamos transferencia bancaria con 10% de descuento y efectivo en tienda con 15% de descuento.'
       }
     },
     {
@@ -390,15 +416,23 @@ const faqJsonLd = {
       name: '¿Qué garantía tienen los colchones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Todos nuestros colchones incluyen 3 años de garantía del fabricante contra defectos de fabricación y pérdida de firmeza.'
+        text: 'Todos nuestros colchones incluyen garantía extendida contra defectos de fabricación. Además, cumplimos con la Ley de Defensa del Consumidor Argentina.'
       }
     },
     {
       '@type': 'Question',
-      name: '¿Cómo sé qué firmeza de colchón elegir?',
+      name: '¿Tienen local físico en Villa María?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Recomendamos firmeza media-alta para la mayoría de personas. Si duermes de lado, elige firmeza media. Si duermes boca arriba o boca abajo, firmeza media-alta o alta.'
+        text: 'Sí, tenemos showroom en Villa María donde podés ver y probar nuestros productos. También atendemos consultas por WhatsApp para mayor comodidad.'
+      }
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo sé qué colchón elegir?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Contamos con un simulador interactivo que te ayuda a encontrar el colchón perfecto según tu peso, posición al dormir y preferencias. También podés consultarnos por WhatsApp para asesoramiento personalizado.'
       }
     }
   ]
@@ -412,7 +446,7 @@ const breadcrumbJsonLd = {
       '@type': 'ListItem',
       position: 1,
       name: 'Inicio',
-      item: 'https://tiendacolchon.es'
+      item: 'https://azulcolchones.com'
     }
   ]
 }
@@ -428,7 +462,7 @@ export default function RootLayout({
 }>) {
   return (
     <html 
-      lang="es" 
+      lang="es-AR" 
       className={`scroll-smooth ${inter.variable} ${plusJakarta.variable}`}
       suppressHydrationWarning
     >
@@ -437,11 +471,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* DNS Prefetch para servicios de analytics */}
+        {/* DNS Prefetch para servicios */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="dns-prefetch" href="https://www.clarity.ms" />
+        <link rel="dns-prefetch" href="https://www.mercadopago.com" />
         
         {/* Preload crítico para LCP */}
         <link 
@@ -478,20 +512,20 @@ export default function RootLayout({
           textRendering: 'optimizeLegibility'
         }}
       >
-        {/* Skip to main content - Accesibilidad Mejorado */}
+        {/* Skip to main content - Accesibilidad */}
         <a 
           href="#main-content" 
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-violet-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-violet-500/50 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-all duration-200"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-blue-600 focus:text-white focus:rounded-xl focus:font-semibold focus:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-all duration-200"
         >
           Saltar al contenido principal
         </a>
 
-        {/* Auth Provider - Envuelve toda la app */}
+        {/* Auth Provider */}
         <AuthProvider>
-          {/* Header Component - Sticky con shadow */}
+          {/* Header Component */}
           <Header />
           
-          {/* Main Content - Flex-1 para empujar footer al fondo */}
+          {/* Main Content */}
           <main 
             id="main-content" 
             className="flex-1 w-full scroll-mt-20"
@@ -504,16 +538,16 @@ export default function RootLayout({
           {/* Footer Component */}
           <Footer />
 
-          {/* Botón de WhatsApp flotante */}
+          {/* WhatsApp flotante */}
           <WhatsAppButton 
-            phoneNumber="34600123456"
-            message="¡Hola! Me interesa conocer más sobre vuestros colchones viscoelásticos"
+            phoneNumber="5493531234567"
+            message="¡Hola! Me interesa conocer más sobre los colchones de Azul Colchones"
             position="right"
             showTooltip={true}
           />
         </AuthProvider>
 
-        {/* ✅ ANALYTICS - Todos los servicios de tracking modulares */}
+        {/* Analytics */}
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>

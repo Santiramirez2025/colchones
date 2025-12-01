@@ -57,7 +57,7 @@ export default function HeroSection({
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 backdrop-blur-sm mb-8 group hover:scale-105 transition-transform">
             <Sparkles className="w-4 h-4 text-violet-400 animate-pulse" />
             <span className="text-sm font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Catálogo Premium 2025
+              Ofertas de luiquidacion 2025
             </span>
             <div className="w-2 h-2 rounded-full bg-violet-400 animate-ping" />
           </div>
@@ -74,7 +74,7 @@ export default function HeroSection({
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 font-light max-w-3xl mx-auto mb-12 leading-relaxed">
-          Una selección exclusiva <span className="text-white font-semibold">exclusiva</span> de colchones y productos
+          Una selección <span className="text-white font-semibold">exclusiva</span> de colchones y productos
           </p>
 
           {/* CTA Button - Centered */}
@@ -89,25 +89,6 @@ export default function HeroSection({
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {[
-              { icon: Star, value: '4.9', label: 'Valoración', color: 'from-amber-400 to-yellow-400' },
-              { icon: Award, value: '500+', label: 'Productos', color: 'from-violet-400 to-purple-400' },
-              { icon: TrendingUp, value: '10K+', label: 'Clientes', color: 'from-fuchsia-400 to-pink-400' }
-            ].map((stat, i) => (
-              <div
-                key={i}
-                className="group relative p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 backdrop-blur-sm hover:border-zinc-700 transition-all duration-300 hover:scale-105"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <stat.icon className={`w-6 h-6 mb-3 bg-gradient-to-br ${stat.color} bg-clip-text text-transparent`} />
-                <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm text-zinc-400 font-medium">{stat.label}</div>
-              </div>
-            ))}
           </div>
 
         </div>

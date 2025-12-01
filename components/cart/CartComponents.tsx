@@ -1,19 +1,23 @@
-// components/cart/CartComponents.tsx
+// components/cart/CartComponents.tsx - ARGENTINA 2025
 'use client'
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, Truck, Award, Star, ChevronRight, Lock, Package, Heart, BadgeCheck, Plus, Check, Sparkles, ChevronDown } from 'lucide-react'
+import { Shield, Truck, Award, Star, ChevronRight, Lock, Package, Heart, BadgeCheck, Plus, Check, Sparkles, ChevronDown, CreditCard, RotateCcw, Clock } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart-store'
+import { formatARS } from '@/lib/utils/currency'
 import type { Product, ProductVariant } from '@prisma/client'
 
 type ProductWithVariants = Product & {
   variants: ProductVariant[]
 }
 
-// Progress Bar for Free Shipping
+// ============================================================================
+// SHIPPING PROGRESS - ARGENTINA
+// ============================================================================
+
 interface ShippingProgressProps {
   current: number
   target: number
@@ -27,27 +31,36 @@ export function ShippingProgress({ current, target }: ShippingProgressProps) {
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl p-4 mb-6"
+      className="bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-blue-500/10 border border-blue-500/20 rounded-2xl p-4 sm:p-5 mb-6 backdrop-blur-sm"
     >
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <Truck className="w-5 h-5 text-indigo-600" />
-          <span className="font-semibold text-gray-900">
-            {percentage === 100 ? (
-              '¡Envío gratis desbloqueado! 🎉'
-            ) : (
-              `Te faltan ${remaining.toFixed(0)}€ para envío gratis`
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center">
+            <Truck className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <span className="font-bold text-white text-sm sm:text-base block">
+              {percentage === 100 ? (
+                '¡Envío gratis desbloqueado! 🎉'
+              ) : (
+                'Envío gratis en Villa María'
+              )}
+            </span>
+            {percentage < 100 && (
+              <span className="text-xs text-zinc-400">
+                Te faltan {formatARS(remaining)} para envío gratis
+              </span>
             )}
-          </span>
+          </div>
         </div>
       </div>
       
-      <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="relative h-2.5 bg-zinc-800 rounded-full overflow-hidden border border-white/10">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-400 rounded-full shadow-lg shadow-blue-500/50"
         />
       </div>
       
@@ -55,93 +68,91 @@ export function ShippingProgress({ current, target }: ShippingProgressProps) {
         <motion.p
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-sm text-emerald-600 font-medium mt-2 flex items-center gap-1"
+          className="text-sm text-emerald-400 font-semibold mt-3 flex items-center gap-2"
         >
           <BadgeCheck className="w-4 h-4" />
-          ¡Has conseguido el envío gratuito!
+          ¡Conseguiste el envío gratuito!
         </motion.p>
       )}
     </motion.div>
   )
 }
 
-// Trust Badges
+// ============================================================================
+// TRUST BADGES - ARGENTINA
+// ============================================================================
+
 export function TrustBadges() {
   const badges = [
     {
       icon: Shield,
-      title: 'Garantía 3 años',
-      description: 'Respaldo total',
-      color: 'text-blue-600',
-      bg: 'bg-blue-50'
+      title: '5 Años Garantía',
+      description: 'Piero Argentina',
+      color: 'text-blue-400',
+      bg: 'from-blue-500/10 to-blue-600/5',
+      border: 'border-blue-500/20'
     },
     {
-      icon: Award,
-      title: 'Hecho en España',
-      description: 'Calidad certificada',
-      color: 'text-amber-600',
-      bg: 'bg-amber-50'
+      icon: RotateCcw,
+      title: '100 Noches',
+      description: 'De prueba gratis',
+      color: 'text-emerald-400',
+      bg: 'from-emerald-500/10 to-emerald-600/5',
+      border: 'border-emerald-500/20'
     },
     {
-      icon: Lock,
-      title: 'Pago seguro',
-      description: 'Encriptación SSL',
-      color: 'text-purple-600',
-      bg: 'bg-purple-50'
+      icon: CreditCard,
+      title: 'MercadoPago',
+      description: 'Pago 100% seguro',
+      color: 'text-cyan-400',
+      bg: 'from-cyan-500/10 to-cyan-600/5',
+      border: 'border-cyan-500/20'
+    },
+    {
+      icon: Truck,
+      title: 'Envío Gratis',
+      description: 'Villa María y zona',
+      color: 'text-violet-400',
+      bg: 'from-violet-500/10 to-violet-600/5',
+      border: 'border-violet-500/20'
     }
   ]
   
-  return (
-    <div className="grid grid-cols-2 gap-3 mb-6">
-      {badges.map((badge, index) => (
-        <motion.div
-          key={badge.title}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.1 }}
-          whileHover={{ scale: 1.02 }}
-          className={`${badge.bg} rounded-xl p-3 border border-gray-100`}
-        >
-          <badge.icon className={`w-5 h-5 ${badge.color} mb-2`} />
-          <div className="text-xs font-bold text-gray-900">{badge.title}</div>
-          <div className="text-[10px] text-gray-600">{badge.description}</div>
-        </motion.div>
-      ))}
-    </div>
-  )
-}
-
-// Mini Testimonial
-export function MiniTestimonial() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-white border border-gray-100 rounded-xl p-4 mb-6"
+      className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl p-5 border border-blue-500/20 mb-6 backdrop-blur-sm"
     >
-      <div className="flex items-center gap-1 mb-2">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+      <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-blue-400" />
+        Comprá con confianza
+      </h4>
+      <div className="grid grid-cols-2 gap-3">
+        {badges.map((badge, index) => (
+          <motion.div
+            key={badge.title}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 + index * 0.05 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            className={`bg-gradient-to-br ${badge.bg} rounded-xl p-3 border ${badge.border} transition-all duration-300`}
+          >
+            <badge.icon className={`w-5 h-5 ${badge.color} mb-2`} />
+            <div className="text-xs font-bold text-white">{badge.title}</div>
+            <div className="text-[10px] text-zinc-400">{badge.description}</div>
+          </motion.div>
         ))}
-      </div>
-      <p className="text-sm text-gray-700 mb-2 italic">
-        "El mejor colchón que he tenido. La compra fue muy fácil y llegó en 24h."
-      </p>
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-sm font-bold">
-          M
-        </div>
-        <div>
-          <div className="text-xs font-semibold text-gray-900">María G.</div>
-          <div className="text-[10px] text-gray-500">Cliente verificado</div>
-        </div>
       </div>
     </motion.div>
   )
 }
 
-// Urgency Banner
+// ============================================================================
+// URGENCY BANNER - ARGENTINA
+// ============================================================================
+
 interface UrgencyBannerProps {
   message?: string
   type?: 'stock' | 'time' | 'discount'
@@ -151,18 +162,21 @@ export function UrgencyBanner({ message, type = 'stock' }: UrgencyBannerProps) {
   const config = {
     stock: {
       icon: '📦',
-      color: 'from-orange-500 to-red-500',
-      text: message || 'Quedan pocas unidades en stock'
+      color: 'from-orange-500 via-red-500 to-orange-600',
+      text: message || '¡Stock limitado! Solo quedan pocas unidades',
+      textColor: 'text-white'
     },
     time: {
       icon: '⏰',
-      color: 'from-purple-500 to-pink-500',
-      text: message || 'Oferta válida solo hoy'
+      color: 'from-violet-500 via-purple-500 to-violet-600',
+      text: message || 'Oferta válida solo por hoy',
+      textColor: 'text-white'
     },
     discount: {
       icon: '🎁',
-      color: 'from-emerald-500 to-teal-500',
-      text: message || '10% de descuento en tu primera compra'
+      color: 'from-emerald-500 via-teal-500 to-emerald-600',
+      text: message || '15% OFF en tu primera compra con VILLAMARIA',
+      textColor: 'text-white'
     }
   }
   
@@ -172,16 +186,20 @@ export function UrgencyBanner({ message, type = 'stock' }: UrgencyBannerProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`bg-gradient-to-r ${current.color} text-white rounded-xl p-3 mb-4 text-center`}
+      className={`bg-gradient-to-r ${current.color} ${current.textColor} rounded-xl p-3.5 mb-4 text-center shadow-xl border border-white/20`}
     >
-      <span className="text-sm font-semibold">
-        {current.icon} {current.text}
+      <span className="text-sm font-bold flex items-center justify-center gap-2">
+        <span className="text-lg">{current.icon}</span>
+        {current.text}
       </span>
     </motion.div>
   )
 }
 
-// NEW: Upsell Component - Dynamic Topper
+// ============================================================================
+// UPSELL COMPONENT - ARGENTINA
+// ============================================================================
+
 interface UpsellProps {
   onAdd?: () => void
 }
@@ -203,12 +221,13 @@ export function Upsell({ onAdd }: UpsellProps) {
         
         if (data.success && data.product) {
           setTopper(data.product)
-          const popularVariant = data.product.variants.find((v: ProductVariant) => v.isPopular) 
+          // ✅ CORREGIDO: usar isDefault en lugar de isPopular
+          const defaultVariant = data.product.variants.find((v: ProductVariant) => v.isDefault) 
             || data.product.variants[0]
-          setSelectedVariant(popularVariant)
+          setSelectedVariant(defaultVariant)
         }
       } catch (error) {
-        console.error('Error loading topper:', error)
+        console.error('[Upsell] Error loading topper:', error)
       } finally {
         setIsLoading(false)
       }
@@ -220,7 +239,7 @@ export function Upsell({ onAdd }: UpsellProps) {
   const handleAddToCart = () => {
     if (!topper || !selectedVariant) return
 
-    // Verificar si ya está en el carrito - buscar por productId y size
+    // Verificar si ya está en el carrito
     const isInCart = items.some(item => 
       item.productId === topper.id && item.size === selectedVariant.size
     )
@@ -231,7 +250,6 @@ export function Upsell({ onAdd }: UpsellProps) {
       return
     }
 
-    // No pasar 'id' - se genera automáticamente
     addItem({
       productId: topper.id,
       name: topper.name,
@@ -239,7 +257,7 @@ export function Upsell({ onAdd }: UpsellProps) {
       price: selectedVariant.price,
       originalPrice: selectedVariant.originalPrice || undefined,
       quantity: 1,
-      image: topper.image,
+      image: topper.images[0] || '/placeholder.jpg',
       slug: topper.slug,
       variant: selectedVariant.size
     })
@@ -247,11 +265,25 @@ export function Upsell({ onAdd }: UpsellProps) {
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
     onAdd?.()
+    
+    // Track analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'add_to_cart', {
+        currency: 'ARS',
+        value: selectedVariant.price,
+        items: [{
+          item_id: topper.id,
+          item_name: topper.name,
+          price: selectedVariant.price,
+          quantity: 1
+        }]
+      })
+    }
   }
 
   if (isLoading) {
     return (
-      <div className="animate-pulse bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 rounded-xl p-4 border border-white/5">
+      <div className="animate-pulse bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 rounded-xl p-4 border border-blue-500/20">
         <div className="flex items-center gap-4">
           <div className="w-20 h-20 bg-zinc-700/50 rounded-lg" />
           <div className="flex-1 space-y-2">
@@ -271,25 +303,30 @@ export function Upsell({ onAdd }: UpsellProps) {
     ? Math.round(((selectedVariant.originalPrice! - selectedVariant.price) / selectedVariant.originalPrice!) * 100)
     : 0
 
-  // Verificar si ya está en el carrito
   const isInCart = items.some(item => 
     item.productId === topper.id && item.size === selectedVariant.size
   )
+
+  const productImage = Array.isArray(topper.images) && topper.images.length > 0 
+    ? topper.images[0] 
+    : '/placeholder.jpg'
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="relative bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-zinc-900/50 border border-amber-500/20 rounded-xl p-4 overflow-hidden"
+      className="relative bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-blue-500/10 border border-blue-500/30 rounded-2xl p-4 overflow-hidden backdrop-blur-sm"
     >
+      {/* Badge recomendado */}
       <div className="absolute -top-1 -right-1">
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl shadow-lg flex items-center gap-1">
+        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-[10px] font-black px-2.5 py-1 rounded-bl-xl rounded-tr-xl shadow-lg flex items-center gap-1">
           <Sparkles className="w-3 h-3" />
           RECOMENDADO
         </div>
       </div>
 
+      {/* Badge descuento */}
       {hasDiscount && (
         <div className="absolute top-3 left-3 z-10">
           <div className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-black px-2 py-1 rounded-lg shadow-lg">
@@ -299,9 +336,10 @@ export function Upsell({ onAdd }: UpsellProps) {
       )}
 
       <div className="flex items-center gap-4">
-        <div className="relative w-20 h-20 bg-zinc-800 rounded-lg flex-shrink-0 overflow-hidden border border-white/10">
+        {/* Image */}
+        <div className="relative w-20 h-20 bg-zinc-800 rounded-xl flex-shrink-0 overflow-hidden border border-blue-500/20">
           <Image
-            src={topper.image || '/images/placeholder.jpg'}
+            src={productImage}
             alt={topper.name}
             fill
             className="object-cover"
@@ -310,6 +348,7 @@ export function Upsell({ onAdd }: UpsellProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
 
+        {/* Info */}
         <div className="flex-1 min-w-0">
           <h4 className="font-black text-white text-sm mb-1 flex items-center gap-2">
             {topper.name}
@@ -321,13 +360,14 @@ export function Upsell({ onAdd }: UpsellProps) {
             )}
           </h4>
           
+          {/* Selector de variantes */}
           <div className="relative mb-2">
             <button
               onClick={() => setShowVariants(!showVariants)}
-              className="w-full text-left px-2 py-1 bg-zinc-800/80 border border-white/10 rounded-lg text-xs text-white font-semibold flex items-center justify-between hover:border-amber-500/30 transition-colors"
+              className="w-full text-left px-2 py-1 bg-zinc-800/80 border border-blue-500/20 rounded-lg text-xs text-white font-semibold flex items-center justify-between hover:border-blue-500/40 transition-colors"
             >
               <span className="flex items-center gap-1.5">
-                <Package className="w-3 h-3 text-amber-400" />
+                <Package className="w-3 h-3 text-blue-400" />
                 {selectedVariant.size}
               </span>
               <ChevronDown className={`w-3 h-3 transition-transform ${showVariants ? 'rotate-180' : ''}`} />
@@ -340,7 +380,7 @@ export function Upsell({ onAdd }: UpsellProps) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -5, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute z-20 w-full mt-1 bg-zinc-900 border border-white/20 rounded-lg shadow-2xl max-h-48 overflow-y-auto"
+                  className="absolute z-20 w-full mt-1 bg-zinc-900 border border-blue-500/30 rounded-lg shadow-2xl max-h-48 overflow-y-auto"
                 >
                   {topper.variants.map((variant) => {
                     const variantDiscount = variant.originalPrice && variant.originalPrice > variant.price
@@ -353,14 +393,14 @@ export function Upsell({ onAdd }: UpsellProps) {
                           setSelectedVariant(variant)
                           setShowVariants(false)
                         }}
-                        className={`w-full px-3 py-2 text-left hover:bg-amber-500/10 transition-colors flex items-center justify-between ${
-                          isSelected ? 'bg-amber-500/20' : ''
+                        className={`w-full px-3 py-2 text-left hover:bg-blue-500/10 transition-colors flex items-center justify-between ${
+                          isSelected ? 'bg-blue-500/20' : ''
                         }`}
                       >
                         <span className="text-xs font-semibold text-white flex items-center gap-2">
                           {variant.size}
-                          {variant.isPopular && (
-                            <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded">
+                          {variant.isDefault && (
+                            <span className="text-[9px] px-1.5 py-0.5 bg-blue-500/20 text-blue-400 rounded">
                               Popular
                             </span>
                           )}
@@ -368,11 +408,11 @@ export function Upsell({ onAdd }: UpsellProps) {
                         <div className="flex items-center gap-2">
                           {variantDiscount && (
                             <span className="text-[10px] text-zinc-500 line-through">
-                              {variant.originalPrice}€
+                              {formatARS(variant.originalPrice!)}
                             </span>
                           )}
-                          <span className="text-xs font-black text-amber-400">
-                            {variant.price}€
+                          <span className="text-xs font-black text-blue-400">
+                            {formatARS(variant.price)}
                           </span>
                         </div>
                       </button>
@@ -383,27 +423,29 @@ export function Upsell({ onAdd }: UpsellProps) {
             </AnimatePresence>
           </div>
 
+          {/* Price */}
           <div className="flex items-center gap-2">
             {hasDiscount && (
               <span className="text-zinc-500 line-through text-xs">
-                {selectedVariant.originalPrice}€
+                {formatARS(selectedVariant.originalPrice!)}
               </span>
             )}
-            <span className="text-amber-400 font-black text-base">
-              {selectedVariant.price}€
+            <span className="text-blue-400 font-black text-base">
+              {formatARS(selectedVariant.price)}
             </span>
           </div>
         </div>
 
+        {/* Add button */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleAddToCart}
           disabled={addedToCart || isInCart}
-          className={`px-4 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center gap-2 flex-shrink-0 ${
+          className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center gap-2 flex-shrink-0 ${
             addedToCart || isInCart
-              ? 'bg-emerald-500 text-white'
-              : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600'
+              ? 'bg-emerald-500 text-white border border-emerald-400/30'
+              : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 border border-blue-400/30'
           }`}
         >
           {addedToCart || isInCart ? (
@@ -420,25 +462,29 @@ export function Upsell({ onAdd }: UpsellProps) {
         </motion.button>
       </div>
 
-      {topper.highlights && (
-        <div className="mt-3 pt-3 border-t border-white/10">
-          <div className="flex flex-wrap gap-1.5">
-            {JSON.parse(topper.highlights as string).slice(0, 3).map((feature: string, index: number) => (
-              <span
-                key={index}
-                className="text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-300 rounded-full font-semibold"
-              >
-                {feature}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Highlights */}
+      {topper.highlights && Array.isArray(topper.highlights) && topper.highlights.length > 0 && (
+  <div className="mt-3 pt-3 border-t border-blue-500/20">
+    <div className="flex flex-wrap gap-1.5">
+      {topper.highlights.slice(0, 3).map((feature: string, index: number) => (
+        <span
+          key={index}
+          className="text-[10px] px-2 py-0.5 bg-blue-500/10 text-blue-300 rounded-full font-semibold border border-blue-500/20"
+        >
+          {feature}
+        </span>
+      ))}
+    </div>
+  </div>
+)}
     </motion.div>
   )
 }
 
-// Checkout Steps Progress
+// ============================================================================
+// CHECKOUT STEPS - ARGENTINA
+// ============================================================================
+
 interface CheckoutStepsProps {
   currentStep: number
 }
@@ -463,14 +509,18 @@ export function CheckoutSteps({ currentStep }: CheckoutStepsProps) {
                 transition={{ delay: index * 0.1 }}
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${
                   step.number <= currentStep
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                    : 'bg-gray-200 text-gray-500'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30'
+                    : 'bg-zinc-800 border border-zinc-700 text-zinc-500'
                 }`}
               >
-                {step.number}
+                {step.number <= currentStep ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  step.number
+                )}
               </motion.div>
               <span className={`text-xs font-medium ${
-                step.number <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                step.number <= currentStep ? 'text-white' : 'text-zinc-500'
               }`}>
                 {step.label}
               </span>
@@ -478,12 +528,12 @@ export function CheckoutSteps({ currentStep }: CheckoutStepsProps) {
             
             {index < steps.length - 1 && (
               <div className="flex-1 h-0.5 mx-2 relative">
-                <div className="absolute inset-0 bg-gray-200" />
+                <div className="absolute inset-0 bg-zinc-800" />
                 <motion.div
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: step.number < currentStep ? 1 : 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 origin-left"
+                  className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 origin-left"
                 />
               </div>
             )}
@@ -494,28 +544,31 @@ export function CheckoutSteps({ currentStep }: CheckoutStepsProps) {
   )
 }
 
-// Empty Cart
+// ============================================================================
+// EMPTY CART - ARGENTINA
+// ============================================================================
+
 export function EmptyCart() {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100"
+      className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-3xl p-12 text-center shadow-2xl border border-blue-500/20 backdrop-blur-sm"
     >
-      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+      <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full flex items-center justify-center border border-blue-500/30">
         <span className="text-5xl">🛒</span>
       </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+      <h3 className="text-2xl font-black text-white mb-3">
         Tu carrito está vacío
       </h3>
-      <p className="text-gray-600 mb-8">
-        Explora nuestro catálogo y encuentra tu colchón perfecto
+      <p className="text-zinc-400 mb-8 max-w-md mx-auto">
+        Explorá nuestro catálogo y encontrá tu colchón perfecto para un mejor descanso
       </p>
       <Link href="/catalogo">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold inline-flex items-center gap-2 shadow-lg"
+          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-bold inline-flex items-center gap-2 shadow-2xl shadow-blue-500/30"
         >
           <span>Explorar productos</span>
           <ChevronRight className="w-5 h-5" />
@@ -525,26 +578,32 @@ export function EmptyCart() {
   )
 }
 
-// Payment Methods
+// ============================================================================
+// PAYMENT METHODS - ARGENTINA
+// ============================================================================
+
 export function PaymentMethods({ selected, onSelect }: { selected: string; onSelect: (method: string) => void }) {
   const methods = [
     {
-      id: 'card',
-      name: 'Tarjeta de crédito/débito',
+      id: 'mercadopago',
+      name: 'MercadoPago',
       icon: '💳',
-      badges: ['Visa', 'Mastercard', 'Amex']
+      description: 'Tarjetas de crédito y débito',
+      badges: ['Visa', 'Mastercard', 'Amex', 'Cabal']
     },
     {
-      id: 'apple_pay',
-      name: 'Apple Pay',
-      icon: '🍎',
-      badge: 'Rápido y seguro'
+      id: 'transfer',
+      name: 'Transferencia Bancaria',
+      icon: '🏦',
+      description: '5% de descuento adicional',
+      badge: 'Más económico'
     },
     {
-      id: 'google_pay',
-      name: 'Google Pay',
-      icon: 'G',
-      badge: 'Pago en 1 clic'
+      id: 'efectivo',
+      name: 'Efectivo',
+      icon: '💵',
+      description: 'Pago al recibir',
+      badge: 'Solo Villa María'
     }
   ]
   
@@ -559,17 +618,24 @@ export function PaymentMethods({ selected, onSelect }: { selected: string; onSel
           whileTap={{ scale: 0.99 }}
           className={`w-full p-4 rounded-xl border-2 transition-all ${
             selected === method.id
-              ? 'border-indigo-600 bg-indigo-50'
-              : 'border-gray-200 hover:border-gray-300 bg-white'
+              ? 'border-blue-500 bg-blue-500/20 ring-2 ring-blue-500/30'
+              : 'border-zinc-800 hover:border-blue-500/50 bg-zinc-900/50'
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{method.icon}</span>
               <div className="text-left">
-                <div className="font-semibold text-gray-900">{method.name}</div>
-                {method.badge && (
-                  <div className="text-xs text-gray-500">{method.badge}</div>
+                <div className="font-bold text-white text-sm">{method.name}</div>
+                <div className="text-xs text-zinc-400">{method.description}</div>
+                {method.badges && (
+                  <div className="flex gap-1.5 mt-1">
+                    {method.badges.map(badge => (
+                      <span key={badge} className="text-[10px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 rounded">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -578,9 +644,9 @@ export function PaymentMethods({ selected, onSelect }: { selected: string; onSel
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center"
+                className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center"
               >
-                <BadgeCheck className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-white" />
               </motion.div>
             )}
           </div>

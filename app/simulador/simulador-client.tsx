@@ -1,16 +1,18 @@
-// app/simulador/simulador-client.tsx - OPTIMIZADO UX/UI
+// app/simulador/simulador-client.tsx - ARGENTINA 2025 CON CUOTAS
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { 
   ArrowLeft, ArrowRight, Check, Sparkles, Brain, 
-  Shield, Truck, Star, Zap, Award
+  Shield, Truck, Star, Zap, Award, CreditCard, MapPin
 } from 'lucide-react'
 import { getTopRecommendations } from '@/lib/matching-algorithm'
 import { SIMULATOR_STEPS } from './simulator-config'
+import { formatARS } from '@/lib/utils/currency'
+import { getMejorCuota, calcularTodasLasCuotas } from '@/lib/utils/pricing'
 
 interface SimulatorClientProps {
   products: any[]
@@ -35,20 +37,20 @@ export default function SimuladorClient({ products }: SimulatorClientProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [recommendations, setRecommendations] = useState<any[]>([])
 
-  console.log('📍 SimuladorClient: Products received:', products?.length || 0)
+  console.log('🧠 [SimuladorClient] Products received:', products?.length || 0)
 
   // Validación de productos
   if (!products || products.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-950 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-2xl shadow-red-500/50">
             <Brain className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
             Error al cargar productos
           </h2>
-          <p className="text-zinc-400 text-base">Por favor, recarga la página</p>
+          <p className="text-zinc-400 text-base">Por favor, recargá la página</p>
         </div>
       </div>
     )
@@ -59,27 +61,27 @@ export default function SimuladorClient({ products }: SimulatorClientProps) {
     const newData = { ...data, [key]: value }
     setData(newData)
 
-    console.log('📍 Selected:', key, '=', value)
-    console.log('📍 Current data:', newData)
+    console.log('✅ [SimuladorClient] Selected:', key, '=', value)
+    console.log('📊 [SimuladorClient] Current data:', newData)
     
     if (currentStep < SIMULATOR_STEPS.length - 1) {
       setTimeout(() => setCurrentStep(currentStep + 1), 300)
     } else {
-      console.log('📍 Final step - generating recommendations')
-      console.log('📍 Profile:', newData)
-      console.log('📍 Products to analyze:', products.length)
+      console.log('🎯 [SimuladorClient] Final step - generating recommendations')
+      console.log('👤 [SimuladorClient] Profile:', newData)
+      console.log('🛏️ [SimuladorClient] Products to analyze:', products.length)
       
       setIsAnalyzing(true)
       
       setTimeout(() => {
         try {
-          console.log('📍 Calling getTopRecommendations...')
+          console.log('🔄 [SimuladorClient] Calling getTopRecommendations...')
           const topProducts = getTopRecommendations(products, newData, 3)
           
-          console.log('📍 Recommendations received:', topProducts.length)
+          console.log('✅ [SimuladorClient] Recommendations received:', topProducts.length)
           
           if (!topProducts || topProducts.length === 0) {
-            console.warn('⚠️ No recommendations, using fallback')
+            console.warn('⚠️ [SimuladorClient] No recommendations, using fallback')
             const fallbackRecs = products.slice(0, 3).map((p, i) => ({
               ...p,
               matchScore: 85 - i * 5,
@@ -88,11 +90,11 @@ export default function SimuladorClient({ products }: SimulatorClientProps) {
             }))
             setRecommendations(fallbackRecs)
           } else {
-            console.log('✅ Setting recommendations:', topProducts)
+            console.log('🎉 [SimuladorClient] Setting recommendations:', topProducts)
             setRecommendations(topProducts)
           }
         } catch (error) {
-          console.error('❌ Error generating recommendations:', error)
+          console.error('❌ [SimuladorClient] Error generating recommendations:', error)
           const fallbackRecs = products.slice(0, 3).map((p, i) => ({
             ...p,
             matchScore: 85 - i * 5,
@@ -121,6 +123,7 @@ export default function SimuladorClient({ products }: SimulatorClientProps) {
     setIsAnalyzing(false)
     setData({ position: '', weight: '', firmness: '', budget: '' })
     setRecommendations([])
+    console.log('🔄 [SimuladorClient] Test restarted')
   }
 
   const progress = ((currentStep + 1) / SIMULATOR_STEPS.length) * 100
@@ -150,11 +153,11 @@ export default function SimuladorClient({ products }: SimulatorClientProps) {
 }
 
 // ============================================================================
-// ANALYZING SCREEN - OPTIMIZADO
+// ANALYZING SCREEN
 // ============================================================================
 function AnalyzingScreen() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-950 flex items-center justify-center px-4 py-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4 py-8 relative overflow-hidden">
       {/* Animated background blobs */}
       <div className="absolute inset-0 opacity-20">
         <motion.div
@@ -164,7 +167,7 @@ function AnalyzingScreen() {
             y: [0, 30, 0]
           }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-20 left-10 md:left-20 w-64 md:w-96 h-64 md:h-96 bg-violet-500 rounded-full blur-3xl"
+          className="absolute top-20 left-10 md:left-20 w-64 md:w-96 h-64 md:h-96 bg-blue-500 rounded-full blur-3xl"
         />
         <motion.div
           animate={{ 
@@ -223,7 +226,7 @@ function AnalyzingScreen() {
           initial={{ width: 0 }}
           animate={{ width: "100%" }}
           transition={{ duration: 2.5, ease: "easeInOut" }}
-          className="h-2 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 rounded-full max-w-md mx-auto shadow-lg shadow-violet-500/50"
+          className="h-2 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-400 rounded-full max-w-md mx-auto shadow-lg shadow-blue-500/50"
         />
       </motion.div>
     </div>
@@ -231,10 +234,14 @@ function AnalyzingScreen() {
 }
 
 // ============================================================================
-// RESULTS SCREEN - OPTIMIZADO MOBILE-FIRST
+// RESULTS SCREEN
 // ============================================================================
 function ResultsScreen({ recommendations, onRestart }: any) {
   const topMatch = recommendations[0]
+  
+  // ✅ Calcular cuotas
+  const mejorCuota = useMemo(() => getMejorCuota(topMatch.price), [topMatch.price])
+  const todasLasCuotas = useMemo(() => calcularTodasLasCuotas(topMatch.price), [topMatch.price])
 
   // Helper para obtener features de forma segura
   const getDisplayFeatures = (product: any): string[] => {
@@ -252,7 +259,7 @@ function ResultsScreen({ recommendations, onRestart }: any) {
     if (product.warranty >= 10) fallback.push(`${product.warranty} años de garantía`)
     if (product.cooling) fallback.push('Sistema de refrigeración avanzado')
     if (product.hypoallergenic) fallback.push('Materiales hipoalergénicos')
-    if (product.eco) fallback.push('Certificación ecológica')
+      if (product.isEco) fallback.push('Certificación ecológica')
     
     return fallback.length > 0 ? fallback : [
       'Excelente relación calidad-precio',
@@ -265,15 +272,14 @@ function ResultsScreen({ recommendations, onRestart }: any) {
   // Helper para obtener imagen válida
   const getProductImage = (product: any): string => {
     if (product.images?.[0]) return product.images[0]
-    if (product.image) return product.image
-    return '/placeholder-mattress.jpg' // Fallback
+    return '/placeholder-mattress.jpg'
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-950 py-8 md:py-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 py-8 md:py-12 px-4 relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-0 w-72 md:w-96 h-72 md:h-96 bg-violet-500 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-0 left-0 w-72 md:w-96 h-72 md:h-96 bg-blue-500 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-0 w-72 md:w-96 h-72 md:h-96 bg-cyan-500 rounded-full blur-3xl animate-pulse" />
       </div>
 
@@ -288,7 +294,7 @@ function ResultsScreen({ recommendations, onRestart }: any) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-2xl shadow-emerald-500/30"
+            className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-2xl shadow-emerald-500/50"
           >
             <Check className="w-8 h-8 md:w-10 md:h-10 text-white" />
           </motion.div>
@@ -310,19 +316,19 @@ function ResultsScreen({ recommendations, onRestart }: any) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-10 mb-6 md:mb-8 relative overflow-hidden"
+          className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border border-blue-500/20 rounded-2xl md:rounded-3xl p-6 md:p-10 mb-6 md:mb-8 relative overflow-hidden shadow-2xl"
         >
-          <div className="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-48 md:w-64 h-48 md:h-64 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl" />
           
           <div className="relative">
             {/* Best match badge */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold mb-4 md:mb-6 shadow-lg">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
               MEJOR MATCH
             </div>
 
-            {/* Product image - MOBILE OPTIMIZED */}
-            <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-xl md:rounded-2xl overflow-hidden mb-6 bg-white/5">
+            {/* Product image */}
+            <div className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-xl md:rounded-2xl overflow-hidden mb-6 bg-white/5 border border-blue-500/20">
               <Image
                 src={getProductImage(topMatch)}
                 alt={topMatch.name}
@@ -331,6 +337,14 @@ function ResultsScreen({ recommendations, onRestart }: any) {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
+              
+              {/* Badge cuotas en imagen */}
+              <div className="absolute top-3 left-3">
+                <div className="bg-emerald-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs md:text-sm font-bold flex items-center gap-1 shadow-lg">
+                  <CreditCard className="w-3 h-3 md:w-4 md:h-4" />
+                  Hasta 12 cuotas
+                </div>
+              </div>
             </div>
 
             {/* Product info */}
@@ -359,25 +373,41 @@ function ResultsScreen({ recommendations, onRestart }: any) {
                 </div>
 
                 {/* Firmness badge */}
-                <div className="inline-block bg-violet-500/20 border border-violet-500/30 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-violet-300 font-semibold text-sm md:text-base mb-4 md:mb-6">
+                <div className="inline-block bg-blue-500/20 border border-blue-500/30 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-blue-300 font-semibold text-sm md:text-base mb-4 md:mb-6">
                   Firmeza: {topMatch.firmness || 'Media'}
                 </div>
 
-                {/* Price */}
-                <div className="flex items-baseline gap-2 md:gap-3 mb-6 md:mb-8">
-                  <span className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">
-                    {topMatch.price}€
-                  </span>
-                  {topMatch.originalPrice && topMatch.originalPrice > topMatch.price && (
-                    <>
-                      <span className="text-xl md:text-2xl text-zinc-500 line-through">
-                        {topMatch.originalPrice}€
+                {/* Price con cuotas */}
+                <div className="space-y-3 mb-6 md:mb-8">
+                  <div className="flex items-baseline gap-2 md:gap-3">
+                    <span className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                      {formatARS(topMatch.price)}
+                    </span>
+                    {topMatch.originalPrice && topMatch.originalPrice > topMatch.price && (
+                      <>
+                        <span className="text-xl md:text-2xl text-zinc-500 line-through">
+                          {formatARS(topMatch.originalPrice)}
+                        </span>
+                        <span className="px-2 py-1 md:px-3 md:py-1 bg-emerald-500 text-white rounded-full text-xs md:text-sm font-bold">
+                          -{Math.round((1 - topMatch.price / topMatch.originalPrice) * 100)}%
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Mejor cuota */}
+                  <div className="inline-block bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-4 py-2 rounded-xl font-bold text-sm md:text-base">
+                    {mejorCuota.cuotas}x {mejorCuota.formatted.precioCuota} sin recargo
+                  </div>
+                  
+                  {/* Otras opciones de cuotas */}
+                  <div className="flex flex-wrap gap-2 text-xs md:text-sm text-zinc-400">
+                    {todasLasCuotas.slice(1).map((cuota) => (
+                      <span key={cuota.cuotas}>
+                        {cuota.cuotas}x {cuota.formatted.precioCuota} <span className="text-orange-400">({cuota.recargoPercentage})</span>
                       </span>
-                      <span className="px-2 py-1 md:px-3 md:py-1 bg-emerald-500 text-white rounded-full text-xs md:text-sm font-bold">
-                        -{Math.round((1 - topMatch.price / topMatch.originalPrice) * 100)}%
-                      </span>
-                    </>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -389,9 +419,9 @@ function ResultsScreen({ recommendations, onRestart }: any) {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + i * 0.1 }}
-                    className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl p-3 md:p-4"
+                    className="flex items-start gap-3 bg-white/5 border border-blue-500/20 rounded-xl md:rounded-2xl p-3 md:p-4"
                   >
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
                       <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     </div>
                     <span className="text-white font-medium text-sm md:text-base leading-relaxed">
@@ -404,11 +434,11 @@ function ResultsScreen({ recommendations, onRestart }: any) {
           </div>
         </motion.div>
 
-        {/* Benefits - MOBILE OPTIMIZED */}
+        {/* Benefits - ARGENTINIZADOS */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
           {[
-            { icon: Shield, title: '3 Años Garantía', desc: 'Protección total' },
-            { icon: Truck, title: 'Envío Gratis', desc: '24-48h España' },
+            { icon: Shield, title: '5 Años Garantía', desc: 'Piero Argentina' },
+            { icon: Truck, title: 'Envío Gratis', desc: 'Villa María' },
             { icon: Award, title: '100 Noches', desc: 'Prueba en casa' }
           ].map((benefit, i) => (
             <motion.div
@@ -416,9 +446,9 @@ function ResultsScreen({ recommendations, onRestart }: any) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 + i * 0.1 }}
-              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 text-center hover:bg-white/10 transition-all"
+              className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border border-blue-500/20 rounded-xl md:rounded-2xl p-4 md:p-6 text-center hover:bg-blue-500/5 transition-all"
             >
-              <div className="w-10 h-10 md:w-14 md:h-14 mx-auto mb-2 md:mb-4 rounded-lg md:rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center">
+              <div className="w-10 h-10 md:w-14 md:h-14 mx-auto mb-2 md:mb-4 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <benefit.icon className="w-5 h-5 md:w-7 md:h-7 text-white" />
               </div>
               <h4 className="text-white font-bold text-sm md:text-lg mb-1">
@@ -431,7 +461,7 @@ function ResultsScreen({ recommendations, onRestart }: any) {
           ))}
         </div>
 
-        {/* CTAs - MOBILE OPTIMIZED */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -440,7 +470,7 @@ function ResultsScreen({ recommendations, onRestart }: any) {
         >
           <Link
             href={`/producto/${topMatch.slug}`}
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 text-white px-6 md:px-8 py-4 md:py-5 rounded-xl md:rounded-2xl font-bold text-base md:text-lg shadow-2xl hover:shadow-violet-500/50 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white px-6 md:px-8 py-4 md:py-5 rounded-xl md:rounded-2xl font-bold text-base md:text-lg shadow-2xl shadow-blue-500/30 transition-all hover:scale-105 active:scale-95"
           >
             Ver {topMatch.name}
             <ArrowRight className="w-5 h-5" />
@@ -454,22 +484,35 @@ function ResultsScreen({ recommendations, onRestart }: any) {
             Hacer otro test
           </button>
         </motion.div>
+
+        {/* Location badge */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="text-center mt-6"
+        >
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 px-4 py-2 rounded-full text-sm text-zinc-400">
+            <MapPin className="w-4 h-4 text-blue-400" />
+            <span>Villa María, Córdoba • <span className="text-white font-semibold">Envío gratis</span></span>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
 }
 
 // ============================================================================
-// QUESTIONS SCREEN - OPTIMIZADO MOBILE-FIRST
+// QUESTIONS SCREEN
 // ============================================================================
 function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any) {
   const currentStepData = SIMULATOR_STEPS[currentStep]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-950 py-8 md:py-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 py-8 md:py-12 px-4 relative overflow-hidden">
       {/* Background blobs */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-10 md:top-20 left-10 md:left-20 w-64 md:w-96 h-64 md:h-96 bg-violet-500 rounded-full blur-3xl" />
+        <div className="absolute top-10 md:top-20 left-10 md:left-20 w-64 md:w-96 h-64 md:h-96 bg-blue-500 rounded-full blur-3xl" />
         <div className="absolute bottom-10 md:bottom-20 right-10 md:right-20 w-64 md:w-96 h-64 md:h-96 bg-cyan-500 rounded-full blur-3xl" />
       </div>
 
@@ -480,14 +523,14 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8 md:mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-2 md:px-5 md:py-3 rounded-full mb-4 md:mb-6">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur-xl border border-blue-500/20 px-4 py-2 md:px-5 md:py-3 rounded-full mb-4 md:mb-6 shadow-lg shadow-blue-500/20">
             <Brain className="w-4 h-4 md:w-5 md:h-5 text-cyan-400" />
             <span className="text-white font-semibold text-sm md:text-base">
-              Test IA Personalizado
+              Test IA Personalizado • Villa María
             </span>
           </div>
           <h1 className="text-3xl md:text-5xl lg:text-7xl font-black text-white mb-3 md:mb-4 leading-tight px-4">
-            Encuentra tu colchón ideal
+            Encontrá tu colchón ideal
           </h1>
           <p className="text-base md:text-xl text-zinc-300">
             {SIMULATOR_STEPS.length} preguntas • 2 minutos • Precisión del 96%
@@ -498,7 +541,7 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="mb-6 md:mb-8 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl md:rounded-2xl p-4 md:p-6"
+          className="mb-6 md:mb-8 bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border border-blue-500/20 rounded-xl md:rounded-2xl p-4 md:p-6 shadow-xl"
         >
           <div className="flex justify-between items-center mb-3">
             <span className="text-white font-semibold text-sm md:text-base">
@@ -510,7 +553,7 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
           </div>
           <div className="h-2.5 md:h-3 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-400 rounded-full shadow-lg shadow-blue-500/50"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
@@ -526,7 +569,7 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-6 md:p-10 mb-6"
+            className="bg-gradient-to-br from-zinc-900 to-zinc-950 backdrop-blur-xl border border-blue-500/20 rounded-2xl md:rounded-3xl p-6 md:p-10 mb-6 shadow-2xl"
           >
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-2 md:mb-3 text-center leading-tight">
               {currentStepData.title}
@@ -535,7 +578,7 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
               {currentStepData.subtitle}
             </p>
 
-            {/* Options grid - MOBILE OPTIMIZED */}
+            {/* Options grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {currentStepData.options.map((option, index) => {
                 const isSelected = data[currentStepData.key] === option.value
@@ -549,12 +592,12 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
                     onClick={() => onSelect(option.value)}
                     className={`group relative bg-white/5 hover:bg-white/10 border-2 rounded-xl md:rounded-2xl p-4 md:p-6 transition-all duration-300 hover:scale-105 active:scale-95 ${
                       isSelected 
-                        ? 'border-cyan-400 bg-cyan-500/10' 
-                        : 'border-white/20 hover:border-white/40'
+                        ? 'border-cyan-400 bg-cyan-500/10 shadow-lg shadow-cyan-500/30' 
+                        : 'border-blue-500/20 hover:border-blue-500/40'
                     }`}
                   >
                     {/* Icon */}
-                    <div className={`w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <div className={`w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 rounded-xl bg-gradient-to-br ${option.gradient} flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
                       <option.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
                     
@@ -573,7 +616,7 @@ function QuestionsScreen({ currentStep, progress, data, onSelect, onBack }: any)
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute top-2 right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center"
+                        className="absolute top-2 right-2 w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center shadow-lg"
                       >
                         <Check className="w-4 h-4 text-white" />
                       </motion.div>

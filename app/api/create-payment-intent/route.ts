@@ -2,10 +2,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// ✅ Validar que existe la clave antes de inicializar
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn('⚠️ STRIPE_SECRET_KEY no configurado - Endpoint deshabilitado')
+}
+
+// ✅ Inicialización condicional
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-10-29.clover', // ✅ Versión correcta
+    })
+  : null
 
 export async function POST(request: NextRequest) {
   try {
+    // ✅ Verificar que Stripe esté configurado
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe no está configurado. Usá MercadoPago en /api/checkout' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const { amount, currency = 'eur', metadata } = body
 

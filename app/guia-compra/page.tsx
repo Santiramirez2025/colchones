@@ -10,109 +10,109 @@ export default function GuiaCompraPage() {
     {
       number: 1,
       icon: ShoppingCart,
-      title: 'Explora el catálogo',
-      description: 'Descubre nuestra selección de colchones premium',
+      title: 'Explorá el catálogo',
+      description: 'Descubrí nuestra selección de colchones premium',
       color: 'from-blue-500 to-cyan-500',
       details: [
-        'Navega por categorías: Viscoelásticos, Muelles ensacados, Híbridos',
-        'Usa los filtros: firmeza, grosor, características',
-        'Lee las fichas técnicas de cada modelo',
-        'Consulta opiniones reales de clientes'
+        'Navegá por categorías: Viscoelásticos, Muelles ensacados, Híbridos',
+        'Usá los filtros: firmeza, grosor, características',
+        'Leé las fichas técnicas de cada modelo',
+        'Consultá opiniones reales de clientes'
       ],
       tips: [
-        'Identifica tu tipo de descanso: boca arriba, lateral, boca abajo',
-        'Considera tu peso y el de tu pareja si compartís cama',
-        'Revisa las tablas de firmeza según tus preferencias'
+        'Identificá tu tipo de descanso: boca arriba, lateral, boca abajo',
+        'Considerá tu peso y el de tu pareja si comparten cama',
+        'Revisá las tablas de firmeza según tus preferencias'
       ]
     },
     {
       number: 2,
       icon: Ruler,
-      title: 'Selecciona tu medida',
-      description: 'Elige el tamaño perfecto para tu dormitorio',
+      title: 'Seleccioná tu medida',
+      description: 'Elegí el tamaño perfecto para tu dormitorio',
       color: 'from-violet-500 to-purple-500',
       details: [
-        'Medidas disponibles: 80x190, 90x190, 105x190, 135x190, 150x190, 160x200, 180x200',
-        'Verifica el espacio disponible en tu habitación',
-        'Ten en cuenta el tamaño de tu somier o base',
+        'Medidas disponibles: 1 plaza (80/90x190), 1½ plaza (100/105x190), 2 plazas (140/150x190), Queen (160x200), King (180/200x200)',
+        'Verificá el espacio disponible en tu habitación',
+        'Tené en cuenta el tamaño de tu somier o base',
         'El precio se actualiza automáticamente según la medida'
       ],
       tips: [
-        'Mide tu somier antes de comprar',
-        'Deja al menos 60cm de espacio libre alrededor de la cama',
-        'Para parejas, recomendamos mínimo 150x190cm'
+        'Medí tu somier antes de comprar para asegurar compatibilidad',
+        'Dejá al menos 60cm de espacio libre alrededor de la cama',
+        'Para parejas, recomendamos mínimo 2 plazas (140x190cm)'
       ]
     },
     {
       number: 3,
       icon: Package,
-      title: 'Añade al carrito',
-      description: 'Revisa tu selección antes de finalizar',
+      title: 'Agregá al carrito',
+      description: 'Revisá tu selección antes de finalizar',
       color: 'from-emerald-500 to-green-500',
       details: [
-        'Verifica el modelo y medida seleccionados',
-        'Consulta el plazo de entrega estimado',
-        'Añade accesorios opcionales: almohadas, protectores',
-        'Revisa los costes de envío (gratis en península)'
+        'Verificá el modelo y medida seleccionados',
+        'Consultá el plazo de entrega estimado para tu zona',
+        'Agregá accesorios opcionales: almohadas, protectores',
+        'Revisá los costos de envío según tu ubicación'
       ],
       tips: [
-        'Aprovecha packs: colchón + almohada con descuento',
-        'El carrito se guarda si necesitas más tiempo',
-        'Puedes modificar cantidades antes del checkout'
+        'Aprovechá combos: colchón + almohada con descuento especial',
+        'El carrito se guarda si necesitás más tiempo para decidir',
+        'Podés modificar cantidades y productos antes del checkout'
       ]
     },
     {
       number: 4,
       icon: CreditCard,
       title: 'Checkout seguro',
-      description: 'Completa tu compra de forma rápida y segura',
+      description: 'Completá tu compra de forma rápida y segura',
       color: 'from-amber-500 to-orange-500',
       details: [
-        'Rellena tus datos de contacto y envío',
-        'Elige método de pago: tarjeta, PayPal, transferencia',
-        'Revisa el resumen de tu pedido',
-        'Acepta términos y condiciones'
+        'Completá tus datos de contacto y dirección de envío',
+        'Elegí método de pago: Mercado Pago (cuotas sin interés), transferencia, débito o efectivo',
+        'Revisá el resumen completo de tu pedido',
+        'Aceptá términos y condiciones de compra'
       ],
       tips: [
-        'Todos los pagos están encriptados con SSL',
-        'Recibirás confirmación inmediata por email',
-        'Guarda tu número de pedido para hacer seguimiento'
+        'Todos los pagos están protegidos con encriptación SSL',
+        'Recibirás confirmación inmediata por email y WhatsApp',
+        'Guardá tu número de pedido para hacer seguimiento del envío'
       ]
     },
     {
       number: 5,
       icon: Truck,
       title: 'Envío y entrega',
-      description: 'Recibe tu colchón en 48-72h',
+      description: 'Recibí tu colchón en tu domicilio',
       color: 'from-pink-500 to-rose-500',
       details: [
-        'Envío gratis a península (consulta islas y Ceuta/Melilla)',
-        'Entrega De 3 a 6 días laborables',
-        'Te llamamos antes para coordinar la entrega',
-        'Opción de subida a domicilio disponible'
+        'Envío a todo el país (consultá costos según tu zona)',
+        'Entrega de 7 a 15 días hábiles según ubicación',
+        'Te contactamos antes para coordinar día y horario',
+        'Envío a domicilio incluido en el servicio'
       ],
       tips: [
-        'Asegúrate de que alguien pueda recibir el paquete',
+        'Asegurate de que alguien pueda recibir el paquete',
         'El colchón viene enrollado al vacío para facilitar el transporte',
-        'Déjalo expandirse 24-48h antes de usarlo'
+        'Dejalo expandirse 24-48h antes de usarlo por primera vez'
       ]
     },
     {
       number: 6,
       icon: CheckCircle,
-      title: 'Disfruta tu descanso',
+      title: 'Disfrutá tu descanso',
       description: '30 días de prueba y 3 años de garantía',
       color: 'from-indigo-500 to-blue-500',
       details: [
-        'Periodo de adaptación de 30 días',
-        'Devolución gratis si no estás satisfecho',
+        'Periodo de adaptación de 30 días desde la recepción',
+        'Devolución sin cargo si no estás satisfecho',
         'Garantía de 3 años en todos los colchones',
-        'Atención al cliente disponible para cualquier duda'
+        'Atención al cliente disponible por WhatsApp y email'
       ],
       tips: [
         'Dale 2-3 semanas de adaptación a tu cuerpo',
-        'Usa protector de colchón desde el primer día',
-        'Voltea el colchón cada 3 meses los primeros 6 meses'
+        'Usá protector de colchón desde el primer día',
+        'Volteá el colchón cada 3 meses durante los primeros 6 meses'
       ]
     }
   ]
@@ -120,19 +120,27 @@ export default function GuiaCompraPage() {
   const faqs = [
     {
       question: '¿Puedo cambiar la medida después de comprar?',
-      answer: 'Sí, durante los 30 días de prueba puedes cambiar la medida sin coste adicional.'
+      answer: 'Sí, durante los 30 días de prueba podés cambiar la medida sin costo adicional. Solo coordinamos el cambio.'
     },
     {
       question: '¿El envío incluye subida a domicilio?',
-      answer: 'El envío estándar es hasta portal. La subida a domicilio está disponible como servicio adicional.'
+      answer: 'Sí, el envío incluye la entrega en tu domicilio. Consultá costos de envío según tu ubicación en Argentina.'
     },
     {
       question: '¿Qué hago si no me gusta el colchón?',
-      answer: 'Tienes 30 días para probarlo. Si no te convence, lo recogemos gratis y te devolvemos el importe.'
+      answer: 'Tenés 30 días para probarlo. Si no te convence, coordinamos la devolución y te reintegramos el importe completo.'
     },
     {
       question: '¿Necesito un somier específico?',
-      answer: 'Nuestros colchones son compatibles con cualquier base: somier de láminas, canapé o base tapizada.'
+      answer: 'Nuestros colchones son compatibles con cualquier base: somier de láminas, cama con cajones o base firme.'
+    },
+    {
+      question: '¿Qué métodos de pago aceptan?',
+      answer: 'Aceptamos Mercado Pago (con cuotas sin interés), transferencia bancaria, tarjeta de débito y efectivo.'
+    },
+    {
+      question: '¿Cuánto demora el envío a mi zona?',
+      answer: 'El tiempo de entrega varía entre 7 y 15 días hábiles según tu ubicación. Te confirmamos el plazo exacto al procesar tu pedido.'
     }
   ]
 
@@ -151,7 +159,7 @@ export default function GuiaCompraPage() {
             Guía de Compra
           </h1>
           <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Comprar tu colchón ideal es fácil. Sigue estos pasos y resuelve cualquier duda
+            Comprar tu colchón ideal es fácil. Seguí estos pasos y resolvé cualquier duda
           </p>
         </div>
 
@@ -257,7 +265,7 @@ export default function GuiaCompraPage() {
                   </button>
                 ) : (
                   <a
-                    href="/catalogo"
+                    href="/productos"
                     className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg"
                   >
                     Ver catálogo
@@ -313,7 +321,7 @@ export default function GuiaCompraPage() {
         <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">¿Listo para mejorar tu descanso?</h2>
           <p className="text-white/90 mb-6 max-w-2xl mx-auto">
-            Explora nuestro catálogo y encuentra el colchón perfecto para ti. Envío gratis, 30 días de prueba y 3 años de garantía.
+            Explorá nuestro catálogo y encontrá el colchón perfecto para vos. Envío a todo el país, 30 días de prueba y 3 años de garantía.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
@@ -327,7 +335,7 @@ export default function GuiaCompraPage() {
               href="/contacto"
               className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold transition-all border border-white/20 inline-flex items-center gap-2"
             >
-              ¿Necesitas ayuda?
+              ¿Necesitás ayuda?
             </a>
           </div>
         </div>

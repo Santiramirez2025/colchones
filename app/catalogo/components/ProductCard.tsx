@@ -1,8 +1,11 @@
+// app/catalogo/components/ProductCard.tsx - ✅ REVISADO Y CORREGIDO
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Star, Heart, TrendingUp, Sparkles, Zap, Award, ShoppingBag, Info, X } from 'lucide-react'
+import { Star, Heart, TrendingUp, Sparkles, Zap, Award, ShoppingBag, Info, X, CreditCard } from 'lucide-react'
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion'
+import { formatARS } from '@/lib/utils/currency'
+import { getMejorCuota, calcularTodasLasCuotas } from '@/lib/utils/pricing'
 
 // ============================================================================
 // TYPES
@@ -11,21 +14,29 @@ interface ProductCardProps {
   product: {
     id: string
     name: string
-    subtitle: string
-    price: number
+    subtitle?: string | null
+    price: number // Ya en pesos (no centavos)
     originalPrice?: number | null
+    compareAtPrice?: number | null
+    discount?: number | null
     rating: number
     reviewCount: number
-    firmness: string
-    images?: string
+    firmness?: string | null
+    images?: string | string[] | null
     slug: string
     isBestSeller?: boolean | null
     isNew?: boolean | null
-    techFeatures?: string | string[]
-    mainColor?: string // Para AI-glow dinámico
+    isPremium?: boolean | null
+    isEco?: boolean | null
+    antiMite?: boolean | null
+    pillowTop?: boolean | null
+    includesBase?: boolean | null
+    techFeatures?: string | string[] | null
+    mainColor?: string | null
+    category?: string | null
   }
   index?: number
-  isFavorite?: boolean // ✅ Añadido para compatibilidad
+  isFavorite?: boolean
   onToggleFavorite?: (id: string) => void
   avgPrice?: number
 }
@@ -33,9 +44,9 @@ interface ProductCardProps {
 // ============================================================================
 // HELPERS
 // ============================================================================
-function parseArrayField(field: string | string[] | undefined): string[] {
+function parseArrayField(field: string | string[] | null | undefined): string[] {
   if (!field) return []
-  if (Array.isArray(field)) return field
+  if (Array.isArray(field)) return field.filter(Boolean)
   
   if (typeof field === 'string') {
     if (field.includes('\n')) {
@@ -89,15 +100,11 @@ function useFavorites() {
 
 // Hook para detección de tema
 function useTheme() {
-  const [isDark, setIsDark] = useState(true)
+  const [isDark, setIsDark] = useState(false)
   
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    setIsDark(mediaQuery.matches)
-    
-    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
+    // ✅ Forzar modo claro para el catálogo
+    setIsDark(false)
   }, [])
   
   return isDark
@@ -115,6 +122,12 @@ function generateAIDescription(product: any): string {
   return descriptions[Math.floor(Math.random() * descriptions.length)]
 }
 
+// Formatear cantidad de reviews
+function formatReviews(count: number): string {
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`
+  return count.toString()
+}
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -122,7 +135,7 @@ export default function ProductCard({
   product, 
   index = 0,
   onToggleFavorite,
-  avgPrice = 1000
+  avgPrice = 30000
 }: ProductCardProps) {
   const isDark = useTheme()
   const { favorites, toggleFavorite: localToggleFavorite } = useFavorites()
@@ -132,6 +145,7 @@ export default function ProductCard({
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [showQuickView, setShowQuickView] = useState(false)
+  const [showCuotasDetail, setShowCuotasDetail] = useState(false)
   const [particles, setParticles] = useState<Array<{id: number, x: number, y: number}>>([])
   
   // Refs
@@ -143,35 +157,53 @@ export default function ProductCard({
   const mouseY = useMotionValue(0)
   
   // Spring suave para rotación 3D
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), {
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [3, -3]), {
     stiffness: 150,
     damping: 20
   })
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), {
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-3, 3]), {
     stiffness: 150,
     damping: 20
   })
   
+  // ✅ Calcular cuotas
+  const mejorCuota = useMemo(() => getMejorCuota(product.price), [product.price])
+  const todasLasCuotas = useMemo(() => calcularTodasLasCuotas(product.price), [product.price])
+  
+  // ✅ Manejar imagen (puede ser string o array)
+  const productImage = useMemo(() => {
+    if (!product.images) return '/images/placeholder-colchon.jpg'
+    if (typeof product.images === 'string') return product.images
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images[0]
+    }
+    return '/images/placeholder-colchon.jpg'
+  }, [product.images])
+  
   // Parsear features
-  const techFeatures = useMemo(() => parseArrayField(product.techFeatures), [product.techFeatures])
+  const techFeatures = useMemo(() => {
+    const features = parseArrayField(product.techFeatures)
+    return features.length > 0 ? features : ['Confort garantizado', 'Calidad premium', 'Fabricación nacional']
+  }, [product.techFeatures])
   
   // Cálculos
   const discountPercentage = useMemo(() => {
     if (product.originalPrice && product.originalPrice > 0 && product.originalPrice > product.price) {
       return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     }
-    return 0
-  }, [product.originalPrice, product.price])
+    return product.discount || 0
+  }, [product.originalPrice, product.price, product.discount])
   
-  const firmnessLevels = ['Suave', 'Media-Suave', 'Media', 'Media-Firme', 'Firme']
-  const firmnessLevel = Math.max(1, firmnessLevels.indexOf(product.firmness) + 1)
+  const firmnessLevels = ['EXTRA_BLANDO', 'BLANDO', 'MEDIO', 'FIRME', 'MEDIO_FIRME', 'EXTRA_FIRME']
+  const firmnessIndex = product.firmness ? firmnessLevels.indexOf(product.firmness.toUpperCase()) : 2
+  const firmnessLevel = Math.max(1, Math.min(5, firmnessIndex >= 0 ? firmnessIndex + 1 : 3))
   const isGoodValue = product.rating >= 4.7 && product.price < avgPrice
   
   // AI Description
   const aiDescription = useMemo(() => generateAIDescription(product), [product.id])
   
-  // Color principal para AI-glow
-  const mainColor = product.mainColor || '#8b5cf6' // violet-500 por defecto
+  // Color principal
+  const mainColor = product.mainColor || '#3b82f6' // blue-500 por defecto
   
   // Handlers
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -216,26 +248,11 @@ export default function ProductCard({
     }
   }
   
-  // Formateo
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(price)
-  }
-  
-  const formatReviews = (count: number) => {
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}k`
-    return count.toString()
-  }
-  
-  // Theme classes
-  const bgClass = isDark 
-    ? 'bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800' 
-    : 'bg-gradient-to-br from-white via-gray-50 to-gray-100'
-  const textClass = isDark ? 'text-white' : 'text-gray-900'
-  const textSecondaryClass = isDark ? 'text-zinc-400' : 'text-gray-600'
-  const borderClass = isDark ? 'border-zinc-800' : 'border-gray-200'
+  // ✅ MODO CLARO FORZADO
+  const bgClass = 'bg-white'
+  const textClass = 'text-gray-900'
+  const textSecondaryClass = 'text-gray-600'
+  const borderClass = 'border-gray-200'
   
   return (
     <>
@@ -264,71 +281,69 @@ export default function ProductCard({
       {/* Quick View Modal */}
       <AnimatePresence>
         {showQuickView && (
-          <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowQuickView(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowQuickView(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white max-w-2xl w-full rounded-3xl p-8 border border-gray-200 shadow-2xl relative"
             >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={e => e.stopPropagation()}
-                className={`${bgClass} max-w-2xl w-full rounded-3xl p-8 ${borderClass} border shadow-2xl relative`}
+              <button
+                onClick={() => setShowQuickView(false)}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-500 flex items-center justify-center transition-colors"
+                aria-label="Cerrar vista rápida"
               >
-                <button
-                  onClick={() => setShowQuickView(false)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 text-red-500 flex items-center justify-center transition-colors"
-                  aria-label="Cerrar vista rápida"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                
-                <h3 className={`text-2xl font-black ${textClass} mb-4`}>
-                  Especificaciones Técnicas
-                </h3>
-                
-                <div className="space-y-3">
-                  {techFeatures.map((feature, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                      className={`flex items-start gap-3 p-3 rounded-xl ${isDark ? 'bg-zinc-800/50' : 'bg-gray-100'}`}
-                    >
-                      <Zap className="w-5 h-5 text-violet-500 flex-shrink-0 mt-0.5" />
-                      <span className={`text-sm ${textClass}`}>{feature}</span>
-                    </motion.div>
-                  ))}
+                <X className="w-5 h-5" />
+              </button>
+              
+              <h3 className="text-2xl font-black text-gray-900 mb-4">
+                Especificaciones Técnicas
+              </h3>
+              
+              <div className="space-y-3">
+                {techFeatures.map((feature, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-start gap-3 p-3 rounded-xl bg-gray-50"
+                  >
+                    <Zap className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-900">{feature}</span>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                    Recomendación IA
+                  </span>
                 </div>
-                
-                <div className={`mt-6 p-4 rounded-xl ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border ${isDark ? 'border-violet-500/20' : 'border-violet-200'}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-violet-500" />
-                    <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-violet-400' : 'text-violet-700'}`}>
-                      Recomendación IA
-                    </span>
-                  </div>
-                  <p className={`text-sm ${textClass}`}>{aiDescription}</p>
-                </div>
-              </motion.div>
+                <p className="text-sm text-gray-900">{aiDescription}</p>
+              </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
       
       {/* Main Card */}
       <motion.div
         ref={cardRef}
-        initial={{ opacity: 0, y: 50, rotateX: -10 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{
-          duration: 0.6,
-          delay: index * 0.1,
+          duration: 0.5,
+          delay: index * 0.05,
           type: 'spring',
           stiffness: 100
         }}
@@ -336,90 +351,44 @@ export default function ProductCard({
           rotateX,
           rotateY,
           transformStyle: 'preserve-3d',
-          perspective: 1000
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className="w-full group"
       >
         <div className="relative">
-          {/* Glow Effect dinámico basado en color principal */}
+          {/* Glow Effect */}
           <motion.div
-            className="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-700"
+            className="absolute inset-0 -z-10 rounded-3xl blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700"
             style={{
               background: `radial-gradient(circle at center, ${mainColor}, transparent 70%)`
             }}
           />
           
-          {/* Card Container con Glassmorphism */}
-          <div
-            className={`
-              relative ${bgClass} rounded-3xl overflow-hidden
-              border ${borderClass}
-              shadow-2xl
-              backdrop-blur-xl
-              transition-all duration-700 ease-out
-              group-hover:scale-[1.02] group-hover:shadow-violet-500/20
-            `}
-            style={{
-              transform: 'translateZ(20px)'
-            }}
-          >
-            {/* Shimmer animado al hover */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          {/* Card Container */}
+          <div className="relative bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-blue-500/10">
             
             {/* Badges Container */}
             <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
               {product.isBestSeller && (
                 <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', delay: 0.2 }}
-                  className="relative"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-white text-[10px] font-black tracking-wider flex items-center gap-1.5 shadow-lg"
                 >
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(251, 191, 36, 0.5)',
-                        '0 0 40px rgba(251, 191, 36, 0.8)',
-                        '0 0 20px rgba(251, 191, 36, 0.5)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-white text-[10px] font-black tracking-wider flex items-center gap-1.5"
-                  >
-                    <TrendingUp className="w-3 h-3" />
-                    <span>TOP VENTAS</span>
-                  </motion.div>
+                  <TrendingUp className="w-3 h-3" />
+                  <span>TOP VENTAS</span>
                 </motion.div>
               )}
               
               {product.isNew && (
                 <motion.div
-                  initial={{ scale: 0, rotate: 180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', delay: 0.3 }}
-                  className="relative"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full text-white text-[10px] font-black tracking-wider flex items-center gap-1.5 shadow-lg"
                 >
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(139, 92, 246, 0.5)',
-                        '0 0 40px rgba(139, 92, 246, 0.8)',
-                        '0 0 20px rgba(139, 92, 246, 0.5)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                    className="px-3 py-1.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-full text-white text-[10px] font-black tracking-wider flex items-center gap-1.5"
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                    >
-                      <Sparkles className="w-3 h-3" />
-                    </motion.div>
-                    <span>NUEVO 2025</span>
-                  </motion.div>
+                  <Sparkles className="w-3 h-3" />
+                  <span>NUEVO 2025</span>
                 </motion.div>
               )}
               
@@ -427,48 +396,28 @@ export default function ProductCard({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: 'spring', delay: 0.4 }}
-                  className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-pink-600 rounded-full text-white text-[10px] font-black tracking-wider shadow-lg shadow-red-500/50"
+                  className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-pink-600 rounded-full text-white text-[10px] font-black tracking-wider shadow-lg"
                 >
                   <span>-{discountPercentage}%</span>
                 </motion.div>
               )}
             </div>
             
-            {/* Floating Favorite Button con haptic feedback */}
+            {/* Favorite Button */}
             <motion.button
               onClick={handleFavoriteClick}
-              whileTap={{ scale: 0.85 }}
-              whileHover={{ scale: 1.1 }}
-              aria-label={isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-              className={`
-                absolute top-4 right-4 z-20
-                w-12 h-12 rounded-2xl
-                backdrop-blur-xl
-                border-2 
-                flex items-center justify-center
-                shadow-lg
-                transition-all duration-300
-                ${isFavorite 
-                  ? 'bg-red-500/90 border-red-400' 
-                  : `${isDark ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-black/10 border-black/20 hover:bg-black/20'}`
-                }
-              `}
+              whileTap={{ scale: 0.9 }}
+              className={`absolute top-4 right-4 z-20 w-11 h-11 rounded-xl backdrop-blur-md border flex items-center justify-center shadow-lg transition-all ${
+                isFavorite 
+                  ? 'bg-red-500 border-red-400' 
+                  : 'bg-white/90 border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <motion.div
-                animate={isFavorite ? {
-                  scale: [1, 1.3, 1],
-                } : {}}
-                transition={{ duration: 0.3 }}
-              >
-                <Heart 
-                  className={`w-5 h-5 transition-all duration-300 ${
-                    isFavorite 
-                      ? 'fill-white text-white' 
-                      : `${isDark ? 'text-white' : 'text-gray-900'}`
-                  }`} 
-                />
-              </motion.div>
+              <Heart 
+                className={`w-5 h-5 transition-all ${
+                  isFavorite ? 'fill-white text-white' : 'text-gray-700'
+                }`} 
+              />
             </motion.button>
             
             {/* Quick View Button */}
@@ -477,293 +426,196 @@ export default function ProductCard({
                 e.preventDefault()
                 setShowQuickView(true)
               }}
-              whileTap={{ scale: 0.85 }}
-              whileHover={{ scale: 1.1 }}
-              aria-label="Vista rápida"
-              className={`
-                absolute top-20 right-4 z-20 opacity-0 group-hover:opacity-100
-                w-12 h-12 rounded-2xl
-                backdrop-blur-xl
-                border-2
-                flex items-center justify-center
-                shadow-lg
-                transition-all duration-300
-                ${isDark ? 'bg-white/10 border-white/20 hover:bg-white/20' : 'bg-black/10 border-black/20 hover:bg-black/20'}
-              `}
+              whileTap={{ scale: 0.9 }}
+              className="absolute top-16 right-4 z-20 opacity-0 group-hover:opacity-100 w-11 h-11 rounded-xl backdrop-blur-md bg-white/90 border border-gray-200 flex items-center justify-center shadow-lg transition-all hover:bg-gray-50"
             >
-              <Info className={`w-5 h-5 ${isDark ? 'text-white' : 'text-gray-900'}`} />
+              <Info className="w-5 h-5 text-gray-700" />
             </motion.button>
             
-            {/* Image Container con lazy loading avanzado */}
-            <div className="relative h-80 bg-gradient-to-br from-zinc-800 to-zinc-900 overflow-hidden">
-              {/* Shimmer placeholder animado */}
+            {/* Image Container */}
+            <div className="relative h-80 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
               {!imageLoaded && !imageError && (
-                <div className="absolute inset-0 overflow-hidden">
-                  <motion.div
-                    animate={{
-                      x: ['-100%', '100%']
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: 'linear'
-                    }}
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    style={{ width: '50%' }}
-                  />
-                </div>
+                <div className="absolute inset-0 animate-pulse bg-gray-200" />
               )}
               
-              {product.images && !imageError ? (
-                <motion.img
-                  src={product.images}
-                  alt={product.name}
-                  loading="lazy"
-                  onLoad={() => setImageLoaded(true)}
-                  onError={() => {
-                    setImageError(true)
-                    setImageLoaded(true)
-                  }}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={imageLoaded ? { opacity: 1, scale: 1 } : {}}
-                  transition={{ duration: 0.5 }}
-                  whileHover={{ scale: 1.1 }}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-8xl">
-                  🛏️
-                </div>
-              )}
-              
-              {/* Tech Features Overlay con animación secuencial */}
-              {techFeatures.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex items-end p-6"
-                >
-                  <div className="text-white space-y-3 w-full">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Zap className="w-4 h-4 text-violet-400" />
-                      <span className="text-xs font-black uppercase tracking-widest text-violet-400">
-                        Características
-                      </span>
-                    </div>
-                    {techFeatures.slice(0, 3).map((feature, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileHover={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="flex items-start gap-2"
-                      >
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.2, 1],
-                            opacity: [0.5, 1, 0.5]
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            delay: i * 0.3
-                          }}
-                          className="w-1.5 h-1.5 rounded-full bg-violet-400 mt-1.5 flex-shrink-0"
-                        />
-                        <span className="text-sm font-medium leading-tight">{feature}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
+              <motion.img
+                src={productImage}
+                alt={product.name}
+                loading="lazy"
+                onLoad={() => setImageLoaded(true)}
+                onError={() => {
+                  setImageError(true)
+                  setImageLoaded(true)
+                }}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={imageLoaded ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.5 }}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
               
               {/* Good Value Badge */}
               {isGoodValue && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', delay: 0.5 }}
-                  className="absolute bottom-4 left-4"
-                >
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(16, 185, 129, 0.5)',
-                        '0 0 40px rgba(16, 185, 129, 0.8)',
-                        '0 0 20px rgba(16, 185, 129, 0.5)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="px-3 py-1.5 bg-emerald-500 rounded-xl text-white text-xs font-black shadow-lg flex items-center gap-1.5"
-                  >
+                <div className="absolute bottom-4 left-4">
+                  <div className="px-3 py-1.5 bg-emerald-500 rounded-xl text-white text-xs font-black shadow-lg flex items-center gap-1.5">
                     <Award className="w-3 h-3" />
                     <span>MEJOR PRECIO</span>
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </div>
               )}
             </div>
             
             {/* Content Section */}
-            <div className={`relative p-6 space-y-4 ${isDark ? 'bg-gradient-to-br from-zinc-900 to-zinc-800' : 'bg-gradient-to-br from-white to-gray-50'}`}>
-              
-              {/* Rating con animación de estrellas */}
+            <div className="p-6 space-y-4 bg-white">
+              {/* Rating */}
               <div className="flex items-center gap-2">
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <motion.div
+                    <Star
                       key={i}
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{
-                        type: 'spring',
-                        delay: 0.6 + i * 0.05,
-                        stiffness: 200
-                      }}
-                    >
-                      <Star
-                        className={`w-4 h-4 transition-all duration-300 ${
-                          i < Math.floor(product.rating)
-                            ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]'
-                            : `${isDark ? 'text-zinc-700' : 'text-gray-300'}`
-                        }`}
-                      />
-                    </motion.div>
+                      className={`w-4 h-4 ${
+                        i < Math.floor(product.rating)
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'text-gray-300'
+                      }`}
+                    />
                   ))}
                 </div>
-                <span className={`text-sm font-bold ${textClass}`}>
+                <span className="text-sm font-bold text-gray-900">
                   {product.rating.toFixed(1)}
                 </span>
-                <span className={`text-xs ${textSecondaryClass}`}>
+                <span className="text-xs text-gray-500">
                   ({formatReviews(product.reviewCount)})
                 </span>
               </div>
               
-              {/* Product Name con gradient en hover */}
+              {/* Product Name */}
               <div>
-                <motion.h3
-                  className={`
-                    text-2xl font-black mb-2 leading-tight
-                    transition-all duration-300
-                    ${textClass}
-                    group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-violet-400 group-hover:to-fuchsia-400 group-hover:bg-clip-text
-                  `}
-                >
+                <h3 className="text-xl font-black text-gray-900 mb-1 leading-tight group-hover:text-blue-600 transition-colors">
                   {product.name}
-                </motion.h3>
-                <p className={`text-sm ${textSecondaryClass} leading-relaxed line-clamp-2`}>
-                  {product.subtitle}
+                </h3>
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {product.subtitle || 'Confort y calidad garantizados'}
                 </p>
               </div>
               
-              {/* AI Description */}
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                whileHover={{ opacity: 1, height: 'auto' }}
-                className={`overflow-hidden rounded-xl p-3 ${isDark ? 'bg-violet-500/10' : 'bg-violet-100'} border ${isDark ? 'border-violet-500/20' : 'border-violet-200'}`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="w-3 h-3 text-violet-500" />
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-violet-400' : 'text-violet-700'}`}>
-                    IA Recomienda
+              {/* Firmness */}
+              {product.firmness && (
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-1.5 h-5 rounded-sm ${
+                          i < firmnessLevel
+                            ? 'bg-gradient-to-t from-blue-600 to-blue-400'
+                            : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-gray-700">
+                    {product.firmness}
                   </span>
                 </div>
-                <p className={`text-xs ${textClass}`}>{aiDescription}</p>
-              </motion.div>
+              )}
               
-              {/* Firmness Indicator con animación */}
-              <div className={`inline-flex items-center gap-3 px-4 py-2.5 ${isDark ? 'bg-zinc-800/50' : 'bg-gray-200/50'} backdrop-blur-sm border ${isDark ? 'border-zinc-700' : 'border-gray-300'} rounded-xl`}>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      transition={{
-                        delay: 0.8 + i * 0.05,
-                        type: 'spring',
-                        stiffness: 200
-                      }}
-                      className={`
-                        w-1.5 h-5 rounded-sm transition-all duration-300 origin-bottom
-                        ${i < firmnessLevel
-                          ? 'bg-gradient-to-t from-violet-600 to-violet-400 shadow-lg shadow-violet-500/50'
-                          : `${isDark ? 'bg-zinc-700' : 'bg-gray-300'}`
-                        }
-                      `}
-                    />
-                  ))}
-                </div>
-                <span className={`text-xs font-bold ${isDark ? 'text-zinc-300' : 'text-gray-700'}`}>
-                  {product.firmness}
-                </span>
-              </div>
-              
-              {/* Price Section */}
-              <div className="space-y-2 pt-2">
-                {product.originalPrice && product.originalPrice > 0 && product.originalPrice > product.price && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.9 }}
-                    className="flex items-center gap-3"
-                  >
-                    <span className={`text-sm font-medium line-through ${isDark ? 'text-zinc-600' : 'text-gray-500'}`}>
-                      €{formatPrice(product.originalPrice)}
+              {/* ✅ PRECIO CON CUOTAS */}
+              <div className="space-y-3 pt-2">
+                {/* Precio original */}
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 line-through">
+                      {formatARS(product.originalPrice)}
                     </span>
-                    <motion.span
-                      animate={{
-                        scale: [1, 1.05, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity
-                      }}
-                      className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs font-bold rounded"
-                    >
-                      AHORRA €{formatPrice(product.originalPrice - product.price)}
-                    </motion.span>
-                  </motion.div>
+                    <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded">
+                      AHORRÁS {formatARS(product.originalPrice - product.price)}
+                    </span>
+                  </div>
                 )}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1, type: 'spring' }}
-                  className="flex items-baseline gap-2"
-                >
-                  <span className={`text-4xl font-black bg-gradient-to-r ${isDark ? 'from-white to-zinc-300' : 'from-gray-900 to-gray-600'} bg-clip-text text-transparent`}>
-                    €{formatPrice(product.price)}
+                
+                {/* Precio de contado */}
+                <div>
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-3xl font-black text-gray-900">
+                      {formatARS(product.price)}
+                    </span>
+                  </div>
+                  <span className="text-xs text-emerald-600 font-bold">
+                    CONTADO • Transferencia • Débito
                   </span>
-                </motion.div>
+                </div>
+                
+                {/* Mejor cuota */}
+                <motion.button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setShowCuotasDetail(!showCuotasDetail)
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-blue-600" />
+                    <div className="text-left">
+                      <div className="text-xs text-blue-600 font-semibold">
+                        Hasta {mejorCuota.cuotas} cuotas
+                      </div>
+                      <div className="text-sm font-black text-gray-900">
+                        {mejorCuota.formatted.precioCuota}
+                      </div>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: showCuotasDetail ? 180 : 0 }}
+                    className="text-blue-600"
+                  >
+                    ▼
+                  </motion.div>
+                </motion.button>
+                
+                {/* Dropdown cuotas */}
+                <AnimatePresence>
+                  {showCuotasDetail && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                        {todasLasCuotas.map((cuota) => (
+                          <div
+                            key={cuota.cuotas}
+                            className="flex items-center justify-between p-2 rounded-lg bg-white"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span className="text-xs font-bold text-blue-600">
+                                  {cuota.cuotas}
+                                </span>
+                              </div>
+                              <span className="text-xs font-semibold text-gray-900">
+                                {cuota.formatted.precioCuota}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-gray-500">
+                              {cuota.formatted.precioTotal}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               
-              {/* CTA Button con partículas en hover */}
+              {/* CTA Button */}
               <motion.a
                 href={`/producto/${product.slug}`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative block w-full mt-4 py-4 rounded-2xl font-black text-white text-sm tracking-wide text-center bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-lg shadow-violet-500/50 overflow-hidden group/btn"
+                className="block w-full py-4 rounded-2xl font-black text-white text-sm tracking-wide text-center bg-gradient-to-r from-blue-600 to-cyan-600 shadow-lg hover:shadow-xl transition-all"
               >
-                {/* Animated background on hover */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"
-                />
-                
-                {/* Shimmer effect */}
-                <motion.div
-                  animate={{
-                    x: ['-100%', '100%']
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatDelay: 1
-                  }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform skew-x-12"
-                  style={{ width: '30%' }}
-                />
-                
-                <span className="relative flex items-center justify-center gap-2 z-10">
+                <span className="flex items-center justify-center gap-2">
                   <ShoppingBag className="w-5 h-5" />
                   <span>VER PRODUCTO</span>
                 </span>
@@ -775,76 +627,3 @@ export default function ProductCard({
     </>
   )
 }
-
-/*
-============================================================================
-TÉCNICAS Y MEJORAS IMPLEMENTADAS - VERSION 2025
-============================================================================
-
-🎨 DISEÑO & ESTÉTICA:
-- Glassmorphism avanzado con backdrop-blur-xl y transparencias dinámicas
-- AI-Glow dinámico basado en el color principal del producto (mainColor prop)
-- Sistema de tema automático (dark/light) con useTheme hook personalizado
-- Gradientes animados y efectos de shimmer en múltiples elementos
-- Neuromorphism híbrido en badges y botones con sombras suaves
-
-🎭 ANIMACIONES & INTERACCIONES (Framer Motion):
-- Efecto 3D con rotación suave basada en posición del mouse (useMotionValue, useSpring)
-- transformStyle: 'preserve-3d' para profundidad realista
-- Animaciones de entrada con spring physics y delays escalonados
-- Badges con pulsaciones luminosas infinitas usando keyframes
-- Partículas animadas al agregar/quitar favoritos con AnimatePresence
-- Shimmer effects en múltiples capas (card, button, placeholder)
-- Transiciones suaves con easings personalizados
-
-⚡ RENDIMIENTO & OPTIMIZACIÓN:
-- Lazy loading de imágenes con placeholder shimmer animado
-- useMemo para cálculos costosos (features parsing, AI description)
-- useRef para evitar re-renders innecesarios
-- Optimización de motion values con useSpring para animaciones fluidas
-- Cleanup de partículas con setTimeout para evitar memory leaks
-
-♿ ACCESIBILIDAD (A11Y):
-- aria-label en todos los botones interactivos
-- Navegación por teclado soportada en modal
-- Contraste adecuado en modo claro y oscuro
-- Focus visible en elementos interactivos
-- Semantic HTML con roles apropiados
-
-🧠 FUNCIONALIDADES INTELIGENTES:
-- Sistema de favoritos con persistencia en localStorage
-- Quick View modal con especificaciones técnicas
-- Descripción generada por IA (mock) con contexto del producto
-- Badge "MEJOR PRECIO" calculado dinámicamente vs precio promedio
-- Detección automática de descuentos con cálculo de ahorro
-
-🎯 INTERACCIONES PREMIUM:
-- Efecto háptico visual al agregar favoritos (scale animation + particles)
-- Hover states complejos con múltiples capas de feedback
-- Sistema de partículas con coordenadas dinámicas
-- Modal de vista rápida con animaciones secuenciales
-- Rotación 3D reactiva al movimiento del mouse
-
-📱 RESPONSIVIDAD:
-- Design fluido que se adapta a todos los tamaños
-- Mantiene la experiencia premium en mobile
-- Animaciones optimizadas para touch devices
-- Tailwind responsive classes para layouts adaptativos
-
-🔧 ARQUITECTURA:
-- Componente modular y reutilizable
-- TypeScript con tipado estricto
-- Hooks personalizados (useFavorites, useTheme)
-- Separation of concerns (helpers, handlers, rendering)
-- Props opcionales con defaults sensatos
-
-🌟 INNOVACIONES 2025:
-- AI-powered product descriptions (mock preparado para API real)
-- Sistema de badges dinámicos con animaciones de luz pulsante
-- Quick view modal con especificaciones técnicas
-- Color theming dinámico basado en producto
-- Micro-interacciones en cada elemento clickeable
-- Sistema de partículas contextual
-
-============================================================================
-*/

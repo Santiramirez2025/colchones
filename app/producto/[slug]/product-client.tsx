@@ -1,13 +1,15 @@
-// app/producto/[slug]/product-client.tsx
+// app/producto/[slug]/product-client.tsx - PRODUCCIÓN ARGENTINA 2025
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CheckCircle2, ShoppingCart, AlertCircle, TrendingUp, Clock } from 'lucide-react'
+import { CheckCircle2, ShoppingCart, AlertCircle, TrendingUp, Clock, CreditCard } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart-store'
 import type { ProductWithRelations, StockInfo, Breadcrumb } from '@/lib/types/product'
 import type { ProductVariant, Review } from '@prisma/client'
+import { formatARS } from '@/lib/utils/currency'
+import { getMejorCuota, calcularTodasLasCuotas, getTextoPromocional } from '@/lib/utils/pricing'
 
 // Component imports
 import Breadcrumbs from './components/Breadcrumbs'
@@ -17,8 +19,6 @@ import ProductInfo from './components/ProductInfo'
 import TabsSection from './components/TabsSection'
 import RelatedProducts from './components/RelatedProducts'
 import ImageModal from './components/ImageModal'
-import UrgencyTimer from './components/UrgencyTimer'
-import SocialProof from './components/SocialProof'
 
 // Helper imports
 import { calculateRatings, generateFaqs } from '@/lib/helpers/product-utils'
@@ -34,6 +34,7 @@ const PLACEHOLDER_IMAGE = '/images/placeholder.jpg'
 const SCROLL_THROTTLE_MS = 100
 const LOW_STOCK_THRESHOLD = 5
 const RECENT_VIEWS_KEY = 'recent_product_views'
+const FREE_SHIPPING_THRESHOLD = 50000 // $50,000 ARS para envío gratis
 
 // ============================================================================
 // TYPES
@@ -81,21 +82,29 @@ export default function ProductClient({
   const toastTimeoutRef = useRef<NodeJS.Timeout>()
   const impressionTracked = useRef(false)
   
-  // ✅ FIX 1: Envolver en useMemo
-  const images = useMemo(() => 
-    Array.isArray(product.images) ? product.images : [],
-    [product.images]
-  )
+  // Memoized arrays con parsing seguro
+  const images = useMemo(() => {
+    const imgs = Array.isArray(product.images) 
+      ? product.images 
+      : typeof product.images === 'string'
+        ? JSON.parse(product.images)
+        : []
+    return imgs
+  }, [product.images])
   
-  const features = useMemo(() => 
-    Array.isArray(product.features) ? product.features : [],
-    [product.features]
-  )
+  const features = useMemo(() => {
+    const feats = Array.isArray(product.features) 
+      ? product.features 
+      : typeof product.features === 'string'
+        ? JSON.parse(product.features)
+        : []
+    return feats
+  }, [product.features])
   
-  const variants = useMemo(() =>
-    Array.isArray(product.variants) ? product.variants : [],
-    [product.variants]
-  )
+  const variants = useMemo(() => {
+    const vars = Array.isArray(product.variants) ? product.variants : []
+    return vars
+  }, [product.variants])
   
   // ============================================================================
   // STATE
@@ -105,6 +114,7 @@ export default function ProductClient({
     variants[0] || null
   )
   const [quantity, setQuantity] = useState(1)
+  const [selectedCuotas, setSelectedCuotas] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('description')
   const [imageIndex, setImageIndex] = useState(0)
   const [showImageModal, setShowImageModal] = useState(false)
@@ -133,11 +143,27 @@ export default function ProductClient({
   
   const faqs = useMemo(() => generateFaqs(product), [product])
   
-  const currentPrice = selectedVariant?.price || product.price
+  // Precios base (ya en pesos)
+  const basePrice = selectedVariant?.price || product.price
   const originalPrice = selectedVariant?.originalPrice || product.originalPrice || undefined
-  const savings = originalPrice ? originalPrice - currentPrice : 0
+  
+  // Calcular cuotas
+  const mejorCuota = useMemo(() => getMejorCuota(basePrice), [basePrice])
+  const todasLasCuotas = useMemo(() => calcularTodasLasCuotas(basePrice), [basePrice])
+  const cuotaSeleccionada = useMemo(() => {
+    if (selectedCuotas === null) return null
+    return todasLasCuotas.find(c => c.cuotas === selectedCuotas) || null
+  }, [selectedCuotas, todasLasCuotas])
+  
+  // Precio actual (contado o con cuotas)
+  const currentPrice = cuotaSeleccionada ? cuotaSeleccionada.precioTotal : basePrice
+  const displayPrice = cuotaSeleccionada 
+    ? `${cuotaSeleccionada.cuotas} x ${cuotaSeleccionada.formatted.precioCuota}`
+    : formatARS(basePrice)
+  
+  const savings = originalPrice ? originalPrice - basePrice : 0
   const discountPercent = originalPrice 
-    ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+    ? Math.round(((originalPrice - basePrice) / originalPrice) * 100)
     : 0
   
   const currentStock = selectedVariant?.stock ?? stockInfo.quantity ?? 0
@@ -146,23 +172,23 @@ export default function ProductClient({
   
   const currentImage = images.length > 0 
     ? images[imageIndex] 
-    : product.image || PLACEHOLDER_IMAGE
+    : product.images[0] || PLACEHOLDER_IMAGE
 
-  // Trust indicators
-  const hasCertifications = product.certifications && product.certifications.length > 0
+  // Trust indicators - Argentina
+  const hasCertifications = product.certifications && Array.isArray(product.certifications) && product.certifications.length > 0
   const hasWarranty = product.warranty && product.warranty > 0
-  const hasFreeShipping = product.freeShipping || currentPrice >= 50
+  const hasFreeShipping = basePrice >= FREE_SHIPPING_THRESHOLD
   const hasReviews = reviews.length > 0
   const isHighRated = product.rating >= 4.5
 
-  // Enhanced product data with features
+  // Enhanced product data
   const enhancedProduct = useMemo(() => ({
     ...product,
     features: features
   }), [product, features])
 
   // ============================================================================
-  // HANDLERS (defined before effects that use them)
+  // HANDLERS
   // ============================================================================
   
   const showToast = useCallback((
@@ -171,7 +197,6 @@ export default function ProductClient({
     description?: string,
     action?: { label: string; onClick: () => void }
   ) => {
-    // Clear existing timeout
     if (toastTimeoutRef.current) {
       clearTimeout(toastTimeoutRef.current)
     }
@@ -187,23 +212,35 @@ export default function ProductClient({
     router.push('/carrito')
   }, [router])
 
+  const handleCuotasChange = useCallback((cuotas: number | null) => {
+    setSelectedCuotas(cuotas)
+    
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'select_promotion', {
+        promotion_name: cuotas ? `${cuotas} cuotas` : 'Contado',
+        creative_name: 'payment_plan',
+        creative_slot: 'product_page'
+      })
+    }
+  }, [])
+
   // ============================================================================
   // EFFECTS
   // ============================================================================
   
-  // Track product view & impression
+  // Track product view & impression - ARGENTINA (ARS)
   useEffect(() => {
     if (!impressionTracked.current) {
       // Track analytics impression
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'view_item', {
-          currency: 'EUR',
-          value: currentPrice,
+          currency: 'ARS',
+          value: basePrice,
           items: [{
             item_id: product.id,
             item_name: product.name,
-            item_category: product.category?.name,
-            price: currentPrice,
+            item_category: product.category,
+            price: basePrice,
             discount: savings
           }]
         })
@@ -218,15 +255,15 @@ export default function ProductClient({
         ].slice(0, 10)
         localStorage.setItem(RECENT_VIEWS_KEY, JSON.stringify(updatedViews))
       } catch (e) {
-        console.error('Error storing recent view:', e)
+        console.error('[ProductClient] Error storing recent view:', e)
       }
       
       impressionTracked.current = true
     }
     
-    // Simulate recent viewers (would come from real-time API)
+    // Simulate recent viewers
     setRecentViewers(Math.floor(Math.random() * 15) + 5)
-  }, [product.id, product.slug, product.name, product.category?.name, currentPrice, savings])
+  }, [product.id, product.slug, product.name, product.category, basePrice, savings])
   
   // Sticky bar scroll detection (throttled)
   useEffect(() => {
@@ -241,7 +278,7 @@ export default function ProductClient({
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
   
-  // ✅ FIX 2: Low stock warning with proper dependencies
+  // Low stock warning
   useEffect(() => {
     if (isLowStock && !showLowStockWarning) {
       const timer = setTimeout(() => {
@@ -256,7 +293,7 @@ export default function ProductClient({
     }
   }, [isLowStock, showLowStockWarning, currentStock, showToast])
   
-  // Cleanup toast timeout on unmount
+  // Cleanup toast timeout
   useEffect(() => {
     return () => {
       if (toastTimeoutRef.current) {
@@ -269,9 +306,13 @@ export default function ProductClient({
   // MORE HANDLERS
   // ============================================================================
   
-  // ✅ FIX 3: handleAddToCart with all dependencies
+  // Add to cart - ARGENTINA CON CUOTAS
   const handleAddToCart = useCallback(async () => {
     if (isAddingToCart || isOutOfStock) return
+    
+    const paymentPlan = cuotaSeleccionada 
+      ? `${cuotaSeleccionada.cuotas} cuotas` 
+      : 'Contado'
     
     setIsAddingToCart(true)
     
@@ -284,42 +325,48 @@ export default function ProductClient({
         originalPrice: originalPrice || undefined,
         quantity: quantity,
         image: currentImage,
-        images: images.length > 0 ? images : (product.image ? [product.image] : []),
+        images: images.length > 0 ? images : (product.images[0] ? [product.images[0]] : []),
         size: selectedVariant?.size || 'Estándar',
         variant: selectedVariant?.dimensions || undefined,
         sku: selectedVariant?.sku || product.sku || undefined,
         maxQuantity: MAX_QUANTITY,
         inStock: product.inStock,
-        category: product.category?.name,
+        category: product.category,
         rating: product.rating,
         isBestSeller: product.isBestSeller
       })
       
+      const description = cuotaSeleccionada
+        ? `${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} · ${cuotaSeleccionada.cuotas} cuotas de ${cuotaSeleccionada.formatted.precioCuota}`
+        : `${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} · Pago de contado`
+      
       showToast(
         'success',
-        '¡Añadido al carrito!',
-        `${quantity} ${quantity === 1 ? 'unidad' : 'unidades'} de ${product.name}`,
+        '¡Agregado al carrito!',
+        description,
         {
           label: 'Ver carrito',
           onClick: handleViewCart
         }
       )
       
-      // Track analytics (non-blocking)
+      // Track analytics - ARGENTINA (ARS) CON CUOTAS
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'add_to_cart', {
-          currency: 'EUR',
+          currency: 'ARS',
           value: currentPrice * quantity,
           items: [{
             item_id: product.id,
             item_name: product.name,
             price: currentPrice,
-            quantity: quantity
+            quantity: quantity,
+            item_category: product.category,
+            dimension1: paymentPlan
           }]
         })
       }
       
-      // Show related products suggestion after 2 seconds
+      // Suggest related products
       setTimeout(() => {
         if (relatedProducts.length > 0) {
           const scrollToRelated = () => {
@@ -330,19 +377,19 @@ export default function ProductClient({
           }
           showToast(
             'info',
-            '💡 Completa tu pedido',
-            'Descubre productos complementarios',
+            '💡 Completá tu pedido',
+            'Descubrí productos complementarios',
             { label: 'Ver más', onClick: scrollToRelated }
           )
         }
       }, 2000)
       
     } catch (error) {
-      console.error('[AddToCart] Error:', error)
+      console.error('[ProductClient] AddToCart error:', error)
       showToast(
         'error',
-        'Error al añadir al carrito',
-        'Por favor, inténtalo de nuevo'
+        'Error al agregar al carrito',
+        'Por favor, intentá de nuevo'
       )
     } finally {
       setIsAddingToCart(false)
@@ -351,12 +398,14 @@ export default function ProductClient({
     isAddingToCart,
     isOutOfStock,
     product,
+    basePrice,
     currentPrice,
     originalPrice,
     quantity,
     currentImage,
     images,
     selectedVariant,
+    cuotaSeleccionada,
     addItem,
     showToast,
     relatedProducts.length,
@@ -365,7 +414,7 @@ export default function ProductClient({
 
   const handleShare = useCallback(async (platform?: string) => {
     const url = window.location.href
-    const text = `${product.name} - ${product.subtitle || ''}`
+    const text = `${product.name} - ${product.subtitle || ''} | Azul Colchones`
     
     if (platform === 'copy') {
       try {
@@ -373,7 +422,6 @@ export default function ProductClient({
         showToast('success', '¡Link copiado!', 'URL copiada al portapapeles')
         setShowShareMenu(false)
         
-        // Track share event
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'share', {
             method: 'copy_link',
@@ -393,7 +441,6 @@ export default function ProductClient({
         await navigator.share({ title: product.name, text, url })
         setShowShareMenu(false)
         
-        // Track share
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'share', {
             method: 'native',
@@ -403,13 +450,13 @@ export default function ProductClient({
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-          console.error('[Share] Error:', error)
+          console.error('[ProductClient] Share error:', error)
         }
       }
       return
     }
     
-    // Social sharing URLs
+    // Social sharing URLs - ARGENTINA
     const shareUrls: Record<string, string> = {
       whatsapp: `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
@@ -420,7 +467,6 @@ export default function ProductClient({
       window.open(shareUrls[platform], '_blank', 'noopener,noreferrer')
       setShowShareMenu(false)
       
-      // Track share
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'share', {
           method: platform,
@@ -436,7 +482,6 @@ export default function ProductClient({
   const handleVariantChange = useCallback((variant: ProductVariant) => {
     setSelectedVariant(variant)
     
-    // Track variant selection
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'select_item', {
         item_list_name: 'Product Variants',
@@ -448,17 +493,21 @@ export default function ProductClient({
       })
     }
   }, [product.id, product.name])
-  // Antes del return, después de handleVariantChange (línea ~460)
-const handleTabChange = useCallback((tab: string) => {
-  setActiveTab(tab as TabType)
-}, [])
+
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab as TabType)
+  }, [])
 
   // ============================================================================
   // RENDER
   // ============================================================================
   
   return (
-    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden scroll-smooth antialiased">
+    <div className="min-h-screen w-full bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 overflow-x-hidden scroll-smooth antialiased">
+      {/* Background effects */}
+      <div className="fixed inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(59,130,246,.02)_1.5px,transparent_1.5px),linear-gradient(90deg,rgba(59,130,246,.02)_1.5px,transparent_1.5px)] bg-[size:64px_64px] pointer-events-none" />
+
       {/* Enhanced Toast Notification */}
       <AnimatePresence>
         {toast.show && (
@@ -511,7 +560,6 @@ const handleTabChange = useCallback((tab: string) => {
         Saltar al contenido principal
       </a>
 
-      {/* ✅ FIX 4: Breadcrumbs with correct prop */}
       <Breadcrumbs productName={product.name} />
 
       <StickyBar 
@@ -528,7 +576,7 @@ const handleTabChange = useCallback((tab: string) => {
 
       <div 
         id="product-content"
-        className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12" 
+        className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 relative z-10" 
         ref={productRef}
       >
         {/* Social Proof Banner */}
@@ -570,6 +618,7 @@ const handleTabChange = useCallback((tab: string) => {
             product={product}
             averageRatings={averageRatings}
             currentPrice={currentPrice}
+            basePrice={basePrice}
             originalPrice={originalPrice}
             savings={savings}
             stockInfo={stockInfo}
@@ -586,6 +635,9 @@ const handleTabChange = useCallback((tab: string) => {
             showShareMenu={showShareMenu}
             features={features}
             setActiveTab={handleTabChange}
+            todasLasCuotas={todasLasCuotas}
+            selectedCuotas={selectedCuotas}
+            onCuotasChange={handleCuotasChange}
           />
         </div>
 
@@ -616,7 +668,7 @@ const handleTabChange = useCallback((tab: string) => {
           </section>
         )}
 
-        {/* Final CTA Section */}
+        {/* Final CTA Section - ARGENTINA CON CUOTAS */}
         {!isOutOfStock && (
           <motion.section 
             initial={{ opacity: 0, y: 20 }}
@@ -624,23 +676,54 @@ const handleTabChange = useCallback((tab: string) => {
             viewport={{ once: true }}
             className="border-t border-white/10 py-16 md:py-24"
           >
-            <div className="max-w-3xl mx-auto text-center">
+            <div className="max-w-3xl mx-auto text-center space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                 ¿Listo para mejorar tu descanso?
               </h2>
-              <p className="text-zinc-400 text-lg mb-8">
+              <p className="text-zinc-400 text-lg mb-6">
                 {hasFreeShipping && "Envío gratis incluido. "}
                 {hasWarranty && `${product.warranty} años de garantía. `}
                 Compra segura y protegida.
               </p>
-              <button
-                onClick={handleAddToCart}
-                disabled={isAddingToCart}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-blue-500/25"
-              >
-                <ShoppingCart className="w-5 h-5 inline-block mr-2" />
-                Añadir al carrito
-              </button>
+              
+              {/* Opciones de pago */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-zinc-400 mb-8">
+                <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <CreditCard className="w-4 h-4" />
+                  <span>Hasta 12 cuotas sin interés</span>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{product.trialNights || 100} noches de prueba</span>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                  className="w-full max-w-md mx-auto px-8 py-5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl shadow-blue-500/25 flex items-center justify-center gap-3"
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  <span>Agregar al carrito</span>
+                </button>
+                
+                {/* Precio y cuotas */}
+                <div className="text-center space-y-1">
+                  <p className="text-3xl font-black text-white">
+                    {formatARS(currentPrice * quantity)}
+                  </p>
+                  {cuotaSeleccionada ? (
+                    <p className="text-sm text-zinc-400">
+                      {cuotaSeleccionada.cuotas} cuotas de {cuotaSeleccionada.formatted.precioCuota}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-emerald-400 font-semibold">
+                      Precio de contado · {getTextoPromocional(basePrice)}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </motion.section>
         )}

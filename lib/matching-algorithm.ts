@@ -204,7 +204,7 @@ interface UserProfile {
       reasons.push('Sistema de refrigeración')
     }
   
-    if (product.eco || product.isEco) {
+    if (product.isEco) {
       featuresScore += 2
       reasons.push('Materiales ecológicos')
     }

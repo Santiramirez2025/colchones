@@ -1,185 +1,326 @@
-import { Shield, Package, Clock, AlertTriangle, CheckCircle, Truck, FileText } from 'lucide-react'
+import { Shield, Package, AlertTriangle, CheckCircle, Clock, Mail, Phone, Award, XCircle } from 'lucide-react'
 
 export default function GarantiaPage() {
-  const sections = [
+  const warrantyConditions = [
     {
       icon: Shield,
-      title: 'Cobertura de Garantía',
-      content: 'La garantía es de 3 años sobre defectos de fabricación. Cubre imperfecciones del producto que no sean causadas por uso indebido o desgaste normal.',
-      color: 'emerald'
+      title: '5 años de garantía',
+      description: 'Todos nuestros colchones cuentan con garantía de fábrica'
     },
     {
-      icon: AlertTriangle,
-      title: 'Revisión en la Entrega',
-      alert: true,
-      items: [
-        'Revisar el producto inmediatamente al recibirlo',
-        'Indicar cualquier desperfecto del embalaje en el albarán',
-        'Rechazar la entrega si hay roturas o daños visibles',
-        'No se aceptan reclamaciones después de firmar el albarán'
-      ]
-    },
-    {
-      icon: Clock,
-      title: 'Plazo de Reclamación',
-      content: 'Agujeros, manchas en el tejido, hilos sueltos u otras imperfecciones similares que no sean reclamadas en el momento de la entrega, o dentro de las 24 horas siguientes a su recepción, quedarán excluidas de la garantía.',
-      highlight: '24 horas para reclamar defectos visibles'
+      icon: CheckCircle,
+      title: 'Solo fallas de fábrica',
+      description: 'Cubre defectos de fabricación y materiales comprobables'
     },
     {
       icon: Package,
-      title: 'Tolerancias de Medidas',
-      content: 'Las medidas de largo, ancho y altura de colchones y toppers admiten variaciones de ±3 cm. No se aceptan devoluciones por ligeras variaciones de medida.',
-      color: 'cyan'
+      title: 'Factura requerida',
+      description: 'Guardá tu factura, es indispensable para cualquier reclamo'
     },
     {
-      icon: Truck,
-      title: 'Producto Equivocado o Extraviado',
-      items: [
-        'Si recibes un producto equivocado, solicita devolución/reposición en 24 horas',
-        'Si la mercancía se extravía, enviamos el producto de nuevo sin coste',
-        'Realizamos reembolso total si es necesario'
-      ]
-    },
-    {
-      icon: FileText,
-      title: 'Garantía Legal',
-      content: 'Con carácter general, la garantía legal de los productos es de tres años desde la entrega. Dispones de dos meses para comunicar las faltas de conformidad. Los defectos manifestados después de los primeros seis meses no se presumirán como defectos de fábrica.'
+      icon: Clock,
+      title: 'Evaluación técnica',
+      description: 'Nuestro equipo evaluará el producto en todos los casos'
     }
   ]
 
-  const exclusions = [
-    'Uso con somieres de muelles (elimina la garantía)',
-    'Daños causados por uso indebido',
-    'Desgaste normal del producto',
-    'Defectos no comunicados en 24 horas',
-    'Daños del embalaje no indicados en el albarán'
+  const warrantyCoverage = [
+    {
+      title: 'Qué cubre la garantía',
+      items: [
+        'Hundimientos superiores a 2.5cm',
+        'Defectos en costuras de fábrica',
+        'Problemas en resortes (si aplica)',
+        'Fallas en materiales comprobables'
+      ],
+      icon: CheckCircle,
+      color: 'text-zinc-300'
+    },
+    {
+      title: 'Qué NO cubre',
+      items: [
+        'Desgaste normal por uso',
+        'Manchas, roturas o quemaduras',
+        'Daños por mascotas',
+        'Uso comercial o inadecuado',
+        'Falta de mantenimiento',
+        'Preferencias de confort'
+      ],
+      icon: XCircle,
+      color: 'text-zinc-500'
+    }
+  ]
+
+  const returnPolicy = [
+    {
+      step: 1,
+      title: 'Derecho de arrepentimiento',
+      description: '10 días corridos desde la recepción según Ley 24.240'
+    },
+    {
+      step: 2,
+      title: 'Condición del producto',
+      description: 'El colchón debe estar SIN USAR, en embalaje original cerrado'
+    },
+    {
+      step: 3,
+      title: 'Costos de flete',
+      description: 'Los gastos de retiro corren por cuenta del comprador'
+    },
+    {
+      step: 4,
+      title: 'Reembolso',
+      description: 'Una vez verificado el estado, procesamos el reembolso en 10 días hábiles'
+    }
+  ]
+
+  const importantNotes = [
+    {
+      icon: AlertTriangle,
+      title: 'Importante sobre arrepentimiento',
+      text: 'Por razones de higiene y salud, NO se aceptan devoluciones de colchones que hayan sido desembalados, probados o usados. El producto debe estar en su embalaje original sin abrir.'
+    },
+    {
+      icon: Award,
+      title: 'Recomendación',
+      text: 'Te sugerimos visitarnos en nuestro showroom en Balerdi 855 para probar los colchones antes de comprar. Así te asegurás de elegir el modelo ideal para vos.'
+    }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 pt-32 pb-20">
-      <div className="container mx-auto px-4 max-w-5xl">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-2xl mb-6 border border-emerald-500/30">
-            <Shield className="w-10 h-10 text-emerald-400" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-            Garantía de 3 Años
-          </h1>
-          <p className="text-zinc-400 text-lg">Protección completa en tu compra</p>
-        </div>
-
-        {/* Important Alert */}
-        <div className="mb-12 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 rounded-2xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-amber-400" />
+    <div className="min-h-screen w-full bg-zinc-950 overflow-x-hidden antialiased">
+      {/* Hero Section */}
+      <section className="w-full border-b border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-zinc-800/50 border border-zinc-700/50 rounded-2xl mb-6">
+              <Shield className="w-8 h-8 md:w-10 md:h-10 text-zinc-300" />
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">⚠️ Importante</h3>
-              <p className="text-zinc-300 leading-relaxed">
-                <strong className="text-white">Revisa tu producto en el momento de la entrega.</strong> Cualquier desperfecto del embalaje debe ser indicado en el albarán. En caso de rotura o daños, <strong className="text-white">rechaza la entrega</strong> y te enviaremos el producto de nuevo sin coste adicional.
-              </p>
-            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+              Garantía y Devoluciones
+            </h1>
+            <p className="text-lg text-zinc-400">
+              5 años de garantía por fallas de fábrica en todos nuestros productos
+            </p>
           </div>
         </div>
+      </section>
 
-        {/* Sections Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {sections.map((section, index) => (
-            <div 
-              key={index}
-              className={`bg-gradient-to-br from-zinc-900 to-zinc-950 border ${
-                section.alert 
-                  ? 'border-amber-500/20' 
-                  : 'border-white/10'
-              } rounded-2xl p-6 hover:border-emerald-500/30 transition-all`}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 bg-${section.color || 'emerald'}-500/10 rounded-xl flex items-center justify-center`}>
-                  <section.icon className={`w-6 h-6 text-${section.color || 'emerald'}-400`} />
+      {/* Important Alert */}
+      <section className="w-full">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-zinc-700/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-zinc-400" />
                 </div>
-                <h2 className="text-xl font-bold text-white">{section.title}</h2>
-              </div>
-              
-              {section.content && (
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  {section.content}
-                </p>
-              )}
-
-              {section.highlight && (
-                <div className="mt-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-                  <p className="text-sm font-semibold text-emerald-400">
-                    ⏰ {section.highlight}
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-2">
+                    ⚠️ Importante - Higiene y Salud
+                  </h3>
+                  <p className="text-zinc-300 leading-relaxed text-sm md:text-base">
+                    Por razones de higiene y salud, <strong className="text-white">NO se aceptan devoluciones de colchones desembalados o usados</strong>. 
+                    Te recomendamos visitarnos en nuestro showroom para probar los productos antes de comprar.
                   </p>
                 </div>
-              )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              {section.items && (
-                <ul className="space-y-2 mt-2">
+      {/* Warranty Conditions */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
+            Garantía de Fábrica
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {warrantyConditions.map((condition, index) => (
+              <div
+                key={index}
+                className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 text-center hover:bg-zinc-800/60 transition-all"
+              >
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-zinc-700/50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <condition.icon className="w-6 h-6 md:w-7 md:h-7 text-zinc-300" />
+                </div>
+                <h3 className="text-base md:text-lg font-bold text-white mb-2">
+                  {condition.title}
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  {condition.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Coverage Details */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {warrantyCoverage.map((section, index) => (
+              <div
+                key={index}
+                className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <section.icon className={`w-6 h-6 ${section.color}`} />
+                  <h3 className="text-xl font-bold text-white">{section.title}</h3>
+                </div>
+                <ul className="space-y-3">
                   {section.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-zinc-300">
-                      <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                      <span className={`mt-1 ${section.color}`}>•</span>
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Exclusions */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-red-500/20 rounded-2xl p-8 mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-red-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-white">Exclusiones de Garantía</h2>
-          </div>
-          
-          <ul className="space-y-3">
-            {exclusions.map((exclusion, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
-                <span className="text-red-400 font-bold mt-0.5">✕</span>
-                <span>{exclusion}</span>
-              </li>
+              </div>
             ))}
-          </ul>
-        </div>
-
-        {/* CTA */}
-        <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">¿Necesitas ayuda?</h2>
-          <p className="text-zinc-300 mb-6">
-            Si tienes alguna duda sobre la garantía o necesitas hacer una reclamación
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a 
-              href="mailto:garantia@tiendacolchon.es"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold transition-all border border-white/10"
-            >
-              <FileText className="w-5 h-5" />
-              garantia@tiendacolchon.es
-            </a>
-            <a 
-              href="tel:+34900123456"
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-            >
-              <Shield className="w-5 h-5" />
-              900 123 456
-            </a>
           </div>
         </div>
+      </section>
 
-        {/* Footer Note */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-zinc-500">
-            Garantía válida desde la fecha de entrega del producto
+      {/* Return Policy */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 text-center">
+            Derecho de Arrepentimiento
+          </h2>
+          <p className="text-zinc-400 text-center mb-8 max-w-2xl mx-auto">
+            Según la Ley 24.240 de Defensa del Consumidor
           </p>
+
+          <div className="max-w-3xl mx-auto space-y-4 mb-12">
+            {returnPolicy.map((item, index) => (
+              <div
+                key={index}
+                className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-zinc-700/50 flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
+                    {item.step}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-base md:text-lg font-bold text-white mb-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-zinc-400">{item.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Important Notes */}
+          <div className="max-w-3xl mx-auto space-y-6">
+            {importantNotes.map((note, index) => (
+              <div
+                key={index}
+                className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6"
+              >
+                <div className="flex items-start gap-4">
+                  <note.icon className="w-6 h-6 text-zinc-400 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-2">{note.title}</h3>
+                    <p className="text-sm text-zinc-300 leading-relaxed">{note.text}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Warranty Process */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
+              ¿Cómo hacer un reclamo de garantía?
+            </h2>
+            <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-6 md:p-8">
+              <ol className="space-y-4">
+                <li className="flex items-start gap-3 text-zinc-300">
+                  <span className="w-6 h-6 flex-shrink-0 rounded-full bg-zinc-700/50 flex items-center justify-center text-white text-xs font-bold">
+                    1
+                  </span>
+                  <span className="text-sm md:text-base">
+                    <strong className="text-white">Contactanos</strong> por email, WhatsApp o teléfono describiendo el problema
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-zinc-300">
+                  <span className="w-6 h-6 flex-shrink-0 rounded-full bg-zinc-700/50 flex items-center justify-center text-white text-xs font-bold">
+                    2
+                  </span>
+                  <span className="text-sm md:text-base">
+                    <strong className="text-white">Enviá fotos</strong> del defecto y tu factura de compra
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-zinc-300">
+                  <span className="w-6 h-6 flex-shrink-0 rounded-full bg-zinc-700/50 flex items-center justify-center text-white text-xs font-bold">
+                    3
+                  </span>
+                  <span className="text-sm md:text-base">
+                    <strong className="text-white">Evaluación técnica:</strong> Nuestro equipo revisará tu caso
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-zinc-300">
+                  <span className="w-6 h-6 flex-shrink-0 rounded-full bg-zinc-700/50 flex items-center justify-center text-white text-xs font-bold">
+                    4
+                  </span>
+                  <span className="text-sm md:text-base">
+                    <strong className="text-white">Solución:</strong> Si procede, coordinamos reparación o reemplazo según corresponda
+                  </span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact CTA */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-8 md:p-12 text-center max-w-3xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              ¿Tenés alguna consulta?
+            </h2>
+            <p className="text-zinc-400 mb-8">
+              Contactanos y te ayudaremos con tu garantía o consulta sobre devoluciones
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a 
+                href="mailto:info@azulcolchones.com"
+                className="inline-flex items-center gap-2 bg-zinc-700 hover:bg-zinc-600 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                <Mail className="w-5 h-5" />
+                info@azulcolchones.com
+              </a>
+              <a 
+                href="tel:+54353XXXXXXX"
+                className="inline-flex items-center gap-2 bg-zinc-700 hover:bg-zinc-600 text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                <Phone className="w-5 h-5" />
+                +54 353 XXX-XXXX
+              </a>
+            </div>
+            <p className="text-xs text-zinc-500 mt-6">
+              Horario: Lunes a Viernes de 9:00 a 18:00hs | Sábados de 10:00 a 14:00hs
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Note */}
+      <section className="w-full border-t border-zinc-800/50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-sm text-zinc-500">
+              Esta política cumple con la Ley 24.240 de Defensa del Consumidor de Argentina
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

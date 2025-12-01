@@ -56,7 +56,7 @@ function ProductCard({ product, index }: ProductCardProps) {
           {/* Imagen con overlay */}
           <div className="relative aspect-square mb-4 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl">
             <Image
-              src={product.image || '/images/placeholder.jpg'}
+              src={product.images[0] || '/images/placeholder.jpg'}
               alt={product.name}
               fill
               sizes="(max-width: 768px) 280px, 320px"

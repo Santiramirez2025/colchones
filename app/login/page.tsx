@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-// --- Iconos (Se mantienen igual) ---
+// --- Iconos ---
 const Icons = {
   Moon: ({ className = "w-6 h-6" }: { className?: string }) => (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -20,37 +20,45 @@ const Icons = {
       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
     </svg>
   ),
+  Eye: ({ className = "w-5 h-5" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+  ),
+  EyeOff: ({ className = "w-5 h-5" }: { className?: string }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+    </svg>
+  ),
 }
-// --- Fin Iconos ---
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  // El loading del formulario local ahora se gestiona de forma más limpia
   const [localLoading, setLocalLoading] = useState(false) 
   const [resetSent, setResetSent] = useState(false)
 
-  // Usamos el 'loading' del AuthContext para la redirección
   const { signIn, signUp, signInWithGoogle, resetPassword, user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/mi-cuenta'
 
-  // Redirigir cuando el usuario esté autenticado y sincronizado
+  // Redirigir cuando el usuario esté autenticado
   useEffect(() => {
-    // Usamos authLoading para sincronizar el estado del Context
     if (user && !authLoading) { 
       router.push(redirectTo)
     }
-  }, [user, authLoading, router, redirectTo]) // Dependemos de authLoading del Context
+  }, [user, authLoading, router, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLocalLoading(true) // Usamos el loading local para el formulario
+    setLocalLoading(true)
 
     try {
       if (isLogin) {
@@ -61,12 +69,7 @@ export default function LoginPage() {
         }
         await signUp(email, password, name)
       }
-      // NOTA: No desactivamos localLoading aquí, el useEffect de redirección lo gestionará
-      // en el flujo de éxito. Si la autenticación es exitosa, pero la sincronización falla,
-      // el authLoading del contexto se pondrá en false y el localLoading debería seguir ese ejemplo.
-      
     } catch (err: any) {
-      // Manejo de errores
       const errorMessage = err.message || 'Error al autenticar'
       if (errorMessage.includes('auth/email-already-in-use')) {
         setError('Este email ya está registrado')
@@ -74,13 +77,16 @@ export default function LoginPage() {
         setError('Email o contraseña incorrectos')
       } else if (errorMessage.includes('auth/weak-password')) {
         setError('La contraseña debe tener al menos 6 caracteres')
+      } else if (errorMessage.includes('auth/user-not-found')) {
+        setError('No existe un usuario con ese email')
+      } else if (errorMessage.includes('auth/invalid-email')) {
+        setError('El formato del email no es válido')
+      } else if (errorMessage.includes('auth/too-many-requests')) {
+        setError('Demasiados intentos. Intentá de nuevo más tarde')
       } else {
-        // En caso de error desconocido, mostramos el mensaje.
-        // También puede ser que la función 'syncUser' en el AuthContext falle y arroje un error.
         setError(errorMessage)
       }
-      
-      setLocalLoading(false) // Desactivamos loading solo en caso de error
+      setLocalLoading(false)
     }
   }
 
@@ -97,11 +103,12 @@ export default function LoginPage() {
 
   const handleResetPassword = async () => {
     if (!email) {
-      setError('Ingresa tu email para recuperar la contraseña')
+      setError('Ingresá tu email para recuperar la contraseña')
       return
     }
     
     setError('')
+    setLocalLoading(true)
     
     try {
       await resetPassword(email)
@@ -110,140 +117,173 @@ export default function LoginPage() {
     } catch (err: any) {
       const errorMessage = err.message || 'Error al enviar el email de recuperación'
       if (errorMessage.includes('auth/user-not-found')) {
-        setError('No existe un usuario con ese email.')
+        setError('No existe un usuario con ese email')
+      } else if (errorMessage.includes('auth/invalid-email')) {
+        setError('El formato del email no es válido')
       } else {
-        setError('Error al enviar el email de recuperación.')
+        setError('Error al enviar el email de recuperación')
       }
+    } finally {
+      setLocalLoading(false)
     }
   }
   
-  // Usamos el loading del AuthContext para deshabilitar botones mientras se carga el usuario inicial.
-  const isGlobalLoading = localLoading || authLoading;
+  const isGlobalLoading = localLoading || authLoading
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center px-4 py-12">
+      {/* Fondo decorativo */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-fuchsia-500/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         
         {/* Logo */}
         <Link href="/" className="flex justify-center mb-8 group">
-          <div className="flex items-center gap-2.5">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-violet-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-105 transition">
-              <Icons.Moon className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-violet-600 flex items-center justify-center shadow-xl shadow-violet-500/30 group-hover:scale-105 transition-transform">
+              <Icons.Moon className="w-7 h-7 text-white" />
             </div>
             <div className="text-2xl font-black">
-              <span className="text-white">Tienda</span>
-              <span className="text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text">Colchon</span>
+              <span className="text-white">Azul</span>
+              <span className="text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text">Colchones</span>
             </div>
           </div>
         </Link>
 
         {/* Card */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-xl">
-          <h1 className="text-2xl font-bold text-white mb-2 text-center">
-            {isLogin ? 'Bienvenido de nuevo' : 'Crear cuenta'}
-          </h1>
-          <p className="text-zinc-400 text-center mb-6 text-sm">
-            {isLogin ? 'Inicia sesión para continuar' : 'Regístrate para empezar'}
-          </p>
+        <div className="bg-zinc-900/80 border border-white/10 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {isLogin ? 'Bienvenido de nuevo' : 'Creá tu cuenta'}
+            </h1>
+            <p className="text-zinc-400 text-sm">
+              {isLogin ? 'Iniciá sesión para continuar con tu compra' : 'Registrate para empezar a comprar'}
+            </p>
+          </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
-              {error}
+            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm flex items-start gap-3">
+              <span className="text-red-500 text-lg flex-shrink-0">⚠</span>
+              <span>{error}</span>
             </div>
           )}
 
           {resetSent && (
-            <div className="mb-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
-              Email de recuperación enviado. Revisa tu bandeja de entrada.
+            <div className="mb-4 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm flex items-start gap-3">
+              <span className="text-emerald-500 text-lg flex-shrink-0">✓</span>
+              <span>Email de recuperación enviado. Revisá tu bandeja de entrada.</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-5">
             {!isLogin && (
               <div>
                 <label className="block text-sm font-semibold text-zinc-300 mb-2">
-                  Nombre completo *
+                  Nombre completo <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition"
-                  placeholder="Tu nombre"
+                  className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:bg-zinc-800 transition"
+                  placeholder="Juan Pérez"
                   required={!isLogin}
+                  disabled={isGlobalLoading}
                 />
               </div>
             )}
 
             <div>
               <label className="block text-sm font-semibold text-zinc-300 mb-2">
-                Email *
+                Email <span className="text-red-400">*</span>
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition"
+                className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:bg-zinc-800 transition"
                 placeholder="tu@email.com"
                 required
+                disabled={isGlobalLoading}
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-semibold text-zinc-300">
-                  Contraseña *
+                  Contraseña <span className="text-red-400">*</span>
                 </label>
                 {isLogin && (
                   <button
                     type="button"
                     onClick={handleResetPassword}
-                    // Deshabilitar si ya está en proceso de carga o si el email está vacío para evitar spam
-                    disabled={isGlobalLoading || email === ''} 
-                    className="text-xs text-violet-400 hover:text-violet-300 transition disabled:opacity-50"
+                    disabled={isGlobalLoading || !email}
+                    className="text-xs text-violet-400 hover:text-violet-300 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
                 )}
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition"
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 bg-zinc-800/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 focus:bg-zinc-800 transition"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  disabled={isGlobalLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition"
+                  disabled={isGlobalLoading}
+                >
+                  {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
+                </button>
+              </div>
               {!isLogin && (
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-2 text-xs text-zinc-500">
                   Mínimo 6 caracteres
                 </p>
               )}
             </div>
 
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={isGlobalLoading}
-              className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100 shadow-lg shadow-violet-500/30"
+              className="w-full py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed shadow-lg shadow-violet-500/30 text-base"
             >
-              {isGlobalLoading ? 'Procesando...' : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+              {isGlobalLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Procesando...
+                </span>
+              ) : isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
             </button>
-          </form>
+          </div>
 
           <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-zinc-500 font-medium">O continuar con</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-zinc-700" />
+            <span className="text-xs text-zinc-500 font-medium">O continuá con</span>
+            <div className="flex-1 h-px bg-zinc-700" />
           </div>
 
           <button
             onClick={handleGoogleSignIn}
             disabled={isGlobalLoading}
-            className="w-full py-3.5 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] disabled:opacity-50 disabled:scale-100"
+            className="w-full py-3.5 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 hover:scale-[1.02] disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
           >
             <Icons.Google />
-            <span>Google</span>
+            <span>Continuar con Google</span>
           </button>
 
           <div className="mt-6 text-center">
@@ -253,25 +293,25 @@ export default function LoginPage() {
                 setError('')
                 setResetSent(false)
               }}
-              className="text-sm text-zinc-400 hover:text-violet-400 transition font-medium"
-              disabled={isGlobalLoading} // Bloquear cambio de vista mientras se procesa
+              className="text-sm text-zinc-400 hover:text-violet-400 transition font-medium disabled:opacity-50"
+              disabled={isGlobalLoading}
             >
               {isLogin ? (
-                <>¿No tienes cuenta? <span className="text-violet-400 font-bold">Regístrate</span></>
+                <>¿No tenés cuenta? <span className="text-violet-400 font-bold">Registrate</span></>
               ) : (
-                <>¿Ya tienes cuenta? <span className="text-violet-400 font-bold">Inicia sesión</span></>
+                <>¿Ya tenés cuenta? <span className="text-violet-400 font-bold">Iniciá sesión</span></>
               )}
             </button>
           </div>
         </div>
 
-        <p className="mt-6 text-center text-xs text-zinc-500">
-          Al continuar, aceptas nuestros{' '}
-          <Link href="/terminos" className="text-violet-400 hover:underline">
+        <p className="mt-6 text-center text-xs text-zinc-500 leading-relaxed">
+          Al continuar, aceptás nuestros{' '}
+          <Link href="/terminos" className="text-violet-400 hover:text-violet-300 transition underline">
             Términos de Servicio
           </Link>{' '}
           y{' '}
-          <Link href="/privacidad" className="text-violet-400 hover:underline">
+          <Link href="/privacidad" className="text-violet-400 hover:text-violet-300 transition underline">
             Política de Privacidad
           </Link>
         </p>

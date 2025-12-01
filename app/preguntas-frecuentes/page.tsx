@@ -30,17 +30,17 @@ export default function PreguntasFrecuentesPage() {
     {
       category: 'producto',
       question: '¿Cómo diferenciar la cara de verano de la cara de invierno?',
-      answer: 'Los colchones con dos caras suelen indicarlo en la etiqueta. La cara de verano tiene tejidos más frescos y transpirables, mientras que la de invierno incorpora materiales más acogedores. Si tu colchón no especifica caras estacionales, es de una sola cara de uso.'
+      answer: 'Los colchones con dos caras suelen indicarlo en la etiqueta. La cara de verano tiene tejidos más frescos y transpirables (ideal para el calor cordobés), mientras que la de invierno incorpora materiales más acogedores. Si tu colchón no especifica caras estacionales, es de una sola cara de uso.'
     },
     {
       category: 'producto',
       question: 'Tengo sobrepeso, ¿puedo comprar cualquier colchón?',
-      answer: 'Para personas con sobrepeso recomendamos colchones de firmeza media-alta o alta, con mayor densidad en el núcleo y mejor soporte. Es importante verificar el peso máximo recomendado por el fabricante. Contáctanos para asesoramiento personalizado.'
+      answer: 'Para personas con sobrepeso recomendamos colchones de firmeza media-alta o alta, con mayor densidad en el núcleo y mejor soporte. Es importante verificar el peso máximo recomendado por el fabricante. Comunicate con nosotros por WhatsApp para asesoramiento personalizado sin cargo.'
     },
     {
       category: 'producto',
       question: '¿Cuál debe ser la medida de mi colchón?',
-      answer: 'El colchón debe medir exactamente lo mismo que tu somier o base. Las medidas estándar son: individual 90x190cm, matrimonio 135x190cm o 150x190cm, y queen/king 160x200cm o 180x200cm. Mide tu base antes de comprar.'
+      answer: 'El colchón debe medir exactamente lo mismo que tu sommier o base. Las medidas estándar en Argentina son: 1 plaza (80x190cm o 90x190cm), 1½ plaza (100x190cm), 2 plazas (140x190cm o 150x190cm), y Queen/King (160x200cm o 180x200cm). Medí tu base antes de comprar.'
     },
     {
       category: 'envio',
@@ -54,58 +54,73 @@ export default function PreguntasFrecuentesPage() {
     },
     {
       category: 'envio',
-      question: '¿Cuándo se considera que un colchón está enviado en mal estado?',
-      answer: 'Si al recibirlo presenta roturas en la funda, manchas, deformaciones evidentes o defectos visibles. Es importante revisar el paquete en presencia del transportista y rechazarlo si está dañado. Contáctanos inmediatamente si detectas algún problema.'
+      question: '¿Hacen envíos a Villa María y la zona?',
+      answer: '¡Sí! Hacemos envíos GRATIS a toda Villa María, Bell Ville, San Francisco y localidades cercanas. Para el resto de Córdoba y otras provincias, consultanos por WhatsApp para coordinar el envío. Entregamos en 3-7 días hábiles según la zona.'
     },
     {
       category: 'envio',
-      question: '¿Me recogen el colchón antiguo?',
-      answer: 'La recogida del colchón antiguo no está incluida en nuestro servicio estándar. Puedes gestionarla a través del servicio de recogida de voluminosos de tu ayuntamiento o contratar un servicio privado de retirada de enseres.'
+      question: '¿Cuándo se considera que un colchón está enviado en mal estado?',
+      answer: 'Si al recibirlo presenta roturas en la funda, manchas, deformaciones evidentes o defectos visibles. Es importante revisar el paquete en presencia del transportista y rechazarlo si está dañado. Comunicate inmediatamente con nosotros si detectás algún problema.'
+    },
+    {
+      category: 'envio',
+      question: '¿Me retiran el colchón viejo?',
+      answer: 'La retira del colchón antiguo no está incluida en nuestro servicio estándar. Podés gestionarla a través del servicio de recolección de residuos voluminosos de la Municipalidad de Villa María o contratar un servicio privado de retiro de enseres.'
     },
     {
       category: 'uso',
       question: '¿Cómo tengo que desenrollar mi colchón?',
-      answer: 'Coloca la caja sobre la base o somier, abre con cuidado, retira el plástico protector y deja que el colchón se expanda naturalmente. No uses objetos punzantes cerca del colchón. La expansión completa tarda 24-48 horas, aunque puedes usarlo antes.'
+      answer: 'Colocá la caja sobre la base o sommier, abrí con cuidado, retirá el plástico protector y dejá que el colchón se expanda naturalmente. No uses objetos punzantes cerca del colchón. La expansión completa tarda 24-48 horas, aunque podés usarlo antes.'
     },
     {
       category: 'uso',
       question: '¿Cuánto tiempo debo esperar antes de su primer uso?',
-      answer: 'Puedes usarlo tras 2-4 horas de expansión, aunque es ideal esperar 24 horas para que recupere completamente su forma y se airee. Durante las primeras noches puede tener un ligero olor a nuevo que desaparece rápidamente.'
+      answer: 'Podés usarlo tras 2-4 horas de expansión, aunque es ideal esperar 24 horas para que recupere completamente su forma y se airee. Durante las primeras noches puede tener un ligero olor a nuevo que desaparece rápidamente con ventilación.'
     },
     {
       category: 'uso',
       question: '¿Se puede poner funda a los colchones?',
-      answer: 'Sí, es muy recomendable usar un protector o funda transpirable. Esto protege el colchón de manchas, ácaros y sudor, prolongando su vida útil. Asegúrate de que sea transpirable para no afectar la ventilación del colchón.'
+      answer: 'Sí, es muy recomendable usar un protector o funda transpirable. Esto protege el colchón de manchas, ácaros y sudor, prolongando su vida útil. Asegurate de que sea transpirable para no afectar la ventilación del colchón.'
     },
     {
       category: 'uso',
       question: '¿Cómo debo cuidar mi colchón?',
-      answer: 'Usa protector de colchón, ventila la habitación diariamente, aspira la superficie mensualmente, gíralo 180° cada 3 meses (si es de doble cara), no saltes sobre él y evita doblarlo o exponerlo al sol directo. Limpia manchas inmediatamente con paño húmedo.'
+      answer: 'Usá protector de colchón, ventilá la habitación diariamente (especialmente en verano), aspirá la superficie mensualmente, giralo 180° cada 3 meses (si es de doble cara), no saltes sobre él y evitá doblarlo o exponerlo al sol directo. Limpiá manchas inmediatamente con paño húmedo.'
     },
     {
       category: 'uso',
       question: '¿Cómo debe medirse la altura de mi colchón?',
-      answer: 'La altura se mide desde la base hasta el punto más alto, incluyendo el acolchado. Es importante para verificar que encaje con tu somier, canapé o ropa de cama. La mayoría de colchones tienen entre 18-30cm de altura.'
+      answer: 'La altura se mide desde la base hasta el punto más alto, incluyendo el acolchado. Es importante para verificar que encaje con tu sommier, canapé o ropa de cama. La mayoría de colchones tienen entre 18-30cm de altura.'
     },
     {
       category: 'uso',
       question: '¿Puedo dar la vuelta a mi colchón?',
-      answer: 'Solo si es de doble cara. Los colchones modernos suelen ser de una sola cara de uso. Verifica la etiqueta: si indica "No turn" o tiene acolchado solo superior, no debes voltear. Sí puedes girarlo 180° (pies-cabeza) cada 3 meses.'
+      answer: 'Solo si es de doble cara. Los colchones modernos suelen ser de una sola cara de uso. Verificá la etiqueta: si indica "No voltear" o tiene acolchado solo superior, no debés darle vuelta. Sí podés girarlo 180° (pies-cabeza) cada 3 meses.'
     },
     {
       category: 'uso',
       question: 'Mi colchón está un poco hundido, ¿qué hago?',
-      answer: 'Si es nuevo, puede ser asentamiento normal durante los primeros meses. Si el hundimiento supera los 2cm o lleva más de 6 meses, contacta con nosotros para valorar garantía. Asegúrate de que tu base proporciona soporte adecuado.'
+      answer: 'Si es nuevo, puede ser asentamiento normal durante los primeros meses. Si el hundimiento supera los 2cm o lleva más de 6 meses, contactanos para valorar garantía. Asegurate de que tu base o sommier proporcione soporte adecuado.'
     },
     {
       category: 'garantia',
       question: '¿Cada cuánto tengo que cambiar mi colchón?',
-      answer: 'Se recomienda cambiar el colchón cada 8-10 años, aunque depende del uso y calidad. Señales para cambiarlo: deformaciones visibles, falta de soporte, despertarte con dolores, o si notas que descansas peor que antes.'
+      answer: 'Se recomienda cambiar el colchón cada 8-10 años, aunque depende del uso y calidad. Señales para cambiarlo: deformaciones visibles, falta de soporte, despertarte con dolores, o si notás que descansás peor que antes.'
     },
     {
       category: 'garantia',
-      question: '¿Cuánto tiempo de prueba tengo?',
-      answer: 'Ofrecemos garantía legal de 3 años por defectos de fabricación. No incluimos periodo de prueba de satisfacción, pero puedes ejercer tu derecho de desistimiento dentro de los 14 días naturales desde la recepción, siempre que el producto esté sin usar y en su embalaje original.'
+      question: '¿Qué garantía tienen los colchones?',
+      answer: 'Todos nuestros colchones tienen garantía de 5 años contra defectos de fabricación. La garantía cubre deformaciones, roturas de costuras o fallas en materiales. No cubre desgaste normal, manchas o daños por mal uso. Conservá tu factura como comprobante.'
+    },
+    {
+      category: 'garantia',
+      question: '¿Puedo devolver el colchón si no me gusta?',
+      answer: 'Según la Ley de Defensa del Consumidor argentina, tenés derecho a arrepentirte dentro de los 10 días corridos desde que recibís el producto, siempre que esté sin usar y en su embalaje original. Consultanos las condiciones específicas.'
+    },
+    {
+      category: 'garantia',
+      question: '¿Qué formas de pago aceptan?',
+      answer: 'Aceptamos efectivo, transferencia bancaria, Mercado Pago y todas las tarjetas de crédito con hasta 12 cuotas sin interés. También podés pagar con tarjeta de débito. Para compras en el local, aceptamos todos los medios de pago habituales en Villa María.'
     }
   ]
 
@@ -209,25 +224,36 @@ export default function PreguntasFrecuentesPage() {
         <div className="bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 border border-violet-500/30 rounded-2xl p-8 text-center">
           <MessageCircle className="w-12 h-12 text-violet-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">
-            ¿No encuentras lo que buscas?
+            ¿No encontrás lo que buscás?
           </h2>
           <p className="text-zinc-400 mb-6">
-            Nuestro equipo está listo para ayudarte con cualquier duda
+            Nuestro equipo en Villa María está listo para ayudarte con cualquier duda
           </p>
-          <a
-            href="/contacto"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/30"
-          >
-            Contactar con soporte
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="https://wa.me/5493531234567"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/30"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Chatear por WhatsApp
+            </a>
+            <a
+              href="/contacto"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-violet-500/30"
+            >
+              Contactar con soporte
+            </a>
+          </div>
         </div>
 
         {/* Quick Tips */}
         <div className="grid md:grid-cols-3 gap-6 mt-12">
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-6">
             <Calendar className="w-8 h-8 text-emerald-400 mb-3" />
-            <h3 className="font-bold text-white mb-2">Envío en 3-6 días</h3>
-            <p className="text-sm text-zinc-400">Entrega rápida a toda la península</p>
+            <h3 className="font-bold text-white mb-2">Envío 3-7 días</h3>
+            <p className="text-sm text-zinc-400">Gratis en Villa María y zona</p>
           </div>
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-6">
             <Shield className="w-8 h-8 text-blue-400 mb-3" />
@@ -236,8 +262,8 @@ export default function PreguntasFrecuentesPage() {
           </div>
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-6">
             <MessageCircle className="w-8 h-8 text-violet-400 mb-3" />
-            <h3 className="font-bold text-white mb-2">Atención personalizada</h3>
-            <p className="text-sm text-zinc-400">Te ayudamos a elegir el colchón ideal</p>
+            <h3 className="font-bold text-white mb-2">12 cuotas sin interés</h3>
+            <p className="text-sm text-zinc-400">Todas las tarjetas - Mercado Pago</p>
           </div>
         </div>
       </div>
